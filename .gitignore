@@ -6,6 +6,7 @@ data/**
 *.parq
 *.pq
 .audit-deps/
+.ui-deps/
 
 # Contexto local dos agentes e documentos internos ficam fora dos commits.
 .claude/
@@ -35,6 +36,7 @@ __pycache__/
 *.key
 credentials*.json
 reports/runs/
+outputs/
 *.egg-info/
 build/
 dist/

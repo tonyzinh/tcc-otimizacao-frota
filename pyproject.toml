@@ -5,16 +5,19 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "tcc-frota"
 version = "0.1.0"
-description = "Experimento acadêmico sintético de alocação preventiva D+1"
-requires-python = ">=3.11"
+description = "Experimento acadêmico de frota e diagnóstico de disponibilidade D+1"
+requires-python = ">=3.12"
 dependencies = []
 
 [project.optional-dependencies]
 excel = ["openpyxl>=3.1"]
 test = ["pytest>=8"]
+parquet = ["pyarrow>=18"]
+ui = ["streamlit>=1.49,<2"]
 
 [project.scripts]
 tcc-frota = "tcc_frota.cli:main"
+tcc-frota-disponibilidade = "tcc_frota.availability.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
