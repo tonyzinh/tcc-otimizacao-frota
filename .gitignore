@@ -40,3 +40,5 @@ outputs/
 *.egg-info/
 build/
 dist/
+
+.databricks

@@ -1,6 +1,6 @@
 # Otimização da Alocação de Frota em Aplicativos de Transporte Urbano
 
-TCC sobre redução de KM morto por alocação preventiva D+1. O experimento sintético local permanece como validação de software e referência histórica. A etapa de **disponibilidade operacional** usa os nove CSVs autorizados atualmente presentes em `data/`; também aceita Parquets futuros. Ela já executa diagnóstico, linha do tempo conservadora e um baseline D+1 de candidatura, mas ainda não produz disponibilidade individual confirmada nem previsão de região.
+TCC sobre redução de KM morto por alocação preventiva D+1. O experimento sintético local permanece como validação de software e referência histórica. A etapa de **disponibilidade operacional** usa os nove CSVs autorizados atualmente presentes em `data/`; também aceita Parquets futuros. Ela executa diagnóstico, linha do tempo conservadora, baseline D+1 de candidatura e região proxy para veículos com Cobli recente e vínculo temporal único. Ainda não produz disponibilidade individual confirmada nem região futura validada.
 
 ## Disponibilidade operacional
 

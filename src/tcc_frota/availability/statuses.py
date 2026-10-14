@@ -26,7 +26,7 @@ def status_intervals(
     """Aceita apenas logs com relação e intervalo completos no próprio extrato."""
     aware(as_of)
     audit: Counter[str] = Counter()
-    groups: dict[str, set[tuple[str, datetime, datetime, OperationalState, str | None]]] = defaultdict(set)
+    groups: dict[str, set[tuple[str, datetime, datetime, OperationalState, str | None, str | None]]] = defaultdict(set)
     for row in rows:
         audit["input_rows"] += 1
         if row.get("qualidade_relacionamento") != "RELACIONADO" or row.get("qualidade_intervalo") != "COMPLETO":
@@ -54,7 +54,8 @@ def status_intervals(
             audit["end_after_as_of"] += 1
             continue
         driver = None if missing_value(row.get("CD_MOTORISTA")) else str(row["CD_MOTORISTA"]).strip()
-        value = (vehicle, start, end, state, driver)
+        plate = None if missing_value(row.get("placa")) else str(row["placa"]).strip().upper()
+        value = (vehicle, start, end, state, driver, plate)
         if value in groups[key]:
             audit["identical_versions"] += 1
         groups[key].add(value)
@@ -63,7 +64,7 @@ def status_intervals(
         if len(versions) != 1:
             audit["ambiguous_status_events"] += 1
             continue
-        vehicle, start, end, state, driver = next(iter(versions))
-        result.append(EvidenceInterval(vehicle, start, end, state, "eventos_status_motoristas", key, driver))
+        vehicle, start, end, state, driver, plate = next(iter(versions))
+        result.append(EvidenceInterval(vehicle, start, end, state, "eventos_status_motoristas", key, driver, plate))
     audit["accepted_status_events"] = len(result)
     return result, dict(audit)

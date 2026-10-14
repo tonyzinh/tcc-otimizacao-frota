@@ -40,6 +40,7 @@ class EvidenceInterval:
     source: str
     reference: str | None = None
     driver_id: str | None = None
+    plate: str | None = None
 
     def __post_init__(self) -> None:
         aware(self.start)

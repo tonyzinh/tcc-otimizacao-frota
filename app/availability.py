@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import json
+import sys
+from datetime import datetime
 from pathlib import Path
 
 import streamlit as st
@@ -9,6 +11,10 @@ import streamlit as st
 
 ROOT = Path(__file__).resolve().parents[1]
 RUNS = ROOT / "reports" / "runs"
+sys.path.insert(0, str(ROOT / "src"))
+
+from tcc_frota.availability.forecast import CandidateForecast
+from tcc_frota.availability.recommend import ServiceNeed, rank_experimental_candidates
 
 
 def read_jsonl(path: Path) -> list[dict[str, object]]:
@@ -59,8 +65,29 @@ if forecasts:
         "horas positivas": row["positive_observed_hours"],
         "horas negativas": row["negative_observed_hours"],
         "confiança": row.get("confidence_level", "NAO_REGISTRADA"),
+        "região proxy": row.get("region"),
+        "idade posição no corte (min)": row.get("location_age_minutes"),
+        "método localização": row.get("location_method"),
         "motivo": row["reason"],
     } for row in forecasts if row["vehicle_id"] == vehicle])
+    st.subheader("Candidatos experimentais para uma solicitação")
+    st.caption("Ranking de proxies históricos; não comprova disponibilidade ou posição amanhã e não autoriza despacho.")
+    regions = sorted({str(row["region"]) for row in forecasts if row.get("region")})
+    if regions:
+        region = st.selectbox("Região de origem (grade experimental)", regions)
+        times = sorted({str(row["target"]) for row in forecasts})
+        target = st.selectbox("Horário da solicitação", times)
+        values = [CandidateForecast(**{**row, "target": datetime.fromisoformat(str(row["target"]))}) for row in forecasts if row["target"] == target]
+        ranked = rank_experimental_candidates(ServiceNeed(datetime.fromisoformat(target), region), values)
+        st.write(f"{len(ranked)} candidatos com proxy suficiente nesta faixa e região.")
+        st.table([{
+            "veículo": item.vehicle_id,
+            "taxa histórica de candidatura": item.candidate_probability,
+            "idade posição no corte (min)": item.location_age_minutes,
+            "explicação": item.reason,
+        } for item in ranked[:20]])
+    else:
+        st.info("Nenhuma região pôde ser vinculada temporalmente à frota neste corte.")
 else:
     st.info("Execute forecast-candidates com --output reports/runs/forecast_candidates.jsonl para explorar o baseline D+1.")
 

@@ -28,6 +28,42 @@ class RankedVehicle:
     reason: str
 
 
+@dataclass(frozen=True)
+class ExperimentalCandidate:
+    vehicle_id: str
+    at: datetime
+    region_proxy: str
+    candidate_probability: float
+    location_age_minutes: float
+    reason: str
+
+
+def rank_experimental_candidates(
+    need: ServiceNeed,
+    forecasts: Iterable[CandidateForecast],
+    *,
+    min_candidate_probability: float = 0.5,
+    max_position_age_minutes: float = 120,
+) -> list[ExperimentalCandidate]:
+    """Ordena proxies para análise; não autoriza despacho nem afirma disponibilidade."""
+    if not 0 <= min_candidate_probability <= 1 or max_position_age_minutes <= 0:
+        raise ValueError("parâmetros experimentais inválidos")
+    result: list[ExperimentalCandidate] = []
+    for item in forecasts:
+        if (
+            item.target != need.at or item.region != need.origin_region
+            or item.candidate_probability is None or item.candidate_probability < min_candidate_probability
+            or item.location_age_minutes is None or item.location_age_minutes > max_position_age_minutes
+        ):
+            continue
+        result.append(ExperimentalCandidate(
+            item.vehicle_id, item.target, item.region, item.candidate_probability,
+            item.location_age_minutes,
+            "Online histórico sem ocupação conhecida + região Cobli inferida; disponibilidade futura não confirmada",
+        ))
+    return sorted(result, key=lambda item: (-item.candidate_probability, item.location_age_minutes, item.vehicle_id))
+
+
 def rank_vehicles(
     need: ServiceNeed,
     forecasts: Iterable[CandidateForecast],

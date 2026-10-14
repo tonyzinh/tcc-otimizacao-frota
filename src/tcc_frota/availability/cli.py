@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
 
@@ -12,6 +12,7 @@ from tcc_frota.availability.diagnostics import diagnose_source, timestamp
 from tcc_frota.availability.evaluation import evaluate_candidate_proxy
 from tcc_frota.availability.forecast import HistoricalCandidateBaseline
 from tcc_frota.availability.io import iter_rows
+from tcc_frota.availability.location import last_vehicle_positions
 from tcc_frota.availability.rides import ride_intervals
 from tcc_frota.availability.relationships import relationship_coverage
 from tcc_frota.availability.statuses import status_intervals
@@ -24,7 +25,10 @@ RIDE_COLUMNS = (
 )
 STATUS_COLUMNS = (
     "CD_LOG_STATUS_MOTORISTA", "CD_MOTORISTA", "CD_VEICULO", "TX_STATUS",
-    "inicio_evento", "fim_evento", "qualidade_intervalo", "qualidade_relacionamento",
+    "inicio_evento", "fim_evento", "qualidade_intervalo", "qualidade_relacionamento", "placa",
+)
+COBLI_POSITION_COLUMNS = (
+    "placa", "TYPE", "END_ADDRESS_DATETIME", "END_ADDRESS_LATITUDE", "END_ADDRESS_LONGITUDE",
 )
 
 
@@ -76,6 +80,7 @@ def main(argv: list[str] | None = None) -> int:
     predict.add_argument("--target-date", required=True, type=_date)
     predict.add_argument("--lookback-days", type=int, default=56)
     predict.add_argument("--min-observed-hours", type=float, default=3.0)
+    predict.add_argument("--max-position-age-minutes", type=float, default=120.0)
     predict.add_argument("--output", type=Path, help="previsões individuais, apenas em reports/runs/")
     predict.add_argument("--evaluation-as-of", help="audita o alvo depois do dia; usado somente no backtest")
     args = parser.parse_args(argv)
@@ -120,6 +125,7 @@ def main(argv: list[str] | None = None) -> int:
     evidence, ride_audit = ride_intervals(_rows(rides, RIDE_COLUMNS), timezone=args.timezone, as_of=as_of)
     status_paths = locate_source(args.data_root, "eventos_status_motoristas")
     status_audit: dict[str, int] = {}
+    status_evidence = []
     if status_paths:
         status_evidence, status_audit = status_intervals(_rows(status_paths, STATUS_COLUMNS), timezone=args.timezone, as_of=as_of)
         evidence.extend(status_evidence)
@@ -132,6 +138,21 @@ def main(argv: list[str] | None = None) -> int:
             model.predict(vehicle, midnight + timedelta(hours=hour), min_observed_hours=args.min_observed_hours)
             for vehicle in sorted(vehicles) for hour in range(24)
         ]
+        location_audit: dict[str, int] = {}
+        cobli_paths = locate_source(args.data_root, "cobli_eventos")
+        if cobli_paths and status_evidence:
+            positions, location_audit = last_vehicle_positions(
+                _rows(cobli_paths, COBLI_POSITION_COLUMNS), status_evidence,
+                timezone=args.timezone, cutoff=cutoff,
+                max_age_minutes=args.max_position_age_minutes,
+            )
+            predictions = [
+                replace(item, region=positions[item.vehicle_id].region,
+                        location_age_minutes=positions[item.vehicle_id].age_minutes_at_cutoff,
+                        location_method=positions[item.vehicle_id].method)
+                if item.vehicle_id in positions else item
+                for item in predictions
+            ]
         available = sum(item.candidate_probability is not None for item in predictions)
         evaluation = None
         if args.evaluation_as_of:
@@ -161,7 +182,9 @@ def main(argv: list[str] | None = None) -> int:
             "vehicle_hour_slots": len(predictions),
             "candidate_probability_estimated_slots": available,
             "availability_probability_estimated_slots": 0,
-            "region_predictions": 0,
+            "vehicle_hour_slots_with_region_proxy": sum(item.region is not None for item in predictions),
+            "candidate_slots_with_region_proxy": sum(item.region is not None and item.candidate_probability is not None for item in predictions),
+            "location_audit": location_audit,
             "ride_audit": ride_audit,
             "status_audit": status_audit,
             "backtest": evaluation,

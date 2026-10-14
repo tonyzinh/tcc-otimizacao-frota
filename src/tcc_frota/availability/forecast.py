@@ -31,6 +31,8 @@ class CandidateForecast:
     availability_validated: bool = False
     region_validated: bool = False
     confidence_level: str = "NAO_CALIBRADA"
+    location_age_minutes: float | None = None
+    location_method: str | None = None
 
 
 class HistoricalCandidateBaseline:
