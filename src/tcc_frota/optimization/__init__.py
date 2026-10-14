@@ -1,0 +1,1 @@
+"""Planejamento preventivo guloso."""
