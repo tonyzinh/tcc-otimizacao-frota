@@ -1,6 +1,10 @@
 # Otimização da Alocação de Frota em Aplicativos de Transporte Urbano
 
-TCC sobre redução de KM morto por alocação preventiva D+1. O experimento sintético local permanece como validação de software e referência histórica. A entrada escolhida para a próxima etapa é o Parquet autorizado `data/app_solicitacao_hist.parquet`; os notebooks Databricks atuais fazem apenas perfil e auditoria agregada desse arquivo. Não houve execução no workspace nem validação com frota real.
+TCC sobre redução de KM morto por alocação preventiva D+1. O experimento sintético local permanece como validação de software e referência histórica. A etapa de **disponibilidade operacional** usa os nove CSVs autorizados atualmente presentes em `data/`; também aceita Parquets futuros. Ela já executa diagnóstico, linha do tempo conservadora e um baseline D+1 de candidatura, mas ainda não produz disponibilidade individual confirmada nem previsão de região.
+
+## Disponibilidade operacional
+
+Consulte [arquitetura, regras e execução](docs/disponibilidade.md) e [dicionário de entrada](docs/disponibilidade_dicionario.md). Os comandos locais `tcc-frota-disponibilidade audit`, `relationships`, `reconstruct` e `forecast-candidates` são descritos no guia. `Online` indica aptidão para receber corrida; uma corrida ou indisponibilidade ativa prevalece. Resultados sem evidência suficiente ficam `DESCONHECIDO`. O corte D+1 é parâmetro explícito; 20h local é hipótese experimental inicial.
 
 ## Execução local
 
@@ -31,4 +35,4 @@ Sem instalação editável, configure `PYTHONPATH=src` e use `python -m tcc_frot
 
 O levantamento de regras operacionais, as decisões internas e o estado detalhado do projeto são mantidos localmente e ficam fora do Git. Eles precisam ser obtidos por canal autorizado antes de interpretar os dados da empresa ou alterar hipóteses operacionais.
 
-O Parquet real em `data/` e outros extratos locais estão fora do Git. O usuário informou autorização para usar o Parquet no Databricks Free Edition; confira o escopo dessa autorização e transfira o arquivo ao Volume pelo procedimento institucional. A auditoria local pela CLI exige `TCC_REAL_DATA_AUTHORIZED=YES`. Os notebooks Parquet exigem confirmação explícita pelo widget `real_data_authorized`; nenhum faz upload. Consulte [segurança](docs/seguranca_dados.md).
+Os CSVs reais em `data/` e os resultados individuais em `reports/runs/` estão fora do Git. O usuário autorizou o processamento local dos CSVs; nenhum comando de disponibilidade faz upload. Os notebooks Databricks permanecem específicos para Parquet em Volume e **não executam** estes CSVs. Consulte [segurança](docs/seguranca_dados.md).

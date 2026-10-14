@@ -1,7 +1,7 @@
 # Limitações e ameaças à validade
 
 1. **Constructo de KM morto:** a definição corporativa e as parcelas do KPI seguem pendentes (DT003/RN010). Haversine é linha reta, não odômetro ou rota viária.
-2. **Dados:** só houve execução sintética. Os CSVs reais locais não foram auditados além de cabeçalhos; criação do pedido, fuso, cobertura, dedup, GPS histórico e jornada permanecem sem confirmação.
+2. **Dados:** o experimento de KM morto continua apenas sintético. Nove CSVs reais foram auditados em agregados para a frente de disponibilidade; criação do pedido, semântica original do fuso, vínculo temporal de placa, Cobli e jornada permanecem sem confirmação. Essa auditoria não valida o experimento de KM morto.
 3. **Baseline:** despacho mais próximo sem reposicionamento é uma simplificação, não política observada da empresa.
 4. **Disponibilidade:** intervalos sintéticos e compromissos são conhecidos por construção; vínculos motorista–jornada, pausas e posição real não foram reconstruídos.
 5. **Contrafactual:** demanda, comportamento humano, tráfego e adesão real não respondem à intervenção. O replay não demonstra economia financeira nem implantação.
