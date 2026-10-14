@@ -2,6 +2,10 @@
 data/**
 !data/synthetic/
 !data/synthetic/README.md
+*.parquet
+*.parq
+*.pq
+.audit-deps/
 
 # Contexto local dos agentes e documentos internos ficam fora dos commits.
 .claude/
@@ -19,6 +23,8 @@ docs/validacao_regras.md
 __pycache__/
 .pytest_cache/
 .pytest-tmp/
+.pytest-cache*/
+.pytest-tmp*/
 .venv/
 .env
 .env.*
