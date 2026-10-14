@@ -1,6 +1,6 @@
 # Otimização da Alocação de Frota em Aplicativos de Transporte Urbano
 
-TCC sobre redução de KM morto por alocação preventiva D+1. Há um **MVP sintético local** com ingestão, previsão, algoritmo guloso, simulação retrospectiva, testes e relatórios. Notebooks PySpark/Delta foram preparados, mas ainda não foram executados no Databricks.
+TCC sobre redução de KM morto por alocação preventiva D+1. O experimento sintético local permanece como validação de software e referência histórica. A entrada escolhida para a próxima etapa é o Parquet autorizado `data/app_solicitacao_hist.parquet`; os notebooks Databricks atuais fazem apenas perfil e auditoria agregada desse arquivo. Não houve execução no workspace nem validação com frota real.
 
 ## Execução local
 
@@ -19,7 +19,7 @@ Sem instalação editável, configure `PYTHONPATH=src` e use `python -m tcc_frot
 
 - `src/tcc_frota/`: núcleo local, gerador, ingestão, qualidade, demanda, otimização, simulação e avaliação.
 - `tests/`: testes unitários e integração sintética.
-- `databricks/`: sete notebooks e SQL para Unity Catalog/Delta; consulte o [guia](docs/execucao_databricks.md).
+- `databricks/notebooks/`: perfil de esquema e auditoria agregada do Parquet autorizado; consulte o [guia](docs/execucao_databricks.md).
 - `config/`: parâmetros e contratos do cenário experimental.
 - `reports/examples/`: [JSON](reports/examples/synthetic_run.json) e [gráfico SVG](reports/examples/synthetic_comparison.svg) gerados localmente.
 
@@ -31,4 +31,4 @@ Sem instalação editável, configure `PYTHONPATH=src` e use `python -m tcc_frot
 
 O levantamento de regras operacionais, as decisões internas e o estado detalhado do projeto são mantidos localmente e ficam fora do Git. Eles precisam ser obtidos por canal autorizado antes de interpretar os dados da empresa ou alterar hipóteses operacionais.
 
-Os CSVs reais em `data/` são extratos locais não versionados e ainda não auditados. Não os publique nem os envie a serviços externos sem autorização. A auditoria local de dados reais exige autorização formal e `TCC_REAL_DATA_AUTHORIZED=YES`; os notebooks aceitam apenas sintéticos. Consulte [segurança](docs/seguranca_dados.md) antes de usar dados reais.
+O Parquet real em `data/` e outros extratos locais estão fora do Git. O usuário informou autorização para usar o Parquet no Databricks Free Edition; confira o escopo dessa autorização e transfira o arquivo ao Volume pelo procedimento institucional. A auditoria local pela CLI exige `TCC_REAL_DATA_AUTHORIZED=YES`. Os notebooks Parquet exigem confirmação explícita pelo widget `real_data_authorized`; nenhum faz upload. Consulte [segurança](docs/seguranca_dados.md).
