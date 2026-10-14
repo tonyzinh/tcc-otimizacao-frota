@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tcc-frota"
+version = "0.1.0"
+description = "Experimento acadêmico sintético de alocação preventiva D+1"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+excel = ["openpyxl>=3.1"]
+test = ["pytest>=8"]
+
+[project.scripts]
+tcc-frota = "tcc_frota.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q --basetemp=.pytest-tmp"

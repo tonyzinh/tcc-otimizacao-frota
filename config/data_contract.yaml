@@ -1,0 +1,8 @@
+dataset_kind: synthetic
+timestamps: timezone_aware_utc
+distance_input_unit: meters_for_documented_source_fields
+request_id: CD_SOLICITACAO
+request_creation: explicit_verified_source_required
+final_status: latest_status_event_with_tie_audit
+coordinates: decimal_degrees
+real_data_default: disabled

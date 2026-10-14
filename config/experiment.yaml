@@ -1,0 +1,12 @@
+dataset: synthetic
+seed: 20261014
+planning_hour_local: 7
+simulation_hour_start: 8
+simulation_hour_end: 10
+vehicle_capacity_per_slot: 2
+speed_kmh: 30
+max_pickup_minutes: 18
+max_reposition_km: 12
+minimum_coverage_experimental: 0.75
+distance_method: haversine_estimated
+baseline: no_preventive_repositioning

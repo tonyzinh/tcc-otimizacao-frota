@@ -1,0 +1,34 @@
+# Dados locais: não versionar extratos, amostras ou saídas com registros.
+data/**
+!data/synthetic/
+!data/synthetic/README.md
+
+# Contexto local dos agentes e documentos internos ficam fora dos commits.
+.claude/
+.codex/
+AGENTS.md
+CLAUDE.md
+docs/REGRAS_NEGOCIO_TCC.md
+docs/CONTEXTO_PROJETO.md
+docs/ESTADO_PROJETO.md
+docs/DECISOES_TECNICAS.md
+docs/PLANO_IMPLEMENTACAO.md
+docs/dicionario_dados.md
+docs/validacao_regras.md
+.uv-cache/
+__pycache__/
+.pytest_cache/
+.pytest-tmp/
+.venv/
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.pfx
+*.key
+credentials*.json
+reports/runs/
+*.egg-info/
+build/
+dist/

@@ -1,0 +1,7 @@
+dataset_kind: synthetic
+catalog: workspace
+schema: tcc_frota_synthetic
+volume: inputs
+allow_real_data: false
+external_upload: false
+note: Verify catalog and permissions in your own Free Edition workspace before running setup.
