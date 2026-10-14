@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="650" height="220" viewBox="0 0 650 220" role="img" aria-label="Comparação sintética de KM vazio geodésico estimado">
+<rect width="650" height="220" fill="white"/><text x="20" y="28" font-family="sans-serif" font-size="17">KM vazio estimado — cenário sintético</text>
+<text x="20" y="74" font-family="sans-serif" font-size="13">Baseline</text><rect x="165" y="55" width="420.0" height="28" fill="#356899"/><text x="595.0" y="74" font-family="sans-serif" font-size="13">14.76 km</text>
+<text x="20" y="124" font-family="sans-serif" font-size="13">Preventivo</text><rect x="165" y="105" width="420.0" height="28" fill="#2b8668"/><text x="595.0" y="124" font-family="sans-serif" font-size="13">14.76 km</text>
+<text x="20" y="177" font-family="sans-serif" font-size="12">Inclui pickup e reposicionamento; Haversine não é rodagem observada.</text>
+<text x="20" y="198" font-family="sans-serif" font-size="12">Cobertura: 100.0% → 100.0%. Sem inferência operacional.</text></svg>

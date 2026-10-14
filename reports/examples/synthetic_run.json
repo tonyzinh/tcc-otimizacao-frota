@@ -1,0 +1,340 @@
+{
+  "baseline": {
+    "baseline_type": "simplified_no_repositioning",
+    "coverage": 1.0,
+    "dataset_kind": "synthetic",
+    "distance_components": {
+      "pickup": "estimated_from_positions",
+      "reposition": "estimated_from_positions",
+      "return": "not_measured"
+    },
+    "distance_method": "haversine_estimated",
+    "distance_source": "synthetic_positions",
+    "distance_unit": "km",
+    "estimated_km_dead_per_served": 1.4757861056850703,
+    "estimated_km_dead_total": 14.757861,
+    "estimated_pickup_km": 14.757861,
+    "estimated_reposition_km": 0.0,
+    "excluded": {},
+    "mean_estimated_wait_minutes": 2.9515722113701406,
+    "observed_km": null,
+    "requests": 10,
+    "return_km": null,
+    "scenario": "baseline_simplified",
+    "served": 10,
+    "vehicles_used": 4
+  },
+  "comparable_inputs": true,
+  "coverage_constraint_met": true,
+  "cutoff": "2026-10-14T20:00:00+00:00",
+  "estimated_km_reduction_percent": 0.0,
+  "fleet_size": 5,
+  "forecast_absolute_error_by_zone": {
+    "centro": 0.0,
+    "leste": 0.0,
+    "norte": 0.0
+  },
+  "forecast_expected_by_zone": {
+    "centro": 1.0,
+    "leste": 3.0,
+    "norte": 1.0
+  },
+  "forecast_hour": 8,
+  "gates": {
+    "A_data_synthetic": true,
+    "A_to_F_real": false,
+    "B_metric_synthetic": true,
+    "C_availability_synthetic": true,
+    "D_baseline_synthetic": true,
+    "E_comparability_synthetic": true,
+    "F_reproducibility_synthetic": true
+  },
+  "interpretation": "contrafactual sintético; distância geodésica estimada; sem economia real observada",
+  "multiple_periods": {
+    "baseline_estimated_km_total": 44.273583,
+    "baseline_served_total": 30,
+    "estimated_km_reduction_percent": 0.0,
+    "periods": [
+      {
+        "baseline_estimated_km": 14.757861,
+        "baseline_served": 10,
+        "comparable_inputs": true,
+        "date": "2026-10-15",
+        "proposed_estimated_km": 14.757861,
+        "proposed_served": 10,
+        "run_id": "d8a9b4d0f2e7",
+        "seed": 20261014
+      },
+      {
+        "baseline_estimated_km": 14.757861,
+        "baseline_served": 10,
+        "comparable_inputs": true,
+        "date": "2026-10-16",
+        "proposed_estimated_km": 14.757861,
+        "proposed_served": 10,
+        "run_id": "e2181bf3672f",
+        "seed": 20261015
+      },
+      {
+        "baseline_estimated_km": 14.757861,
+        "baseline_served": 10,
+        "comparable_inputs": true,
+        "date": "2026-10-17",
+        "proposed_estimated_km": 14.757861,
+        "proposed_served": 10,
+        "run_id": "44ac67b64e39",
+        "seed": 20261016
+      }
+    ],
+    "proposed_estimated_km_total": 44.273583,
+    "proposed_served_total": 30
+  },
+  "plan": {
+    "adherence_hypothetical": 1.0,
+    "applied_recommendation_count": 1,
+    "estimated_reposition_km": 3.426531,
+    "objective": "estimated_pickup_km + estimated_reposition_km; coverage constrained",
+    "projected_coverage": 1.0,
+    "projected_pickup_km": 7.904798,
+    "recommendation_count": 1,
+    "recommendations_aggregated": [
+      {
+        "count": 1,
+        "estimated_km": 3.426531,
+        "from_zone": "centro",
+        "to_zone": "leste"
+      }
+    ]
+  },
+  "proposed": {
+    "baseline_type": "simplified_no_repositioning",
+    "coverage": 1.0,
+    "dataset_kind": "synthetic",
+    "distance_components": {
+      "pickup": "estimated_from_positions",
+      "reposition": "estimated_from_positions",
+      "return": "not_measured"
+    },
+    "distance_method": "haversine_estimated",
+    "distance_source": "synthetic_positions",
+    "distance_unit": "km",
+    "estimated_km_dead_per_served": 1.4757861056850703,
+    "estimated_km_dead_total": 14.757861,
+    "estimated_pickup_km": 11.33133,
+    "estimated_reposition_km": 3.426531,
+    "excluded": {},
+    "mean_estimated_wait_minutes": 2.266265930413618,
+    "observed_km": null,
+    "requests": 10,
+    "return_km": null,
+    "scenario": "preventive_greedy",
+    "served": 10,
+    "vehicles_used": 4
+  },
+  "run_id": "d8a9b4d0f2e7",
+  "seed": 20261014,
+  "sensitivity": [
+    {
+      "actual_simulated_coverage": 0.8,
+      "baseline_pickup_km": 7.904798,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "fleet_size",
+      "proposed_pickup_km": 4.478267,
+      "proposed_reposition_km": 3.426531,
+      "value": 3
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 14.757861,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "fleet_size",
+      "proposed_pickup_km": 11.33133,
+      "proposed_reposition_km": 3.426531,
+      "value": 5
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 14.757861,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "fleet_size",
+      "proposed_pickup_km": 11.33133,
+      "proposed_reposition_km": 3.426531,
+      "value": 7
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 14.757861,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "minimum_coverage",
+      "proposed_pickup_km": 11.33133,
+      "proposed_reposition_km": 3.426531,
+      "value": 0.5
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 14.757861,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "minimum_coverage",
+      "proposed_pickup_km": 11.33133,
+      "proposed_reposition_km": 3.426531,
+      "value": 0.75
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 14.757861,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "minimum_coverage",
+      "proposed_pickup_km": 11.33133,
+      "proposed_reposition_km": 3.426531,
+      "value": 1.0
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 14.757861,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "leste_train_count",
+      "proposed_pickup_km": 14.757861,
+      "proposed_reposition_km": 0.0,
+      "value": 1
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 14.757861,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "leste_train_count",
+      "proposed_pickup_km": 11.33133,
+      "proposed_reposition_km": 3.426531,
+      "value": 3
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 14.757861,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "leste_train_count",
+      "proposed_pickup_km": 7.904798,
+      "proposed_reposition_km": 6.853063,
+      "value": 4
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 7.904798,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "leste_eval_count",
+      "proposed_pickup_km": 4.478267,
+      "proposed_reposition_km": 3.426531,
+      "value": 1
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 14.757861,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "leste_eval_count",
+      "proposed_pickup_km": 11.33133,
+      "proposed_reposition_km": 3.426531,
+      "value": 3
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 21.610924,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "leste_eval_count",
+      "proposed_pickup_km": 18.184392,
+      "proposed_reposition_km": 3.426531,
+      "value": 4
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 14.757861,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "initial_distribution",
+      "proposed_pickup_km": 11.33133,
+      "proposed_reposition_km": 3.426531,
+      "value": "center"
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 3.426531,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "initial_distribution",
+      "proposed_pickup_km": 3.426531,
+      "proposed_reposition_km": 0.0,
+      "value": "spread"
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 14.757861,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "max_reposition_km",
+      "proposed_pickup_km": 14.757861,
+      "proposed_reposition_km": 0.0,
+      "value": 0
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 14.757861,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "max_reposition_km",
+      "proposed_pickup_km": 11.33133,
+      "proposed_reposition_km": 3.426531,
+      "value": 5
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 14.757861,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "max_reposition_km",
+      "proposed_pickup_km": 11.33133,
+      "proposed_reposition_km": 3.426531,
+      "value": 12
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 14.757861,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "adherence",
+      "proposed_pickup_km": 14.757861,
+      "proposed_reposition_km": 0.0,
+      "value": 0.0
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 14.757861,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "adherence",
+      "proposed_pickup_km": 14.757861,
+      "proposed_reposition_km": 0.0,
+      "value": 0.5
+    },
+    {
+      "actual_simulated_coverage": 1.0,
+      "baseline_pickup_km": 14.757861,
+      "coverage_constraint_met": true,
+      "estimated_km_reduction_percent": 0.0,
+      "factor": "adherence",
+      "proposed_pickup_km": 11.33133,
+      "proposed_reposition_km": 3.426531,
+      "value": 1.0
+    }
+  ],
+  "target_date": "2026-10-15",
+  "training_days": 4
+}
