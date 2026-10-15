@@ -8,7 +8,7 @@ Consulte [arquitetura, regras e execução](docs/disponibilidade.md) e [dicioná
 
 ## Experimento D+1 com dados reais
 
-A Gold do Databricks alimenta o núcleo Python (`tcc-frota gold-export` e `tcc-frota gold-replay`). Em setembro/2026, nenhuma configuração do plano preventivo reduziu o KM vazio estimado em relação ao baseline sem reposicionamento. Veja o [experimento real](docs/experimento_real.md).
+A Gold do Databricks alimenta o núcleo Python (`tcc-frota gold-export` e `tcc-frota gold-replay`). Em setembro/2026, nenhuma configuração do plano preventivo reduziu o KM vazio estimado em relação ao baseline sem reposicionamento. Veja o [experimento real](docs/experimento_real.md) e a [comparação de algoritmos](docs/comparacao_algoritmos.md). Para visualizar o plano no mapa: `streamlit run app/plano_d1.py --server.address 127.0.0.1` (extra `ui`).
 
 ## Execução local
 

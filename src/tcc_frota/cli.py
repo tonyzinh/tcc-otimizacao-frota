@@ -77,6 +77,10 @@ def main(argv: list[str] | None = None) -> int:
     gold_replay.add_argument("--min-presence-rate", type=float, default=0.5)
     gold_replay.add_argument("--max-reposition-km", type=float, default=12.0)
     gold_replay.add_argument("--execution-tolerance-minutes", type=float, default=30.0)
+    gold_replay.add_argument("--algorithm", default="guloso",
+                             choices=("guloso", "proporcional", "atribuicao_otima", "busca_local", "guloso_simulado"))
+    gold_replay.add_argument("--details", action="store_true",
+                             help="grava o detalhe de cada dia (mapa) em days/, ignorado pelo Git")
     gold_replay.add_argument("--oracle-fleet", action="store_true",
                              help="diagnóstico com frota real de D+1; viola o corte e não é resultado D+1")
     gold_replay.add_argument("--out", type=Path, default=Path("reports/runs/gold_replay"))
@@ -153,10 +157,18 @@ def main(argv: list[str] | None = None) -> int:
             plan_hour=args.plan_hour, horizon_hours=args.horizon_hours, lookback_days=args.lookback_days,
             min_presence_rate=args.min_presence_rate, max_reposition_km=args.max_reposition_km,
             execution_tolerance_minutes=args.execution_tolerance_minutes, oracle_fleet=args.oracle_fleet,
+            algorithm=args.algorithm,
         )
-        result = run_period(str(args.cache), args.start, args.end, config, workers=args.workers)
+        result = run_period(str(args.cache), args.start, args.end, config, workers=args.workers,
+                            details=args.details)
         out = args.out / result["run_id"]
         out.mkdir(parents=True, exist_ok=True)
+        for day in result["days"]:
+            detail = day.pop("details", None)
+            if detail is not None:
+                (out / "days").mkdir(exist_ok=True)
+                (out / "days" / f"{day['target_date']}.json").write_text(
+                    json.dumps(detail, ensure_ascii=False) + "\n", encoding="utf-8")
         (out / "result.json").write_text(json.dumps(result, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
                                          encoding="utf-8")
         print(json.dumps({"run_id": result["run_id"], "config": asdict(config), "totals": result["totals"],

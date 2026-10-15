@@ -84,4 +84,4 @@ Universo do padrão: 2.047 corridas atendidas com origem confiável na janela 07
 
 ### Próximos passos possíveis (dentro do escopo)
 
-Discutir com a orientação: (a) usar no guloso um objetivo avaliado por simulação em vez da aproximação por capacidade; (b) recomendar apenas contagens por zona e faixa (§12 da matriz); (c) repetir em outros meses e janelas; (d) validar DT003 e o enum de estados com a empresa.
+A comparação com outros algoritmos está em [comparacao_algoritmos.md](comparacao_algoritmos.md). Discutir com a orientação: (a) usar no guloso um objetivo avaliado por simulação em vez da aproximação por capacidade; (b) recomendar apenas contagens por zona e faixa (§12 da matriz); (c) repetir em outros meses e janelas; (d) validar DT003 e o enum de estados com a empresa.
