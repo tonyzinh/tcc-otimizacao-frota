@@ -23,6 +23,7 @@ Sem instalação editável, configure `PYTHONPATH=src` e use `python -m tcc_frot
 
 - `src/tcc_frota/`: núcleo local, gerador, ingestão, qualidade, demanda, otimização, simulação e avaliação.
 - `tests/`: testes unitários e integração sintética.
+- `databricks/catalog/`: notebooks Bronze, Silver e Gold dos extratos Elasticsearch no workspace; `databricks/setup/executar_notebooks.py` executa Silver/Gold via Databricks Connect. Consulte o [medalhão](docs/databricks_medalhao.md).
 - `databricks/notebooks/`: perfil de esquema e auditoria agregada do Parquet autorizado; consulte o [guia](docs/execucao_databricks.md).
 - `config/`: parâmetros e contratos do cenário experimental.
 - `reports/examples/`: [JSON](reports/examples/synthetic_run.json) e [gráfico SVG](reports/examples/synthetic_comparison.svg) gerados localmente.

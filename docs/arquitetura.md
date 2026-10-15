@@ -1,5 +1,7 @@
 # Arquitetura implementada
 
+**Databricks (14/10/2026):** os extratos Elasticsearch passam por Bronze, Silver e Gold no workspace, executados e conferidos; a Gold é a entrada preparada para o núcleo Python, que mantém previsão, guloso e replay. Veja [databricks_medalhao.md](databricks_medalhao.md).
+
 O pacote `src/tcc_frota/` contém o núcleo Python independente de Databricks. `databricks/notebooks/` contém apenas perfil e auditoria agregada do Parquet autorizado em PySpark. O adaptador Elasticsearch local acrescenta Bronze por referência ao JSONL original, Silver documental/tipada e Gold temporal/agregado, documentados em [elasticsearch_local.md](elasticsearch_local.md). A demanda Gold depende de criação validada; o plano e a simulação reais continuam bloqueados. A matriz de regras e o registro de decisões são mantidos localmente, fora do Git; consulte essas fontes autorizadas antes de adaptar o experimento a dados reais.
 
 A frente local de disponibilidade lê os nove CSVs atualmente presentes, com contratos para futuros Parquets, e reconstrói corridas/status em `src/tcc_frota/availability/`. Consulte [disponibilidade.md](disponibilidade.md). Ela ainda não alimenta a alocação gulosa porque não há probabilidade de disponibilidade e região validadas.

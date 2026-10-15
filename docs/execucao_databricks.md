@@ -1,5 +1,7 @@
 # Execução com Parquet autorizado no Databricks
 
+> **Atualização de 14/10/2026:** o fluxo principal no Databricks agora é o medalhão dos extratos Elasticsearch (Bronze → Silver → Gold), executado no workspace. Consulte [databricks_medalhao.md](databricks_medalhao.md). O conteúdo abaixo descreve a etapa anterior de perfil do Parquet.
+
 **Atualização:** a etapa de disponibilidade utiliza atualmente nove CSVs locais; o Parquet anterior não está mais em `data/`. Os notebooks desta página continuam preparados somente para Parquet em Volume; não convertem nem processam os CSVs. Para a execução local autorizada, consulte [disponibilidade.md](disponibilidade.md).
 
 **Estado:** os notebooks `00_perfil_parquet.py` e `01_auditoria.py` leem e auditam o Parquet em um Unity Catalog Volume. Ainda não há pipeline real Bronze/Silver/Gold, previsão, alocação ou simulação. Os antigos notebooks sintéticos foram retirados da sequência Databricks. Nenhum notebook desta versão foi executado em um workspace.
