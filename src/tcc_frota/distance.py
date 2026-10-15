@@ -84,3 +84,18 @@ def estimated_meters(meters: float | str | None, field: str) -> DistanceMeasurem
     if value < 0:
         raise ValueError("distância negativa")
     return DistanceMeasurement(value / 1000.0, "source_estimate_meters", field, False)
+
+
+class CachedDistance:
+    """Memoriza um estimador determinístico; mesmo nome e mesmos valores do original."""
+
+    def __init__(self, base: PositionDistance):
+        self.base = base
+        self.name = base.name
+        self._cache: dict[tuple[Position, Position], DistanceMeasurement] = {}
+
+    def measure(self, a: Position, b: Position) -> DistanceMeasurement:
+        key = (a, b)
+        if key not in self._cache:
+            self._cache[key] = self.base.measure(a, b)
+        return self._cache[key]

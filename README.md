@@ -6,6 +6,10 @@ TCC sobre redução de KM morto por alocação preventiva D+1. O experimento sin
 
 Consulte [arquitetura, regras e execução](docs/disponibilidade.md) e [dicionário de entrada](docs/disponibilidade_dicionario.md). Os comandos locais `tcc-frota-disponibilidade audit`, `relationships`, `reconstruct` e `forecast-candidates` são descritos no guia. `Online` indica aptidão para receber corrida; uma corrida ou indisponibilidade ativa prevalece. Resultados sem evidência suficiente ficam `DESCONHECIDO`. O corte D+1 é parâmetro explícito; 20h local é hipótese experimental inicial.
 
+## Experimento D+1 com dados reais
+
+A Gold do Databricks alimenta o núcleo Python (`tcc-frota gold-export` e `tcc-frota gold-replay`). Em setembro/2026, nenhuma configuração do plano preventivo reduziu o KM vazio estimado em relação ao baseline sem reposicionamento. Veja o [experimento real](docs/experimento_real.md).
+
 ## Execução local
 
 Requer Python 3.11+ e pytest. Na raiz do repositório:

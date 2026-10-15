@@ -4,15 +4,15 @@ from __future__ import annotations
 from tcc_frota.models import ScenarioResult
 
 
-def summarize(result: ScenarioResult) -> dict[str, object]:
+def summarize(result: ScenarioResult, *, dataset_kind: str = "synthetic") -> dict[str, object]:
     return {
         "scenario": result.name,
-        "dataset_kind": "synthetic",
+        "dataset_kind": dataset_kind,
         "baseline_type": result.baseline_type,
         "distance_method": result.distance_method,
         "observed_km": None,
         "distance_unit": "km",
-        "distance_source": "synthetic_positions",
+        "distance_source": "synthetic_positions" if dataset_kind == "synthetic" else "gps_positions_gold",
         "distance_components": {
             "pickup": "estimated_from_positions",
             "reposition": "estimated_from_positions",
@@ -32,7 +32,10 @@ def summarize(result: ScenarioResult) -> dict[str, object]:
     }
 
 
-def compare(baseline: ScenarioResult, proposed: ScenarioResult, *, minimum_coverage: float | None = None) -> dict[str, object]:
+def compare(
+    baseline: ScenarioResult, proposed: ScenarioResult, *, minimum_coverage: float | None = None,
+    dataset_kind: str = "synthetic",
+) -> dict[str, object]:
     if baseline.input_signature != proposed.input_signature or not baseline.input_signature:
         raise ValueError("condições iniciais ou restrições diferentes")
     if baseline.request_ids != proposed.request_ids or baseline.vehicle_ids != proposed.vehicle_ids:
@@ -41,7 +44,7 @@ def compare(baseline: ScenarioResult, proposed: ScenarioResult, *, minimum_cover
         raise ValueError("estimadores de distância diferentes")
     if minimum_coverage is not None and not 0 <= minimum_coverage <= 1:
         raise ValueError("cobertura mínima inválida")
-    b, p = summarize(baseline), summarize(proposed)
+    b, p = summarize(baseline, dataset_kind=dataset_kind), summarize(proposed, dataset_kind=dataset_kind)
     coverage_ok = (
         p["coverage"] is not None
         and b["coverage"] is not None
@@ -57,5 +60,9 @@ def compare(baseline: ScenarioResult, proposed: ScenarioResult, *, minimum_cover
         "estimated_km_reduction_percent": round(reduction, 6) if reduction is not None else None,
         "coverage_constraint_met": coverage_ok,
         "comparable_inputs": True,
-        "interpretation": "contrafactual sintético; distância geodésica estimada; sem economia real observada",
+        "interpretation": (
+            "contrafactual sintético; distância geodésica estimada; sem economia real observada"
+            if dataset_kind == "synthetic" else
+            "contrafactual sobre pedidos e frota reais; distância geodésica estimada; sem economia real observada"
+        ),
     }

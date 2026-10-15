@@ -64,6 +64,22 @@ def main(argv: list[str] | None = None) -> int:
     explore = sub.add_parser("es-explore-demand", help="série temporal exploratória de dT_REGISTRO")
     explore.add_argument("--run", type=Path, required=True)
     explore.add_argument("--timezone", default="America/Sao_Paulo")
+    gold_export = sub.add_parser("gold-export", help="copia a Gold do Databricks para cache local ignorado")
+    gold_export.add_argument("--out", type=Path, default=Path("reports/runs/gold_cache"))
+    gold_replay = sub.add_parser("gold-replay", help="experimento D+1 real sobre o cache da Gold")
+    gold_replay.add_argument("--cache", type=Path, default=Path("reports/runs/gold_cache"))
+    gold_replay.add_argument("--start", type=date.fromisoformat, required=True)
+    gold_replay.add_argument("--end", type=date.fromisoformat, required=True)
+    gold_replay.add_argument("--workers", type=int, default=1)
+    gold_replay.add_argument("--plan-hour", type=int, default=7)
+    gold_replay.add_argument("--horizon-hours", type=int, default=3)
+    gold_replay.add_argument("--lookback-days", type=int, default=56)
+    gold_replay.add_argument("--min-presence-rate", type=float, default=0.5)
+    gold_replay.add_argument("--max-reposition-km", type=float, default=12.0)
+    gold_replay.add_argument("--execution-tolerance-minutes", type=float, default=30.0)
+    gold_replay.add_argument("--oracle-fleet", action="store_true",
+                             help="diagnóstico com frota real de D+1; viola o corte e não é resultado D+1")
+    gold_replay.add_argument("--out", type=Path, default=Path("reports/runs/gold_replay"))
     args = parser.parse_args(argv)
     if args.command == "generate-synthetic":
         files = export_synthetic(make_synthetic(seed=args.seed), args.out)
@@ -120,6 +136,31 @@ def main(argv: list[str] | None = None) -> int:
     elif args.command == "es-explore-demand":
         report = build_registration_proxy(args.run, timezone=args.timezone)
         print(json.dumps(report, ensure_ascii=False, sort_keys=True))
+    elif args.command == "gold-export":
+        from databricks.connect import DatabricksSession
+
+        from tcc_frota.gold.export import export_gold
+
+        spark = DatabricksSession.builder.serverless(True).getOrCreate()
+        print(json.dumps(export_gold(spark, args.out), ensure_ascii=False))
+    elif args.command == "gold-replay":
+        from dataclasses import asdict
+
+        from tcc_frota.gold.replay import RealExperimentConfig, run_period
+
+        authorize("real", "local")
+        config = RealExperimentConfig(
+            plan_hour=args.plan_hour, horizon_hours=args.horizon_hours, lookback_days=args.lookback_days,
+            min_presence_rate=args.min_presence_rate, max_reposition_km=args.max_reposition_km,
+            execution_tolerance_minutes=args.execution_tolerance_minutes, oracle_fleet=args.oracle_fleet,
+        )
+        result = run_period(str(args.cache), args.start, args.end, config, workers=args.workers)
+        out = args.out / result["run_id"]
+        out.mkdir(parents=True, exist_ok=True)
+        (out / "result.json").write_text(json.dumps(result, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
+                                         encoding="utf-8")
+        print(json.dumps({"run_id": result["run_id"], "config": asdict(config), "totals": result["totals"],
+                          "file": str(out / "result.json")}, ensure_ascii=False))
     else:
         rows = read_rows(args.path, dataset_kind=args.dataset_kind)
         summary = audit_rows(rows, tuple(args.required), key=args.key)
