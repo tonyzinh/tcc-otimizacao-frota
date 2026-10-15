@@ -1,0 +1,76 @@
+/*
+ * Design tokens do FleetLab.
+ * Escuro é o tema padrão; o claro é selecionado (não é uma inversão automática).
+ * Cores de série vêm de uma paleta categórica validada para daltonismo (3 estratégias + baseline
+ * neutro). Cores de status são reservadas a estado e sempre acompanham ícone + rótulo.
+ */
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #07080a;
+  --surface-1: #0d0f12;
+  --surface-2: #13161a;
+  --surface-3: #1a1e23;
+  --overlay: rgb(13 15 18 / 0.84);
+  --border: rgb(255 255 255 / 0.07);
+  --border-strong: rgb(255 255 255 / 0.13);
+
+  --text-1: #eceef1;
+  --text-2: #a2a8b1;
+  --text-3: #6b727c;
+
+  --brand: #c4f26a;
+  --brand-ink: #0b0e05;
+  --brand-soft: rgb(196 242 106 / 0.12);
+  --focus: #c4f26a;
+
+  --series-guloso: #3987e5;
+  --series-proporcional: #d95926;
+  --series-atribuicao: #199e70;
+  --series-baseline: #8a9099;
+
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-serious: #ec835a;
+  --status-critical: #d03b3b;
+  --success-text: #2bb52b;
+  --critical-text: #f07272;
+
+  --grid: #22262b;
+  --axis: #383d44;
+  --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 12px 32px -12px rgb(0 0 0 / 0.6);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --bg: #f4f5f7;
+  --surface-1: #ffffff;
+  --surface-2: #f3f4f6;
+  --surface-3: #e9ebef;
+  --overlay: rgb(255 255 255 / 0.88);
+  --border: rgb(12 14 18 / 0.08);
+  --border-strong: rgb(12 14 18 / 0.15);
+
+  --text-1: #0d0f12;
+  --text-2: #4b515a;
+  --text-3: #80868f;
+
+  --brand: #3d6b0f;
+  --brand-ink: #ffffff;
+  --brand-soft: rgb(61 107 15 / 0.1);
+  --focus: #3d6b0f;
+
+  --series-guloso: #2a78d6;
+  --series-proporcional: #eb6834;
+  --series-atribuicao: #1baf7a;
+  --series-baseline: #898781;
+
+  --success-text: #006300;
+  --critical-text: #b42323;
+
+  --grid: #e8e9ec;
+  --axis: #c5c8ce;
+  --shadow-panel: 0 1px 2px rgb(12 14 18 / 0.04), 0 12px 32px -16px rgb(12 14 18 / 0.18);
+}

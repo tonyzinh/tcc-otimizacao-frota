@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="FleetLab — POC visual da alocação preventiva D+1 de frotas (dados demonstrativos)." />
+    <meta name="color-scheme" content="dark light" />
+    <title>FleetLab — Mobility Intelligence</title>
+    <script>
+      // Aplica o tema salvo antes da primeira pintura (sem flash). Falha silenciosa sem storage.
+      try {
+        var saved = localStorage.getItem('fleetlab.theme')
+        if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
