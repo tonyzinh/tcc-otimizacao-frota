@@ -17,7 +17,6 @@ from pathlib import Path
 
 PRIVATE = Path("config/custos_privado.yaml")
 PRIVATE_OUT = Path("reports/runs/seletivo/valor_liquido_privado.csv")
-PUBLIC_TEX = Path("tabelas/tab_seletivo_valor_liquido_parametrico.tex")
 PUBLIC_E = Path("resultados/seletivo/km_vazio_por_corrida_extra.csv")
 SOURCES = {"seletivo": "resultados/seletivo/finalistas_{m}.csv", "bateria": "resultados/finalistas_{m}.csv"}
 
@@ -169,15 +168,9 @@ def scenarios_tex(rows: list[dict], path: Path) -> Path:
     return path
 
 
-def public_grid() -> Path:
-    """Grade pública do guloso seletivo (mesma grade dos autores)."""
-    return grid_tex(PUBLIC_TEX)
-
-
 def main() -> int:
     es = scenario_e()
     write_csv(PUBLIC_E, es)
-    public_grid()
     grid_tex(EQ_GRID_TEX)
     rows = classify(es)
     write_csv(EQ_SCEN_CSV, rows)
