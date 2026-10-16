@@ -101,3 +101,19 @@ def test_deterministic():
     a = simulate(reqs, drivers, P, W, {"d1": (LAT, LON)})
     b = simulate(reqs, drivers, P, W, {"d1": (LAT, LON)})
     assert (a.served, a.pickup_km, a.reposition_km, a.wait_s) == (b.served, b.pickup_km, b.reposition_km, b.wait_s)
+
+
+def test_end_of_day_mode_starts_session_at_target_and_counts_km_from_last_position():
+    reqs = [r(1, 6 * 3600)]
+    drivers = [d("a", start=5 * 3600, lat=LAT + 0.03)]
+    origin = (LAT + 0.02, LON)
+    res = simulate(reqs, drivers, P, W, {"a": (LAT, LON)}, move_mode="fim_do_dia", move_origins={"a": origin})
+    assert res.moves_executed == 1
+    assert res.reposition_km == pytest.approx(reta_km(*origin, LAT, LON) * 1.4)
+    assert res.pickup_km == pytest.approx(0.0, abs=1e-9)          # começou o dia na zona-alvo
+    early = simulate(reqs, [d("a", start=2 * 3600, lat=LAT + 0.03)], P, W, {"a": (LAT, LON)},
+                     move_mode="fim_do_dia", move_origins={"a": origin})
+    assert early.moves_executed == 0                                 # já trabalhava antes da janela
+    capped = simulate(reqs, drivers, P, W, {"a": (LAT, LON)}, move_mode="fim_do_dia",
+                      move_origins={"a": (LAT + 0.2, LON)}, max_move_km=5.0)
+    assert capped.moves_executed == 0

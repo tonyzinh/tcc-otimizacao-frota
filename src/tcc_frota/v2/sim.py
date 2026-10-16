@@ -101,10 +101,20 @@ def _merge(intervals) -> list[tuple[float, float, float, float]]:
 
 def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimParams,
              window: tuple[float, float], moves: dict[str, tuple[float, float]] | None = None,
-             tail_s: float = 3 * 3600, max_move_km: float = float("inf")) -> SimResult:
-    """Replay de um dia. Uma recomendação só é executada na primeira disponibilidade do motorista
-    na janela e se o deslocamento real (por rua estimado) respeitar `max_move_km`; caso contrário
-    conta como não executada (não adesão)."""
+             tail_s: float = 3 * 3600, max_move_km: float = float("inf"), move_mode: str = "inicio_turno",
+             move_origins: dict[str, tuple[float, float]] | None = None) -> SimResult:
+    """Replay de um dia com recomendações de reposicionamento.
+
+    `move_mode="inicio_turno"`: o motorista vai à zona-alvo na primeira disponibilidade da janela,
+    partindo da posição real naquele instante, e fica indisponível durante o trajeto.
+    `move_mode="fim_do_dia"`: o motorista vai à zona-alvo ao encerrar D (partindo de
+    `move_origins[did]`, a última posição real de D) e começa a primeira sessão de D+1 já na zona-alvo;
+    não vale para quem já trabalhava mais de 30 min antes da janela.
+    Em ambos, o deslocamento real (por rua estimado) precisa respeitar `max_move_km`; caso contrário a
+    recomendação conta como não executada (não adesão). O KM executado entra no total (RN031)."""
+    if move_mode not in ("inicio_turno", "fim_do_dia"):
+        raise ValueError("move_mode inválido")
+    move_origins = move_origins or {}
     if len({r.rid for r in requests}) != len(requests) or len({d.did for d in drivers}) != len(drivers):
         raise ValueError("pedidos ou motoristas duplicados")
     moves = dict(moves or {})
@@ -121,6 +131,7 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
     commits = {d.did: _merge(d.commitments) for d in drivers}
     next_commit = {d.did: 0 for d in drivers}
     pending_move = dict(moves)
+    first_start = {d.did: min((x[0] for x in d.sessions), default=float("inf")) for d in drivers}
     waiting: dict[int, SimRequest] = {}
     events: list = []
     seq = 0
@@ -187,6 +198,8 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
         if did not in pending_move:
             return False
         lat, lon = pending_move.pop(did)
+        if move_mode == "fim_do_dia":       # só vale ao iniciar o dia; depois disso, não adesão
+            return False
         if t >= w1:
             return False
         km = reta_km(pos[did][0], pos[did][1], lat, lon) * params.road_factor
@@ -224,6 +237,15 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
             if busy_until[did] is None:
                 if lat is not None:
                     pos[did] = (lat, lon)
+                if move_mode == "fim_do_dia" and did in pending_move:
+                    target = pending_move.pop(did)
+                    origin = move_origins.get(did) or pos[did]
+                    km = reta_km(origin[0], origin[1], target[0], target[1]) * params.road_factor
+                    if first_start[did] >= w0 - 1800 and 1e-9 < km <= max_move_km + 1e-9:
+                        res.reposition_km += km
+                        res.moves_executed += 1
+                        res.jobs.append((did, t, t, "reposicionamento_fim_do_dia"))
+                        pos[did] = target
                 become_free(did, t)
         elif kind == "sess_end":
             online[data] = False

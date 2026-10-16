@@ -66,6 +66,16 @@ def main(argv: list[str] | None = None) -> int:
     explore.add_argument("--timezone", default="America/Sao_Paulo")
     gold_export = sub.add_parser("gold-export", help="copia a Gold do Databricks para cache local ignorado")
     gold_export.add_argument("--out", type=Path, default=Path("reports/runs/gold_cache"))
+    gold_export.add_argument("--v2", action="store_true", help="exporta as tabelas tb_gld_*_v2")
+    prepare = sub.add_parser("prepare-raw", help="confere lotes de data/raw contra os manifestos (v2)")
+    prepare.add_argument("--raw", type=Path, default=Path("data/raw"))
+    prepare.add_argument("--materialize-to", type=Path, default=None,
+                         help="copia os lotes aceitos para <destino>/<tag>/ sem alterar os originais")
+    final = sub.add_parser("final-run", help="v2: dos extratos às tabelas finais do TCC")
+    final.add_argument("--raw", type=Path, default=Path("data/raw"))
+    final.add_argument("--out", type=Path, default=Path("reports/runs/tcc_final"))
+    final.add_argument("--publish", type=Path, default=None,
+                       help="copia só os agregados (CSV e result.json) para esta pasta versionável")
     gold_replay = sub.add_parser("gold-replay", help="experimento D+1 real sobre o cache da Gold")
     gold_replay.add_argument("--cache", type=Path, default=Path("reports/runs/gold_cache"))
     gold_replay.add_argument("--start", type=date.fromisoformat, required=True)
@@ -146,7 +156,23 @@ def main(argv: list[str] | None = None) -> int:
         from tcc_frota.gold.export import export_gold
 
         spark = DatabricksSession.builder.serverless(True).getOrCreate()
-        print(json.dumps(export_gold(spark, args.out), ensure_ascii=False))
+        if args.v2:
+            from tcc_frota.gold.export import export_gold_v2
+
+            out = args.out if args.out != Path("reports/runs/gold_cache") else Path("reports/runs/gold_cache_v2")
+            print(json.dumps(export_gold_v2(spark, out), ensure_ascii=False))
+        else:
+            print(json.dumps(export_gold(spark, args.out), ensure_ascii=False))
+    elif args.command == "prepare-raw":
+        from tcc_frota.v2.raw import prepare_raw
+
+        authorize("real", "local")
+        prepare_raw(args.raw, materialize_to=args.materialize_to)
+    elif args.command == "final-run":
+        from tcc_frota.v2.final_run import final_run
+
+        authorize("real", "local")
+        final_run(args.raw, args.out, publish=args.publish)
     elif args.command == "gold-replay":
         from dataclasses import asdict
 

@@ -51,18 +51,24 @@ def _snap(did, when, lat):
             "lat": lat, "lon": -40.3}
 
 
-def test_planned_fleet_uses_only_positions_known_at_cut():
+def test_planned_fleet_never_uses_positions_from_target_day():
+    """A: só posições até 20h de D. B: até o fim de D. Nenhum regime além de C usa D+1."""
     cut = datetime.combine(TARGET - timedelta(days=1), time(20), TZ)
     snaps = [_snap("a", cut - timedelta(hours=2), -20.30),
              _snap("a", datetime.combine(TARGET - timedelta(days=7), time(5), TZ), -20.31),
              _snap("a", datetime.combine(TARGET - timedelta(days=14), time(5), TZ), -20.31)]
-    after = snaps + [_snap("a", cut + timedelta(hours=1), -20.90), _snap("a", datetime.combine(TARGET, time(5), TZ), -20.95)]
+    late_d = snaps + [_snap("a", cut + timedelta(hours=1), -20.40)]
+    with_target = late_d + [_snap("a", datetime.combine(TARGET, time(5), TZ), -20.95)]
     world = [SimDriver("a", ((5 * 3600.0, 9 * 3600.0, -20.95, -40.3),))]
-    for regime in ("A", "B"):
-        p1, _ = planned_fleet(regime, FleetIndex(snaps, [], []), TARGET, (4, 11), world)
-        p2, _ = planned_fleet(regime, FleetIndex(after, [], []), TARGET, (4, 11), world)
-        assert [(x.did, x.lat) for x in p1] == [(x.did, x.lat) for x in p2] == [("a", -20.30)]
-    oracle, _ = planned_fleet("C", FleetIndex(after, [], []), TARGET, (4, 11), world)
+    a1, _ = planned_fleet("A", FleetIndex(snaps, [], []), TARGET, (4, 11), world)
+    a2, _ = planned_fleet("A", FleetIndex(with_target, [], []), TARGET, (4, 11), world)
+    assert [x.lat for x in a1] == [x.lat for x in a2] == [-20.30]
+    b1, _ = planned_fleet("B", FleetIndex(late_d, [], []), TARGET, (4, 11), world)
+    b2, _ = planned_fleet("B", FleetIndex(with_target, [], []), TARGET, (4, 11), world)
+    assert [x.lat for x in b1] == [x.lat for x in b2] == [-20.40]
+    b20, _ = planned_fleet("B", FleetIndex(with_target, [], []), TARGET, (4, 11), world, position_cut_hour=20)
+    assert [x.lat for x in b20] == [-20.30]
+    oracle, _ = planned_fleet("C", FleetIndex(with_target, [], []), TARGET, (4, 11), world)
     assert oracle[0].lat == -20.95
 
 

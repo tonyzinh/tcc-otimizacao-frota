@@ -5,9 +5,10 @@ feito às 20h de D com um de três regimes:
 
 - A (D+1 estrito): quem trabalha e quando é previsto pela presença em dias comparáveis (limiar 50%,
   como DT011); posição = última posição conhecida até o corte.
-- B (escala conhecida): a lista de quem trabalha amanhã é conhecida no corte; posição = última posição
-  conhecida até o corte; horário previsto como em A. Realista só se houver escala de turnos
-  (DECISÃO DO ALUNO, a confirmar com a empresa).
+- B (escala conhecida): a lista de quem trabalha amanhã é conhecida; o plano é fechado no fim de D
+  com a última posição de D (motoristas dormem onde largam); horário previsto como em A. Não usa
+  nada de D+1 além da escala. Realista só se houver escala de turnos (DECISÃO DO ALUNO, a confirmar
+  com a empresa). Variante de sensibilidade: posição às 20h.
 - C (oráculo): posições e horários reais de D+1. Viola o corte; serve só para diagnóstico.
 """
 from __future__ import annotations
@@ -162,11 +163,20 @@ def _comparable_days(index: FleetIndex, target: date, lookback: int = 28) -> lis
     return same if len(same) >= 2 else pool
 
 
+def end_of_day(target: date) -> datetime:
+    """Último instante de D (= meia-noite de D+1, exclusiva)."""
+    return datetime.combine(target, time(0), TZ) - timedelta(microseconds=1)
+
+
 def planned_fleet(regime: str, index: FleetIndex, target: date, window: tuple[int, int],
-                  world: list[SimDriver], min_presence: float = 0.5) -> tuple[list[PlannedDriver], dict]:
-    """Frota que o planejador enxerga às 20h de D, por regime, e diagnóstico de precisão/revocação."""
+                  world: list[SimDriver], min_presence: float = 0.5,
+                  position_cut_hour: int | None = None) -> tuple[list[PlannedDriver], dict]:
+    """Frota que o planejador enxerga no corte, por regime, e diagnóstico de precisão/revocação.
+
+    Posição: A usa o corte de 20h; B usa o fim de D (ou `position_cut_hour`, se dado)."""
     w0, w1 = window[0] * 3600.0, window[1] * 3600.0
-    cut = datetime.combine(target - timedelta(days=1), time(CUT_HOUR), TZ)
+    hour = position_cut_hour if position_cut_hour is not None else (CUT_HOUR if regime == "A" else 24)
+    cut = end_of_day(target) if hour >= 24 else datetime.combine(target - timedelta(days=1), time(hour), TZ)
     actual = {d.did for d in world}
     days = _comparable_days(index, target)
     presence: dict[str, list[tuple[float, float]]] = defaultdict(list)
