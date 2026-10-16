@@ -364,3 +364,44 @@ def nsga2_search(raw: Path = Path("data/raw"), seeds: tuple[int, ...] = SEEDS) -
     (RESULTS / "calibracao").mkdir(parents=True, exist_ok=True)
     (RESULTS / "calibracao" / "nsga2_busca.json").write_text(json.dumps(busca, ensure_ascii=False, indent=2), encoding="utf-8")
     return busca
+
+
+# ------------------------------------------------------------------ experimentos fora da tabela principal (5.9, 5.11)
+def combo_choice() -> dict:
+    """Melhor reposicionamento para combinar com o despacho D+0: menor KM vazio/corrida na calibração entre
+    os finalistas da tabela principal que executaram ao menos um movimento (regra fixada antes do teste)."""
+    fin = load_finalists()
+    moved = {}
+    for r in read_rows(REGISTRY_CSV):
+        if r["selecionado"] == "True" and r["etapa"] == "calibracao":
+            moved[r["familia"]] = float(r["movimentos_executados"])
+    cands = [(v["calibracao"]["km_vazio_por_corrida"], f) for f, v in fin.items() if moved.get(f, 0) > 0]
+    _, family = min(cands)
+    return {"familia": family, "parametros": fin[family]["parametros"]}
+
+
+def run_test_extra(period: str, *, workers: int = 12, raw: Path = Path("data/raw"), echo=print) -> Path:
+    assert_frozen_committed()
+    frozen = load_frozen()
+    extras = json.loads(EXTRAS_JSON.read_text(encoding="utf-8"))
+    specs = [PlannerSpec(f, f"fin_{f}", v["parametros"]) for f, v in extras.items()]
+    if "despacho" in extras:
+        specs.append(PlannerSpec("combinado", "combinado_reposicionamento_despacho",
+                                 {"reposicionamento": combo_choice(), "despacho": extras["despacho"]["parametros"]}))
+    tasks = [(period, day, CALIB_WINDOW, "B", frozen.sims[period], [s], frozen.model, SEEDS[:1], k == 0, "extra")
+             for day in ex.PERIODS[period].test for k, s in enumerate(specs)]
+    echo(f"[extras {period}] {len(specs)} cenários × {len(ex.PERIODS[period].test)} dias")
+    rows = run_tasks(tasks, raw, workers, echo=echo)
+    path = RESULTS / f"extras_{MONTH_LABEL[period]}_dias.csv"
+    write_rows(path, rows)
+    from tcc_frota.algoritmos.estatistica import analyse
+
+    days = per_day(rows)
+    out = []
+    for scen in sorted({c for c, _ in days if c != "sem_reposicionamento"}):
+        pairs = paired(days, scen)
+        out.append({"periodo": period, "regime": "B", "cenario": scen, "familia": pairs[0]["p"]["familia"],
+                    "rotulo": {"mpc": "Cenário intradiário", "despacho": "D+0", "combinado": "D+1 + D+0"}[pairs[0]["p"]["familia"]],
+                    "parametros": pairs[0]["p"]["parametros"], **analyse(pairs, 1)})
+    write_rows(RESULTS / f"extras_{MONTH_LABEL[period]}.csv", out)
+    return path

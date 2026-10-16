@@ -32,6 +32,10 @@ def main(argv: list[str] | None = None) -> int:
     tst.add_argument("--workers", type=int, default=12)
     tst.add_argument("--raw", type=Path, default=Path("data/raw"))
     tst.add_argument("--familias", nargs="*", default=None)
+    tx = sub.add_parser("testar-extra", help="5.9 intradiário, 5.11 D+0 e combinação (tabelas próprias)")
+    tx.add_argument("periodo", choices=["mar2026", "set2026"])
+    tx.add_argument("--workers", type=int, default=12)
+    tx.add_argument("--raw", type=Path, default=Path("data/raw"))
     ana = sub.add_parser("analisar", help="estatística pareada, Holm e Bonferroni dos dias de teste")
     ana.add_argument("periodo", choices=["mar2026", "set2026"])
     ng = sub.add_parser("nsga2-busca", help="5.6: busca NSGA-II nos dias de calibração (uma semente por processo)")
@@ -75,6 +79,11 @@ def main(argv: list[str] | None = None) -> int:
         from tcc_frota.algoritmos.protocolo import run_test
 
         print(run_test(args.periodo, workers=args.workers, raw=args.raw, families=args.familias))
+        return 0
+    if args.command == "testar-extra":
+        from tcc_frota.algoritmos.protocolo import run_test_extra
+
+        print(run_test_extra(args.periodo, workers=args.workers, raw=args.raw))
         return 0
     if args.command == "nsga2-busca":
         from tcc_frota.algoritmos.protocolo import nsga2_search
