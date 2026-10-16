@@ -44,3 +44,24 @@ Código `53ff94f`; calibração 2–15/03, regime B, 04–11h; baseline 1760 cor
 
 Mesma escolha de configuração que 5.1 (alvo com teto 2, H = 3 km, share 1,0), mas com mais movimentos executados (124 contra 78) e KM vazio por corrida maior (+6,05% contra +4,11%). A diferença para 5.1 não é pequena e tem causa identificável: 5.1 decide o fluxo entre centróides e descarta, na conversão para motoristas, unidades cujo deslocamento real passa de H; o húngaro mede do motorista até a vaga e preenche todas as vagas alcançáveis. Preencher mais vagas aumenta o reposicionamento sem reduzir a busca (2,650 contra 2,632 km por corrida do baseline). Corridas iguais ao baseline; nenhum dia com redução.
 
+## milp
+
+Código `6d8552b`; calibração 2–15/03, regime B, 04–11h; baseline 1760 corridas e 2.632 km vazios por corrida.
+
+| Configuração | Corridas (%) | KM vazio/corrida (%) | B/corrida | R/corrida | Mov. exec. | Dias com redução | Piso | Tempo (s/dia) |
+|---|---:|---:|---:|---:|---:|---:|:---:|---:|
+| `milp|cap1|b0.99|mu0.5` **(finalista)** | +0.00 | +0.00 | 2.632 | 0.000 | 0 | 0/14 | sim | 0.09 |
+| `milp|cap1|b1|mu0.5` | +0.00 | +0.12 | 2.632 | 0.003 | 2 | 0/14 | sim | 0.11 |
+| `milp|cap1|b1|mu0` | +0.00 | +2.32 | 2.629 | 0.065 | 52 | 0/14 | sim | 0.11 |
+| `milp|cap1|b0.99|mu0` | +0.17 | +2.48 | 2.635 | 0.062 | 52 | 0/14 | sim | 0.09 |
+| `milp|cap1.5|b0.99|mu0.5` | +2.22 | +23.81 | 2.591 | 0.668 | 547 | 0/14 | sim | 7.48 |
+| `milp|cap1.5|b1|mu0.5` | +2.05 | +24.69 | 2.599 | 0.683 | 556 | 0/14 | sim | 8.05 |
+| `milp|cap1.5|b0.99|mu0` | +2.50 | +27.15 | 2.562 | 0.785 | 792 | 0/14 | sim | 9.56 |
+| `milp|cap1.5|b1|mu0` | +2.61 | +28.24 | 2.575 | 0.801 | 800 | 0/14 | sim | 11.31 |
+| `milp|cap3|b0.99|mu0.5` | +2.90 | +29.80 | 2.618 | 0.799 | 614 | 0/14 | sim | 19.04 |
+| `milp|cap3|b0.99|mu0` | +2.56 | +29.82 | 2.598 | 0.819 | 646 | 0/14 | sim | 16.97 |
+| `milp|cap3|b1|mu0.5` | +3.01 | +29.89 | 2.607 | 0.812 | 617 | 0/14 | sim | 18.83 |
+| `milp|cap3|b1|mu0` | +2.78 | +30.28 | 2.606 | 0.823 | 646 | 0/14 | sim | 19.34 |
+
+Solver: 139 de 168 instâncias com ótimo provado; 29 pararam no limite de 30 s (6 com cap 1,5 e 23 com cap 3), com gap máximo de 0,24%. Com cap = 1 (hipótese da primeira corrida) e penalidade de 0,5 km por movimento, o modelo não move ninguém em nenhum dia: pela desigualdade triangular, mover um veículo que atende uma única corrida não encurta a busca no modelo. Por isso o finalista pela regra pré-registrada é um plano vazio (igual ao baseline, 0,00%); no teste ele não pode passar no critério 1. Sem penalidade, cap = 1 move 52 vezes em 14 dias e aumenta o KM vazio por corrida em 2,3–2,5%. Com cap = 1,5 ou 3 o modelo move de 547 a 800 vezes, ganha 2,0–3,0% de corridas e aumenta o KM vazio por corrida em 24–30%: o modelo estático supõe que cada veículo atende cap corridas da nova posição, o que o simulador não confirma. A hipótese da primeira corrida (cap ≈ 1–1,5) não produziu redução.
+

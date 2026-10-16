@@ -40,5 +40,27 @@
     },
     "congelado_em": "2026-10-16T15:16:04Z",
     "codigo": "53ff94f"
+  },
+  "milp": {
+    "cenario": "milp|cap1|b0.99|mu0.5",
+    "parametros": {
+      "beta": 0.99,
+      "cap": 1.0,
+      "max_km": 4.0,
+      "mu": 0.5,
+      "time_limit": 30.0
+    },
+    "regra": "menor km vazio/corrida com piso de atendimento",
+    "calibracao": {
+      "corridas_base": 1760.0,
+      "corridas": 1760.0,
+      "var_corridas_pct": 0.0,
+      "km_vazio_por_corrida_base": 2.6322677863934247,
+      "km_vazio_por_corrida": 2.6322677863934247,
+      "var_km_vazio_por_corrida_pct": 0.0,
+      "tempo_plano_medio_s": 0.09187581427561652
+    },
+    "congelado_em": "2026-10-16T15:22:41Z",
+    "codigo": "6d8552b"
   }
 }
