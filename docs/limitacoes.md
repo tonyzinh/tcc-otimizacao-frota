@@ -1,13 +1,38 @@
 # Limitações e ameaças à validade
 
-1. **Constructo de KM morto:** a definição corporativa e as parcelas do KPI seguem pendentes (DT003/RN010). Haversine é linha reta, não odômetro ou rota viária.
-2. **Dados:** o experimento de KM morto continua apenas sintético. Nove CSVs reais foram auditados em agregados para a frente de disponibilidade; criação do pedido, semântica original do fuso, vínculo temporal de placa, Cobli e jornada permanecem sem confirmação. Essa auditoria não valida o experimento de KM morto.
-3. **Baseline:** despacho mais próximo sem reposicionamento é uma simplificação, não política observada da empresa.
-4. **Disponibilidade:** intervalos sintéticos e compromissos são conhecidos por construção; vínculos motorista–jornada, pausas e posição real não foram reconstruídos.
-5. **Contrafactual:** demanda, comportamento humano, tráfego e adesão real não respondem à intervenção. O replay não demonstra economia financeira nem implantação.
-6. **Previsão:** média por zona/hora/dia da semana é explicável, mas pode errar em eventos, feriados e sazonalidade; não usa eventos externos.
-7. **Segmentação:** três zonas fixas simplificam o exemplo. A grade temporalmente correta existe no núcleo, mas escolha de malha real depende de dispersão, cobertura e privacidade.
-8. **Databricks:** notebook/Delta/Unity Catalog não executados em Free Edition nesta entrega; permissões e limites efetivos devem ser verificados no workspace.
-9. **Sensibilidade:** há variação sintética de frota, demanda, distribuição inicial, cobertura, limite de movimento e adesão. Velocidade/tráfego, custo marginal, granularidade espacial e disponibilidade real ainda pedem estudo separado.
+**Atualizado em 16/10/2026 (rodada v2).** Toda conclusão se restringe ao comportamento do modelo nos períodos e premissas descritos em [resultados reais](resultados_reais.md). Um resultado nulo ou adverso deve ser mantido.
 
-Essas limitações restringem toda conclusão a comportamento do modelo no cenário descrito. Um resultado nulo ou adverso deve ser mantido.
+## Construto
+
+1. **KM morto:** a definição corporativa segue pendente (DT003/RN010). Nesta rodada, KM vazio = busca + reposicionamento, como distância por rua **estimada** (Haversine × fator rua/reta calibrado). O retorno não é medido. Não é odômetro nem rota (RN012).
+2. **Atendimento:** "corrida atendida" no simulador = pedido despachado a um motorista. O alvo observado de calibração é o aceite. Cancelamentos pós-aceite só entram na sensibilidade.
+3. **Custo:** nenhum custo por km ou margem por corrida foi fornecido. O ponto de equilíbrio é apresentado como função desses valores, não como número.
+
+## Dados
+
+4. **Períodos:** dois meses (março e setembro/2026), uma região, 14 dias de calibração e 15–16 dias de teste por mês. Sazonalidade anual e eventos não estão cobertos.
+5. **Frota:** fotos a cada 10 min. A posição no aceite e as sessões herdam essa resolução, e o enum de estados é inferido (DT010).
+6. **Status:** o tratamento de cada status (RN004) é decisão do estudo, não homologação da empresa. `nU_DR_REAL` e `tX_H3INDEX_REPOSICIONAMENTO_REAL` têm semântica pendente e não foram usados.
+7. **Caixa geográfica:** a Grande Vitória é aproximada por um retângulo (RN002 pendente).
+
+## Simulação e contrafactual
+
+8. **Baseline simulado:** despacho do motorista livre mais próximo dentro de um raio, com fila e paciência calibrados para reproduzir o aceite e a busca observados. É simplificação declarada (RN021), não a política real; o ajuste não é perfeito (ver tabela de ajuste do baseline).
+9. **Velocidade e rotas:** velocidade constante e fator rua/reta único; sem trânsito por hora. A sensibilidade varia um parâmetro por vez.
+10. **Comportamento:** demanda, adesão dos motoristas e tráfego não reagem à intervenção. A execução das recomendações segue regra fixa (DT014/DT015).
+11. **Trajeto entre corridas:** motoristas ociosos ficam parados no simulador; na realidade, circulam.
+12. **Destino e duração:** destino solicitado disponível para todos os pedidos; duração observada quando a corrida foi encerrada, senão estimada pela distância (fator e velocidade de viagem calibrados). A estimativa é idêntica entre cenários.
+
+## Informação
+
+13. **Regime B:** supõe escala conhecida para D+1 (a confirmar com a empresa) e usa a última posição de D, ou seja, o corte no fim de D. A primeira implementação usava posição às 20h e foi corrigida após a primeira execução (DT015); as duas variantes são reportadas.
+14. **Regime C:** viola o corte e serve só como diagnóstico.
+
+## Estatística
+
+15. **Amostra:** com 15–16 dias pareados por período, os IC 95% por bootstrap de dias são largos para efeitos pequenos. O teste de permutação é exato até 16 dias. Não houve correção para comparações múltiplas; a leitura privilegia padrões consistentes entre períodos e regimes.
+16. **Algoritmo:** o guloso não garante monotonicidade em α (DT014). A fronteira é empírica.
+
+## Infraestrutura
+
+17. **Databricks:** medalhão v2 executado e conferido no Free Edition em 15/10/2026. O sal da pseudonimização aparece no plano das consultas do workspace. Previsão e simulação rodam localmente.
