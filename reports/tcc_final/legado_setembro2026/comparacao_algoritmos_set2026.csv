@@ -1,0 +1,6 @@
+algoritmo,recomendacoes,executadas,pickup_km,reposicionamento_km,reducao_km_vazio_pct,cobertura_pct,dias_sem_piora_cobertura,tempo_plano_s_dia
+guloso,640,129,4536.9,737.4,-14.6,92.4,17/30,220
+proporcional,718,115,4611.2,710.7,-15.6,92.4,16/30,0.03
+atribuicao_otima,752,121,4495.6,650.3,-11.8,92.3,13/30,0.04
+busca_local,657,129,4521.6,724.2,-14.0,92.1,15/30,244
+guloso_simulado,26,4,4595.8,17.1,-0.2,93.3,30/30,58

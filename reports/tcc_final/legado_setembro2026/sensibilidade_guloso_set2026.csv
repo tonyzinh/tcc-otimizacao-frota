@@ -1,0 +1,7 @@
+cenario,recomendacoes,aplicadas,pickup_baseline_km,pickup_preventivo_km,reposicionamento_km,reducao_km_vazio_pct,cobertura_baseline_pct,cobertura_preventivo_pct,dias_sem_piora,reducao_nesses_dias_pct
+padrao,640,129,4603.2,4536.9,737.4,-14.6,93.3,92.4,17,-15.0
+oraculo_frota_real,133,114,4603.2,4577.3,439.9,-9.0,93.3,92.4,14,-12.0
+reposicionamento_max_3km,630,33,4603.2,4587.7,62.6,-1.0,93.3,93.2,26,-1.0
+presenca_75,294,59,4603.2,4584.9,340.5,-7.0,93.3,92.7,19,-6.0
+tolerancia_0min,640,35,4603.2,4617.3,182.9,-4.3,93.3,93.0,24,-3.8
+plano_17h,568,108,2519.9,2528.7,473.8,-19.2,94.0,93.3,21,-23.0
