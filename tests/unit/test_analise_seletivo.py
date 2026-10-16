@@ -33,3 +33,18 @@ def test_free_movement_counts_only_free_to_free_within_gap_and_window():
     assert out["mar2026"]["intervalos_livre_livre"] == 1
     assert out["mar2026"]["km_dia_reta_media"] == pytest.approx(1.112, abs=0.01)
     assert out["mar2026"]["fracao_intervalos_mov_maior_0_5km_pct"] == 100.0
+
+
+def test_authors_grid_and_reading_rule():
+    from tcc_frota.analise.valor_liquido import classify, grid_cells
+    cells = grid_cells()
+    assert len(cells) == 135
+    lo, hi = min(c["e_estrela_km"] for c in cells), max(c["e_estrela_km"] for c in cells)
+    assert lo == pytest.approx(10 / (1.5 + 0.45 * 60 / 14)) and hi == pytest.approx(30 / (0.5 + 0.15 * 60 / 20))
+    base = {"corridas_extras_por_dia": 1.0, "e_ic_inf": 0.0}
+    rows = classify([{**base, "e_km_vazio_por_corrida_extra": 1.0, "e_ic_sup": 2.0},
+                     {**base, "e_km_vazio_por_corrida_extra": 100.0, "e_ic_sup": 200.0},
+                     {**base, "e_km_vazio_por_corrida_extra": 12.0, "e_ic_sup": 20.0},
+                     {**base, "e_km_vazio_por_corrida_extra": float("nan"), "e_ic_sup": float("nan")}])
+    assert [r["classificacao"] for r in rows] == ["compensa em toda a grade", "compensa em nenhuma célula",
+                                                  "compensa em parte da grade", "não se aplica (sem corridas extras)"]

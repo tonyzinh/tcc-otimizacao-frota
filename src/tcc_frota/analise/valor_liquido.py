@@ -6,8 +6,8 @@
 
 Os parâmetros financeiros são sigilosos: vêm de `config/custos_privado.yaml` (ignorado pelo Git), e a tabela
 com esses valores vai só para `reports/runs/seletivo/` (ignorado). O que se publica é uma grade paramétrica
-genérica (margens e custos por km ilustrativos, não os da empresa) e o *e* de cada cenário, que vem da
-simulação. Limitação registrada: o custo gravado pelo SQL da empresa difere do recalculado.
+definida pelos autores (docs/PREMISSAS_E_LIMITACOES.md, seção 3; valores hipotéticos, não da empresa) e o *e*
+de cada cenário, que vem da simulação. Limitação registrada: o custo gravado pelo SQL da empresa difere do recalculado.
 """
 from __future__ import annotations
 
@@ -91,37 +91,103 @@ def private_table(costs: dict, es: list[dict]) -> list[dict]:
     return out
 
 
-# Valores SINTÉTICOS fornecidos na resposta simulada da operação (16/10/2026): diferença ticket − repasse
-# por faixa horária e grade de custo variável por km vazio. Não são estatísticas observadas da empresa.
-SYNTHETIC_MARGINS = {"04-07h": 8.85, "07-10h": 10.44, "10-11h": 8.16}
-SYNTHETIC_COSTS = (0.50, 0.75, 1.00, 1.25, 1.50)
+# Grade hipotética definida pelos autores (docs/PREMISSAS_E_LIMITACOES.md, seção 3). Não são valores da empresa.
+GRID_MARGINS = (10.0, 15.0, 20.0, 25.0, 30.0)   # R$ por corrida, antes do km vazio
+GRID_R_KM = (0.5, 1.0, 1.5)                      # R$/km
+GRID_R_MIN = (0.15, 0.30, 0.45)                  # R$/min
+GRID_SPEEDS = (14.0, 17.0, 20.0)                 # km/h do deslocamento vazio
+GRID_NOTE = "Valores hipotéticos definidos pelos autores; não são da empresa."
+EQ_GRID_TEX = Path("tabelas/tab_equilibrio_grade.tex")
+EQ_SCEN_TEX = Path("tabelas/tab_equilibrio_cenarios.tex")
+EQ_SCEN_CSV = Path("resultados/equilibrio/equilibrio_cenarios.csv")
+
+
+def grid_cells() -> list[dict]:
+    """135 células: margem × r_km × r_min × v, com c_v = r_km + r_min·60/v e e* = margem / c_v."""
+    out = []
+    for r_km in GRID_R_KM:
+        for r_min in GRID_R_MIN:
+            for v in GRID_SPEEDS:
+                c = cost_per_km(r_km, r_min, v)
+                for m in GRID_MARGINS:
+                    out.append({"margem": m, "r_km": r_km, "r_min": r_min, "v_kmh": v, "c_v": c, "e_estrela_km": m / c})
+    return out
+
+
+def _br(x: float, d: int = 2) -> str:
+    return f"{x:.{d}f}".replace(".", "{,}")
+
+
+def grid_tex(path: Path) -> Path:
+    """e* (km) por combinação de custo (linhas, em ordem de c_v) e margem (colunas)."""
+    combos = sorted({(c["r_km"], c["r_min"], c["v_kmh"], c["c_v"]) for c in grid_cells()}, key=lambda t: (t[3], t))
+    lines = [r"% Gerado por tcc_frota.analise.valor_liquido — " + GRID_NOTE,
+             r"\begin{tabular}{rrrr" + "r" * len(GRID_MARGINS) + "}", r"\hline",
+             r"$r_{km}$ (R\$/km) & $r_{min}$ (R\$/min) & $v$ (km/h) & $c_v$ (R\$/km) & "
+             + " & ".join(f"$e^*$, M = {int(m)}" for m in GRID_MARGINS) + r" \\", r"\hline"]
+    for r_km, r_min, v, c in combos:
+        lines.append(f"{_br(r_km)} & {_br(r_min)} & {int(v)} & {_br(c)} & " + " & ".join(_br(m / c, 1) for m in GRID_MARGINS) + r" \\")
+    lines += [r"\hline", r"\multicolumn{" + str(4 + len(GRID_MARGINS)) + r"}{l}{\footnotesize " + GRID_NOTE
+              + r" $e^*$ em km; M = margem por corrida (R\$).} \\", r"\end{tabular}"]
+    path.parent.mkdir(exist_ok=True)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return path
+
+
+def classify(es: list[dict]) -> list[dict]:
+    """Por cenário: células da grade com e < e* (compensa). e indefinido quando não há corridas extras."""
+    cells = grid_cells()
+    out = []
+    for r in es:
+        e, hi = r["e_km_vazio_por_corrida_extra"], r["e_ic_sup"]
+        if e != e or r["corridas_extras_por_dia"] <= 0:
+            n, n_hi, label = None, None, "não se aplica (sem corridas extras)"
+        else:
+            n = sum(e < c["e_estrela_km"] for c in cells)
+            n_hi = sum(hi == hi and hi < c["e_estrela_km"] for c in cells)
+            label = ("compensa em toda a grade" if n == len(cells) else "compensa em nenhuma célula" if n == 0
+                     else "compensa em parte da grade")
+        out.append({**r, "celulas_grade": len(cells), "celulas_e_menor_e_estrela": n,
+                    "celulas_ic_sup_menor_e_estrela_exploratorio": n_hi, "classificacao": label})
+    return out
+
+
+def scenarios_tex(rows: list[dict], path: Path) -> Path:
+    lines = [r"% Gerado por tcc_frota.analise.valor_liquido — grade: " + GRID_NOTE,
+             r"\begin{tabular}{llrrrl}", r"\hline",
+             r"Mês & Cenário & $e$ (km) [IC 95\%] & Células com $e < e^*$ & IC sup. $< e^*$ (expl.) & Leitura \\", r"\hline"]
+    for r in rows:
+        e = r["e_km_vazio_por_corrida_extra"]
+        cell_e = "---" if e != e else f"{_br(e, 1)} [{_br(r['e_ic_inf'], 1)}; {_br(r['e_ic_sup'], 1)}]"
+        n = "---" if r["celulas_e_menor_e_estrela"] is None else f"{r['celulas_e_menor_e_estrela']}/{r['celulas_grade']}"
+        nh = "---" if r["celulas_ic_sup_menor_e_estrela_exploratorio"] is None else f"{r['celulas_ic_sup_menor_e_estrela_exploratorio']}/{r['celulas_grade']}"
+        name = r["cenario"].replace("_", r"\_")
+        lines.append(f"{r['mes']} & {name} & {cell_e} & {n} & {nh} & {r['classificacao']} \\\\")
+    lines += [r"\hline", r"\end{tabular}"]
+    path.parent.mkdir(exist_ok=True)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return path
 
 
 def public_grid() -> Path:
-    """Grade paramétrica com valores sintéticos (rotulados): e* = margem / custo variável por km vazio."""
-    margins = SYNTHETIC_MARGINS
-    costs = SYNTHETIC_COSTS
-    lines = [r"% Gerado por tcc_frota.analise.valor_liquido — valores SINTÉTICOS (resposta simulada); não são da empresa.",
-             r"\begin{tabular}{l" + "r" * len(costs) + "}", r"\hline",
-             r"Faixa (margem sintética, R\$) & " + " & ".join(f"c = {c:.2f}".replace(".", "{,}") for c in costs) + r" \\", r"\hline"]
-    for label, m in margins.items():
-        lines.append(f"{label} ({m:.2f})".replace(".", "{,}") + " & " + " & ".join(f"{m / c:.1f}".replace(".", "{,}") for c in costs) + r" \\")
-    lines += [r"\hline", r"\end{tabular}"]
-    PUBLIC_TEX.parent.mkdir(exist_ok=True)
-    PUBLIC_TEX.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    return PUBLIC_TEX
+    """Grade pública do guloso seletivo (mesma grade dos autores)."""
+    return grid_tex(PUBLIC_TEX)
 
 
 def main() -> int:
     es = scenario_e()
     write_csv(PUBLIC_E, es)
     public_grid()
+    grid_tex(EQ_GRID_TEX)
+    rows = classify(es)
+    write_csv(EQ_SCEN_CSV, rows)
+    scenarios_tex(rows, EQ_SCEN_TEX)
     if not PRIVATE.exists():
-        print("config/custos_privado.yaml ausente: só a grade pública e o e por cenário foram gerados")
+        print("config/custos_privado.yaml ausente: só as grades dos autores e o e por cenário foram gerados")
         return 0
-    rows = private_table(load_costs(), es)
-    write_csv(PRIVATE_OUT, rows)
-    print(f"tabela privada: {PRIVATE_OUT} ({len(rows)} linhas; não versionar)")
+    priv = private_table(load_costs(), es)
+    write_csv(PRIVATE_OUT, priv)
+    print(f"verificação interna (não citar): {PRIVATE_OUT} ({len(priv)} linhas; não versionar)")
     return 0
 
 
