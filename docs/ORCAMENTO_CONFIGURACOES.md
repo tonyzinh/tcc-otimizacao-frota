@@ -47,3 +47,18 @@ Notação: H = salto máximo (km por rua estimado, também limite de execução)
 ## 4. Conferências finais previstas
 
 `pytest`; recalibração de uma família do zero com os mesmos números; nenhum finalista escolhido com dias de teste ou setembro (o arquivo de finalistas é gravado e commitado antes do teste); B + R = total em toda tabela; segunda checagem independente do resultado principal antes de declará-lo.
+
+## 5. Guloso seletivo por economia líquida (pré-registro de 16/10/2026, antes de qualquer execução)
+
+Última tentativa registrada de um algoritmo que reduza o KM vazio (pedido do proponente). Auditoria em [AUDITORIA_SELETIVO.md](AUDITORIA_SELETIVO.md). Saídas em `resultados/seletivo/`.
+
+- **Hipóteses.** H-S1: o guloso seletivo (C2) reduz o KM vazio total por corrida contra C0, com atendimento preservado. H-S2: valor líquido por corrida extra positivo nos custos vigentes (Fase D; custos em arquivo privado).
+- **Critérios:** os 5 da §2, com teste = 16–31/03 e setembro = 16–30/09; Holm entre os cenários finalistas (C1, C2 e C3, se existir) por mês.
+- **Cenários:** C0 sem reposicionamento; C1 guloso de valor marginal do artigo (α = 0,2; ρ = 2,5 km; limite 3 km); C2 guloso seletivo; C3 = C2 com a variante de previsão espacial escolhida na calibração (só se alguma vencer C2).
+- **Algoritmo C2.** Padrão: permanecer. Pré-filtro por ΔV > 0 (proxy do guloso atual, ρ = 2,5 km), até M = 30 pares por iteração, em ordem de ΔV. Cada par é simulado com e sem o movimento em cada cenário. Economia líquida por cenário: S_s = (B_s sem − B_s com) − (R_s com − R_s sem) − λ·(N_s sem − N_s com). O movimento entra se, **nos dois conjuntos** (seleção e validação), a média de S for > 0 e > τ × erro padrão, e a média de corridas com o movimento for ≥ a média sem. Aceito o primeiro par que passa, o plano é atualizado e a iteração recomeça; para quando nenhum par passa. Cada motorista se move no máximo uma vez.
+- **Cenários de demanda:** K por dia, metade de seleção (dias mais recentes do mesmo dia da semana nos 56 dias anteriores a D) e metade de validação (dias mais antigos). Cada cenário = dia sorteado com reposição na sua metade + *bootstrap* dos pedidos, com semente fixa.
+- **Grade (12):** H ∈ {2; 3; 4} km × K ∈ {8; 16} × τ ∈ {1; 2}; λ = 0. λ > 0 não testado (passaria do teto).
+- **Sementes:** 11, 23, 37, 41, 53 (sorteio de cenários); métricas do dia = média das sementes.
+- **Escolha do finalista:** a regra da §1 (menor KM vazio total por corrida com corridas ≥ 0,99 × baseline, calibração 2–15/03, regime B).
+- **4.4, variantes de previsão espacial (3 configurações, só calibração, com os demais parâmetros do finalista C2):** (a) previsão agregada em blocos de 3 h (04–07, 07–10, 10–11) e distribuída igualmente entre as horas do bloco; (b) zonas H3 r6 no pré-filtro (centróide ponderado das zonas r7 filhas), com as origens dos pedidos inalteradas no simulador; (c) destinos restritos a zonas com déficit persistente: pelo menos um pedido não atendido na janela em ≥ 50% dos dias de treino. C3 = a variante com menor KM vazio por corrida, se ela satisfizer o piso e for menor que a do finalista C2 na calibração; caso contrário, C3 não existe.
+- **Motivos de "permanecer"** por motorista do plano (só contagens publicadas): movido; permaneceu sem candidato (pré-filtro); sem economia; sem ganho de atendimento; reprovado na validação.
