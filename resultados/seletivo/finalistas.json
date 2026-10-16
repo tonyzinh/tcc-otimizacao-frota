@@ -1,0 +1,17 @@
+{
+  "C2": {
+    "cenario": "C2|H2|K16|tau1",
+    "parametros": {
+      "k": 16,
+      "lam": 0.0,
+      "m": 30,
+      "max_km": 2.0,
+      "previsao": "padrao",
+      "tau": 1.0
+    },
+    "regra": "menor km vazio/corrida com piso de atendimento"
+  },
+  "C3": null,
+  "congelado_em": "2026-10-16T18:30:20Z",
+  "codigo": "eb13092"
+}
