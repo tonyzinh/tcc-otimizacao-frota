@@ -19,6 +19,8 @@ tcc-frota final-run --raw data/raw --out reports/runs/tcc_final --publish report
 
 O sal da pseudonimização vem de `TCC_PSEUDO_SALT` ou de `data/.pseudo_salt` (≥ 16 caracteres, fora do Git). A saída individual fica em `reports/runs/tcc_final/<run_id>/` (ignorada); só os agregados vão para [`reports/tcc_final/`](reports/tcc_final/). **Resultado:** em março e setembro de 2026, nenhuma configuração reduziu o KM vazio estimado por corrida; o atendimento simulado subiu até cerca de 2–3% com escala conhecida, a um custo de 10 a 138 km vazios por corrida extra. Leia [resultados reais](docs/resultados_reais.md), [perguntas prováveis da banca](docs/perguntas_banca.md), [medalhão v2](docs/databricks_medalhao.md) e [limitações](docs/limitacoes.md).
 
+**Visualização (FleetLab):** `tcc-frota fleetlab-export` e `tcc-frota fleetlab-serve` levam os resultados reais ao frontend em `frontend/`, só na máquina local; veja [frontend/README.md](frontend/README.md).
+
 ## Experimento D+1 com dados reais (legado, setembro/2026, DT011–DT012)
 
 A Gold do Databricks alimenta o núcleo Python (`tcc-frota gold-export` e `tcc-frota gold-replay`). Em setembro/2026, nenhuma configuração do plano preventivo reduziu o KM vazio estimado em relação ao baseline sem reposicionamento. Veja o [experimento real](docs/experimento_real.md) e a [comparação de algoritmos](docs/comparacao_algoritmos.md). Para visualizar o plano no mapa: `streamlit run app/plano_d1.py --server.address 127.0.0.1` (extra `ui`).
