@@ -15,7 +15,7 @@ test = ["pytest>=8"]
 parquet = ["pyarrow>=18"]
 ui = ["streamlit>=1.49,<2"]
 # Rodada v2 (final-run): H3 para zonas, NumPy para a regressão de Poisson, Matplotlib para figuras.
-v2 = ["h3>=4.1", "numpy>=1.26", "matplotlib>=3.8", "pyarrow>=18", "tzdata"]
+v2 = ["h3>=4.1", "numpy>=1.26", "matplotlib>=3.8", "pyarrow>=18", "tzdata", "scikit-learn>=1.6"]
 
 [project.scripts]
 tcc-frota = "tcc_frota.cli:main"
