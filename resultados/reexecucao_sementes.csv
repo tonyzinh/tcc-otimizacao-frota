@@ -1,0 +1,9 @@
+periodo,cenario,sementes,corridas_atendidas_var_pct,corridas_atendidas_var_pct_ic_inf,corridas_atendidas_var_pct_ic_sup,km_vazio_por_corrida_var_pct,km_vazio_por_corrida_var_pct_ic_inf,km_vazio_por_corrida_var_pct_ic_sup,dias_com_reducao,dias
+mar2026,fin_busca_local,"61,67,71,73,79",-0.049751,-0.236814,0.059642,0.639614,0.179013,1.176804,1,16
+mar2026,fin_recozimento,"61,67,71,73,79",0.089552,-0.221187,0.387387,1.949837,0.694477,3.652099,2,16
+mar2026,fin_pso,"61,67,71,73,79",0.129353,-0.194384,0.443975,1.40117,0.41077,2.714046,1,16
+mar2026,fin_robusto_cenarios,"61,67,71,73,79",0.0,0.0,0.0,0.0,0.0,0.0,0,16
+set2026,fin_busca_local,"61,67,71,73,79",0.205832,0.018149,0.53654,0.443065,0.116341,0.770519,2,15
+set2026,fin_recozimento,"61,67,71,73,79",0.188679,0.0,0.493827,0.201375,0.029778,0.414648,1,15
+set2026,fin_pso,"61,67,71,73,79",0.222985,0.01542,0.572391,0.378115,0.079139,0.763455,0,15
+set2026,fin_robusto_cenarios,"61,67,71,73,79",0.068611,0.0,0.23976,0.036711,0.0,0.105525,0,15

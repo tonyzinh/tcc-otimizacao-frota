@@ -155,11 +155,35 @@ def latex(table: list[dict]) -> list[Path]:
     return [p1, p2]
 
 
+def latex_extras() -> Path | None:
+    """Tabela própria dos experimentos fora do escopo D+1 (intradiário e D+0), com o atendimento ao lado."""
+    rows = []
+    for period, lab in MONTH_LABEL.items():
+        path = RESULTS / f"extras_{lab}.csv"
+        if path.exists():
+            rows += [(lab, r) for r in read_rows(path)]
+    if not rows:
+        return None
+    lines = [r"% Gerado por tcc_frota.algoritmos.relatorio — não editar à mão. Fora da tabela principal.",
+             r"\begin{tabular}{llrr}", r"\hline", r"Mês & Experimento & Corridas (\%) & KM vazio/corrida (\%) \\", r"\hline"]
+    for lab, r in rows:
+        c = lambda k: f"{_pt(_f(r[k]))} [{_pt(_f(r[k + '_ic_inf']))}; {_pt(_f(r[k + '_ic_sup']))}]"
+        lines.append(f"{lab} & {r['rotulo']} ({r['cenario'].removeprefix('fin_')}) & {c('corridas_atendidas_var_pct')} & "
+                     f"{c('km_vazio_por_corrida_var_pct')} \\\\")
+    lines += [r"\hline", r"\end{tabular}"]
+    out = TABLES / "tab_bateria_extras.tex"
+    out.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return out
+
+
 def build() -> dict:
     table = final_table()
     pts = pareto_points()
     fig = pareto_figure(pts)
     tex = latex(table)
+    extra = latex_extras()
+    if extra:
+        tex.append(extra)
     return {"algoritmos": len(table), "aprovados": [r["algoritmo"] for r in table if r.get("veredito", "").startswith("superior")],
             "indicios": [r["algoritmo"] for r in table if r.get("veredito") == "indício, não confirmado"],
             "figura": str(fig), "latex": [str(p) for p in tex]}
