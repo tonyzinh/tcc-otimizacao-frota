@@ -2,7 +2,7 @@
 
 Lê `resultados/finalistas_<mes>_dias.csv`, agrega as sementes por dia, recalcula a variação do KM vazio
 total por corrida e das corridas (regime B) com bootstrap pareado de dias em NumPy (gerador diferente
-do usado na bateria) e confere B + R = total linha a linha. Uso: python scripts/checagem_independente.py
+do usado na bateria) e confere B + R = total linha a linha. Uso: python scripts/checagem_independente.py [pasta]
 """
 from __future__ import annotations
 
@@ -31,8 +31,9 @@ def load(path: Path):
 
 def main() -> int:
     rng = np.random.default_rng(987654321)
+    folder = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("resultados")   # ex.: resultados/seletivo
     for month in ("marco", "setembro"):
-        path = Path("resultados") / f"finalistas_{month}_dias.csv"
+        path = folder / f"finalistas_{month}_dias.csv"
         if not path.exists():
             continue
         days, bad = load(path)

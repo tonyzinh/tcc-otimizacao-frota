@@ -1,0 +1,44 @@
+[
+  {
+    "dia": "2026-03-05",
+    "alteracao": "sem_pedidos",
+    "plano_identico": true,
+    "movimentos": 0,
+    "pares_avaliados": 30
+  },
+  {
+    "dia": "2026-03-05",
+    "alteracao": "pedidos_de_outro_dia",
+    "plano_identico": true,
+    "movimentos": 0,
+    "pares_avaliados": 30
+  },
+  {
+    "dia": "2026-03-20",
+    "alteracao": "sem_pedidos",
+    "plano_identico": true,
+    "movimentos": 0,
+    "pares_avaliados": 30
+  },
+  {
+    "dia": "2026-03-20",
+    "alteracao": "pedidos_de_outro_dia",
+    "plano_identico": true,
+    "movimentos": 0,
+    "pares_avaliados": 30
+  },
+  {
+    "dia": "2026-09-22",
+    "alteracao": "sem_pedidos",
+    "plano_identico": true,
+    "movimentos": 0,
+    "pares_avaliados": 30
+  },
+  {
+    "dia": "2026-09-22",
+    "alteracao": "pedidos_de_outro_dia",
+    "plano_identico": true,
+    "movimentos": 0,
+    "pares_avaliados": 30
+  }
+]

@@ -192,3 +192,44 @@ def pareto() -> Path:
     pr.write_rows(OUT / "pareto_C0_C3.csv", [{"periodo": p, "cenario": "C0_sem_reposicionamento", "var_corridas_pct": 0.0,
                                                "var_km_vazio_por_corrida_pct": 0.0} for p in pr.MONTH_LABEL] + rows)
     return out
+
+
+def criteria_table() -> list[dict]:
+    """Os 5 critérios por cenário (C1–C3) a partir de `finalistas_<mes>.csv`; CSV e LaTeX gerados."""
+    from tcc_frota.algoritmos.estatistica import criteria
+
+    num = lambda v: v if v in ("True", "False") else (float(v) if v not in ("", None) else float("nan"))
+    months: dict[str, dict] = {}
+    for period, lab in pr.MONTH_LABEL.items():
+        for r in pr.read_rows(OUT / f"finalistas_{lab}.csv"):
+            months.setdefault(r["cenario"], {}).setdefault(r["regime"], {})[period] = {
+                k: (num(v) if k not in ("periodo", "regime", "cenario") else v) for k, v in r.items()}
+    out = []
+    for scen, reg in sorted(months.items()):
+        b, a = reg["B"], reg.get("A", {})
+        crit = criteria(b, a, {p: v["p_km_vazio_por_corrida_holm"] for p, v in b.items()})
+        row = {"cenario": scen}
+        for p, v in b.items():
+            lab = pr.MONTH_LABEL[p]
+            for k in ("corridas_atendidas_var_pct", "km_vazio_por_corrida_var_pct"):
+                row[f"{lab}_{k}"], row[f"{lab}_{k}_ic_inf"], row[f"{lab}_{k}_ic_sup"] = v[k], v[k + "_ic_inf"], v[k + "_ic_sup"]
+            row[f"{lab}_movimentos_executados"] = v["soma_prop_moves_executed"]
+            row[f"{lab}_p_holm"] = v["p_km_vazio_por_corrida_holm"]
+        out.append({**row, **crit})
+    pr.write_rows(OUT / "tabela_criterios.csv", out)
+    fmt = lambda x: f"{x:+.2f}".replace(".", "{,}")
+    yn = lambda x: "sim" if x else "não"
+    lines = [r"% Gerado por tcc_frota.algoritmos.seletivo.criteria_table — não editar à mão.",
+             r"\begin{tabular}{lrrrrcccccc}", r"\hline",
+             r"Cenário & \multicolumn{2}{c}{Corridas (\%)} & \multicolumn{2}{c}{KM vazio/corrida (\%)} & C1 & C2 & C3 & C4 & C5 & Aprovado \\",
+             r" & mar & set & mar & set & & & & & & \\", r"\hline"]
+    for r in out:
+        cell = lambda lab, k: f"{fmt(r[f'{lab}_{k}'])} [{fmt(r[f'{lab}_{k}_ic_inf'])}; {fmt(r[f'{lab}_{k}_ic_sup'])}]"
+        lines.append(f"{r['cenario'].replace('_', ' ')} & {cell('marco', 'corridas_atendidas_var_pct')} & {cell('setembro', 'corridas_atendidas_var_pct')} & "
+                     f"{cell('marco', 'km_vazio_por_corrida_var_pct')} & {cell('setembro', 'km_vazio_por_corrida_var_pct')} & "
+                     f"{yn(r['c1_km_vazio_menor'])} & {yn(r['c2_nao_inferior_atendimento'])} & {yn(r['c3_reducao_no_simulador'])} & "
+                     f"{yn(r['c4_consistencia'])} & {yn(r['c5_tempo'])} & {'sim' if r['veredito'].startswith('superior') else 'não'} \\\\")
+    lines += [r"\hline", r"\end{tabular}"]
+    Path("tabelas").mkdir(exist_ok=True)
+    Path("tabelas/tab_seletivo_criterios.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return out

@@ -1,0 +1,7 @@
+periodo,cenario,var_corridas_pct,var_km_vazio_por_corrida_pct
+mar2026,C0_sem_reposicionamento,0.0,0.0
+set2026,C0_sem_reposicionamento,0.0,0.0
+mar2026,C1_guloso_marginal_a0.2,0.39801,9.883908
+mar2026,C2_guloso_seletivo,0.0,0.0
+set2026,C1_guloso_marginal_a0.2,2.058319,7.829617
+set2026,C2_guloso_seletivo,0.0,-0.0

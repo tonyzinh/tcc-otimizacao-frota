@@ -1,0 +1,5 @@
+periodo,regime,cenario,planos_dia_semente,permaneceu_sem_candidato,permaneceu_sem_economia,permaneceu_sem_ganho_atendimento,permaneceu_reprovado_validacao,movido,permaneceu_sem_candidato_pct,permaneceu_sem_economia_pct,permaneceu_sem_ganho_atendimento_pct,permaneceu_reprovado_validacao_pct,movido_pct
+mar2026,A,C2_guloso_seletivo,80,64.6875,16.325,0.8875,0.1625,0.0,78.827113,19.893374,1.081493,0.19802,0.0
+mar2026,B,C2_guloso_seletivo,80,68.1875,19.9375,0.7125,0.35,0.0,76.4541,22.35459,0.798879,0.392432,0.0
+set2026,A,C2_guloso_seletivo,75,63.6,11.32,0.426667,0.253333,0.0,84.126984,14.973545,0.564374,0.335097,0.0
+set2026,B,C2_guloso_seletivo,75,56.0,14.0,0.426667,0.173333,0.0,79.320113,19.830028,0.604344,0.245515,0.0
