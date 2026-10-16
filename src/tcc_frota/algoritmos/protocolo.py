@@ -22,6 +22,8 @@ RUNS = Path("reports/runs/bateria")
 FINALISTS = RESULTS / "finalistas.json"
 REGISTRY_CSV = RESULTS / "registro_configuracoes.csv"
 FLOOR = 0.99   # corridas >= 0,99 x baseline (δ = 1%)
+EXTRA_FAMILIES = ("mpc", "despacho")   # fora da tabela principal (intradiário e D+0)
+EXTRAS_JSON = RESULTS / "finalistas_extras.json"
 CALIB_PERIOD, CALIB_REGIME, CALIB_WINDOW = "mar2026", "B", ex.MAIN_WINDOW
 
 DAY_FIELDS = ("n_requests", "served", "pickup_km", "reposition_km", "empty_km", "wait_sum", "moves_planned",
@@ -82,6 +84,9 @@ def grid(family: str) -> list[PlannerSpec]:
             for w in (0.5, 0.8):
                 specs.append(PlannerSpec(family, f"pso|p{p_stay:g}|w{w:g}",
                                          {"p_ficar": p_stay, "inercia": w, "particulas": 15, "iteracoes": 20, "max_km": 4.0}))
+    elif family == "nsga2":
+        busca = json.loads((RESULTS / "calibracao" / "nsga2_busca.json").read_text(encoding="utf-8"))
+        specs.append(PlannerSpec(family, "nsga2|pop20|ger15", {"finalistas": busca["finalistas"]}))
     else:
         raise ValueError(f"família sem grade de calibração: {family}")
     return specs
@@ -97,6 +102,8 @@ def per_day(rows: list[dict]) -> dict[tuple[str, str], dict]:
     for key, rs in acc.items():
         out[key] = {f: sum(float(r[f]) for r in rs) / len(rs) for f in DAY_FIELDS}
         out[key]["sementes"] = len(rs)
+        out[key]["plan_seconds_max"] = max(float(r["plan_seconds"]) for r in rs)
+        out[key]["motoristas_mundo"] = float(rs[0].get("motoristas_mundo") or 0)
         out[key]["parametros"] = rs[0]["parametros"]
         out[key]["familia"] = rs[0]["familia"]
     return out
@@ -187,9 +194,15 @@ def calibrate(family: str, *, workers: int = 12, raw: Path = Path("data/raw"), e
               register: bool = True, out_name: str | None = None) -> dict:
     """Roda a grade da família nos dias de calibração, registra tudo e grava o finalista candidato."""
     frozen = load_frozen()
-    specs = grid(family)
+    extra = family in EXTRA_FAMILIES
+    if extra:
+        from tcc_frota.algoritmos.extras import grid_extra
+
+        specs = grid_extra(family)
+    else:
+        specs = grid(family)
     sim = frozen.sims[CALIB_PERIOD]
-    tasks = [(CALIB_PERIOD, day, CALIB_WINDOW, CALIB_REGIME, sim, [s], frozen.model, SEEDS, k == 0)
+    tasks = [(CALIB_PERIOD, day, CALIB_WINDOW, CALIB_REGIME, sim, [s], frozen.model, SEEDS, k == 0) + (("extra",) if extra else ())
              for day in ex.PERIODS[CALIB_PERIOD].calibration for k, s in enumerate(specs)]
     echo(f"[{family}] {len(specs)} configurações × {len(ex.PERIODS[CALIB_PERIOD].calibration)} dias")
     rows = run_tasks(tasks, raw, workers, echo=echo)
@@ -214,13 +227,14 @@ def freeze(family: str) -> dict:
     """Copia o finalista da calibração para `resultados/finalistas.json` (antes de qualquer teste)."""
     cand = json.loads((RESULTS / "calibracao" / f"{family}.json").read_text(encoding="utf-8"))
     best = cand["finalista"]
-    fin = load_finalists()
+    target = EXTRAS_JSON if family in EXTRA_FAMILIES else FINALISTS
+    fin = json.loads(target.read_text(encoding="utf-8")) if target.exists() else {}
     fin[family] = {"cenario": best["cenario"], "parametros": json.loads(best["parametros"]),
                    "regra": best["regra"], "calibracao": {k: best[k] for k in (
                        "corridas_base", "corridas", "var_corridas_pct", "km_vazio_por_corrida_base",
                        "km_vazio_por_corrida", "var_km_vazio_por_corrida_pct", "tempo_plano_medio_s")},
                    "congelado_em": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "codigo": git_head()}
-    FINALISTS.write_text(json.dumps(fin, ensure_ascii=False, indent=2), encoding="utf-8")
+    target.write_text(json.dumps(fin, ensure_ascii=False, indent=2), encoding="utf-8")
     return fin[family]
 
 
@@ -247,3 +261,106 @@ def calibration_report(family: str, note: str) -> str:
     with path.open("a", encoding="utf-8") as handle:
         handle.write(head + text + "\n")
     return text
+
+
+# ------------------------------------------------------------------ teste (parâmetros congelados)
+MONTH_LABEL = {"mar2026": "marco", "set2026": "setembro"}
+TEST_REGIMES = ("B", "A")
+
+
+def assert_frozen_committed() -> None:
+    """O teste só roda com `resultados/finalistas.json` versionado e igual ao último commit."""
+    tracked = subprocess.run(["git", "ls-files", "--error-unmatch", str(FINALISTS)], capture_output=True).returncode == 0
+    clean = not subprocess.run(["git", "status", "--porcelain", str(FINALISTS)], capture_output=True, text=True).stdout.strip()
+    if not (tracked and clean):
+        raise SystemExit("finalistas.json precisa estar commitado e sem alterações antes do teste")
+
+
+def test_specs(families: list[str] | None = None) -> list[PlannerSpec]:
+    from tcc_frota.algoritmos.bateria import reference_specs
+
+    frozen = load_frozen()
+    fin = load_finalists()
+    specs = reference_specs(frozen.selection)
+    specs += [PlannerSpec(f, f"fin_{f}", v["parametros"]) for f, v in fin.items()]
+    if families:
+        specs = [s for s in specs if s.family in families or s.name in families]
+    return specs
+
+
+def run_test(period: str, *, workers: int = 12, raw: Path = Path("data/raw"), families: list[str] | None = None,
+             echo=print) -> Path:
+    assert_frozen_committed()
+    frozen = load_frozen()
+    specs = test_specs(families)
+    days_file = RESULTS / f"finalistas_{MONTH_LABEL[period]}_dias.csv"
+    old = read_rows(days_file) if days_file.exists() else []
+    names = {s.name for s in specs}
+    keep = [r for r in old if r["cenario"] not in names]
+    has_base = {(r["data"], r["regime"]) for r in keep if r["cenario"] == "sem_reposicionamento"}
+    tasks = []
+    for day in ex.PERIODS[period].test:
+        for regime in TEST_REGIMES:
+            for k, s in enumerate(specs):
+                tasks.append((period, day, CALIB_WINDOW, regime, frozen.sims[period], [s], frozen.model, SEEDS,
+                              k == 0 and (day.isoformat(), regime) not in has_base))
+    echo(f"[teste {period}] {len(specs)} algoritmos × {len(ex.PERIODS[period].test)} dias × {len(TEST_REGIMES)} regimes")
+    rows = keep + run_tasks(tasks, raw, workers, echo=echo)
+    rows.sort(key=lambda r: (r["regime"], r["data"], r["cenario"], str(r["semente"])))
+    write_rows(days_file, rows)
+    return days_file
+
+
+def analyse_test(period: str) -> list[dict]:
+    from tcc_frota.algoritmos.estatistica import analyse, holm
+
+    rows = read_rows(RESULTS / f"finalistas_{MONTH_LABEL[period]}_dias.csv")
+    out = []
+    for regime in TEST_REGIMES:
+        sel = [r for r in rows if r["regime"] == regime]
+        days = per_day(sel)
+        scenarios = sorted({c for c, _ in days if c != "sem_reposicionamento"})
+        m = len(scenarios)
+        res = {}
+        for scen in scenarios:
+            pairs = paired(days, scen)
+            res[scen] = {"periodo": period, "regime": regime, "cenario": scen, "familia": pairs[0]["p"]["familia"],
+                         "parametros": pairs[0]["p"]["parametros"], "sementes_por_dia": pairs[0]["p"]["sementes"],
+                         "m_comparacoes": m, **analyse(pairs, m)}
+        adj = holm({k: v["p_km_vazio_por_corrida"] for k, v in res.items()})
+        for k, v in res.items():
+            v["p_km_vazio_por_corrida_holm"] = adj[k]
+            out.append(v)
+    write_rows(RESULTS / f"finalistas_{MONTH_LABEL[period]}.csv", out)
+    return out
+
+
+# ------------------------------------------------------------------ 5.6 busca NSGA-II (uma semente por processo)
+def _nsga2_worker(args) -> dict:
+    raw, seed = args
+    import os
+
+    os.environ.setdefault("TCC_REAL_DATA_AUTHORIZED", "YES")
+    from tcc_frota.algoritmos import nsga2
+    from tcc_frota.algoritmos.bateria import build_study
+
+    started = datetime.now(timezone.utc)
+    out = nsga2.search(build_study(Path(raw)), load_frozen(), seed)
+    out["segundos"] = (datetime.now(timezone.utc) - started).total_seconds()
+    return out
+
+
+def nsga2_search(raw: Path = Path("data/raw"), seeds: tuple[int, ...] = SEEDS) -> dict:
+    from multiprocessing import get_context
+
+    with get_context("spawn").Pool(len(seeds)) as pool:
+        results = pool.map(_nsga2_worker, [(str(raw), s) for s in seeds])
+    rows = [r for res in results for r in res["avaliacoes"]]
+    write_rows(RESULTS / "nsga2_avaliacoes_calibracao.csv", rows)
+    busca = {"codigo": git_head(), "populacao": 20, "geracoes": 15,
+             "finalistas": {str(r["semente"]): r["finalista"] for r in results},
+             "regras": {str(r["semente"]): r["regra"] for r in results},
+             "segundos": {str(r["semente"]): r["segundos"] for r in results}}
+    (RESULTS / "calibracao").mkdir(parents=True, exist_ok=True)
+    (RESULTS / "calibracao" / "nsga2_busca.json").write_text(json.dumps(busca, ensure_ascii=False, indent=2), encoding="utf-8")
+    return busca

@@ -14,14 +14,14 @@ SIM = SimParams(4.5, 16.0, 1.3, 180.0)
 
 def scenarios(inp, n=4, per_day=30, seed=0):
     rng = random.Random(seed)
-    zones = list(inp.zones.values())
+    zones = sorted(inp.zones.items())
     out = []
     for k in range(n):
         reqs = []
         for i in range(per_day):
-            lat, lon = rng.choice(zones)
+            z, (lat, lon) = rng.choice(zones)
             reqs.append(SimRequest(i, rng.uniform(4 * 3600, 8 * 3600), lat + rng.uniform(-.005, .005),
-                                   lon + rng.uniform(-.005, .005), lat, lon + .02, 900.0, None, False, 5, ""))
+                                   lon + rng.uniform(-.005, .005), lat, lon + .02, 900.0, None, False, 5, z))
         out.append(Scenario(date(2026, 3, 9 - k), tuple(sorted(reqs, key=lambda r: r.t))))
     return tuple(out)
 
@@ -73,3 +73,24 @@ def test_evaluator_floor_penalty():
     ev = Evaluator(ctx(inp, 0, scenarios(inp)), scenarios(inp), 4.0)
     served, empty, repo = ev.base
     assert repo == 0 and ev.objective({}) == empty / served
+
+
+def test_annealing_and_pso_deterministic_and_within_hop():
+    from tcc_frota.algoritmos.pso import EnxameParticulas
+    from tcc_frota.algoritmos.recozimento import RecozimentoSimulado
+    inp = instance(6)
+    sc = scenarios(inp, seed=3)
+    for make in (lambda: RecozimentoSimulado(0.02, 0.98, 40, 4.0), lambda: EnxameParticulas(0.8, 0.5, 5, 4, 4.0)):
+        p = make()
+        a = p.plan(ctx(inp, 4, sc))
+        assert a == make().plan(ctx(inp, 4, sc))
+        assert all(km <= 4.0 + 1e-9 for *_, km in a.values())
+        assert p.info["escolhido"] in ("inicial", "melhor", "vazio")
+
+
+def test_annealing_accepts_worse_only_with_positive_temperature():
+    import random as _r
+    from tcc_frota.algoritmos.recozimento import RecozimentoSimulado
+    hot, cold = RecozimentoSimulado(1e3, 1.0, 1, 4.0), RecozimentoSimulado(0.0, 0.5, 1, 4.0)
+    rng = _r.Random(0)
+    assert hot.accept(0.01, 0, rng) and not cold.accept(0.01, 0, rng) and cold.accept(-0.01, 0, rng)

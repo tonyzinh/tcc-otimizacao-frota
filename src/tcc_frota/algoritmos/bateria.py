@@ -37,7 +37,7 @@ REGISTRY = {
     "robusto_cenarios": "tcc_frota.algoritmos.robusto:MILPCenarios",
     "busca_local": "tcc_frota.algoritmos.busca_local:BuscaLocalLNS",
     "recozimento": "tcc_frota.algoritmos.recozimento:RecozimentoSimulado",
-    "nsga2": "tcc_frota.algoritmos.fluxo_custo_minimo:FluxoParametrico",
+    "nsga2": "tcc_frota.algoritmos.nsga2:NSGA2Finalista",
     "pso": "tcc_frota.algoritmos.pso:EnxameParticulas",
 }
 
@@ -164,20 +164,28 @@ def _init_worker(raw: str) -> None:
     _STUDY = build_study(Path(raw))
 
 
+def _evaluator(args):
+    if len(args) > 9 and args[9] == "extra":
+        from tcc_frota.algoritmos.extras import evaluate_day_ext
+
+        return evaluate_day_ext
+    return evaluate_day
+
+
 def _task(args) -> list[dict]:
-    period, day, window_key, regime, sim, specs, model, seeds, include_baseline = args
-    return evaluate_day(_STUDY, period, day, window_key, regime, sim, specs, model, seeds=seeds,
-                        include_baseline=include_baseline)
+    period, day, window_key, regime, sim, specs, model, seeds, include_baseline = args[:9]
+    return _evaluator(args)(_STUDY, period, day, window_key, regime, sim, specs, model, seeds=seeds,
+                            include_baseline=include_baseline)
 
 
 def run_tasks(tasks: list[tuple], raw: Path = Path("data/raw"), workers: int = 1, study=None, echo=print) -> list[dict]:
-    """Executa tarefas `(período, dia, janela, regime, sim, specs, modelo, sementes, baseline)`."""
+    """Executa tarefas `(período, dia, janela, regime, sim, specs, modelo, sementes, baseline[, "extra"])`."""
     rows: list[dict] = []
     started = time.time()
     if workers <= 1:
         study = study or build_study(raw)
         for i, t in enumerate(tasks, 1):
-            rows += evaluate_day(study, t[0], t[1], t[2], t[3], t[4], t[5], t[6], seeds=t[7], include_baseline=t[8])
+            rows += _evaluator(t)(study, t[0], t[1], t[2], t[3], t[4], t[5], t[6], seeds=t[7], include_baseline=t[8])
             echo(f"  {i}/{len(tasks)} {t[0]} {t[1]} {t[3]} ({time.time() - started:.0f} s)")
         return rows
     from multiprocessing import get_context

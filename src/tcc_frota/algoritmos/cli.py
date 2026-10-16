@@ -27,11 +27,30 @@ def main(argv: list[str] | None = None) -> int:
     cal.add_argument("--saida", default=None, help="nome alternativo do arquivo de linhas")
     frz = sub.add_parser("congelar", help="congela o finalista de uma família")
     frz.add_argument("familia")
+    tst = sub.add_parser("testar", help="avalia finalistas e referências nos dias de teste de um período")
+    tst.add_argument("periodo", choices=["mar2026", "set2026"])
+    tst.add_argument("--workers", type=int, default=12)
+    tst.add_argument("--raw", type=Path, default=Path("data/raw"))
+    tst.add_argument("--familias", nargs="*", default=None)
+    ana = sub.add_parser("analisar", help="estatística pareada, Holm e Bonferroni dos dias de teste")
+    ana.add_argument("periodo", choices=["mar2026", "set2026"])
+    ng = sub.add_parser("nsga2-busca", help="5.6: busca NSGA-II nos dias de calibração (uma semente por processo)")
+    ng.add_argument("--raw", type=Path, default=Path("data/raw"))
     args = parser.parse_args(argv)
     if args.command == "congelar":
         from tcc_frota.algoritmos.protocolo import freeze
 
         print(json.dumps(freeze(args.familia), ensure_ascii=False, indent=2))
+        return 0
+    if args.command == "analisar":
+        from tcc_frota.algoritmos.protocolo import analyse_test
+
+        for r in analyse_test(args.periodo):
+            print(f"{r['regime']} {r['cenario']:<28} corridas {r['corridas_atendidas_var_pct']:+6.2f}% "
+                  f"[{r['corridas_atendidas_var_pct_ic_inf']:+.2f}; {r['corridas_atendidas_var_pct_ic_sup']:+.2f}]  "
+                  f"km vazio/corrida {r['km_vazio_por_corrida_var_pct']:+6.2f}% "
+                  f"[{r['km_vazio_por_corrida_var_pct_ic_inf']:+.2f}; {r['km_vazio_por_corrida_var_pct_ic_sup']:+.2f}]  "
+                  f"p_holm {r['p_km_vazio_por_corrida_holm']:.3f}")
         return 0
     if os.environ.get("TCC_REAL_DATA_AUTHORIZED") != "YES":
         print("defina TCC_REAL_DATA_AUTHORIZED=YES (processamento local autorizado, DT010-v2)", file=sys.stderr)
@@ -52,6 +71,16 @@ def main(argv: list[str] | None = None) -> int:
         out = regressao.run(study, args.daily)
         print(json.dumps({"simulador_igual": same_sim, **out}))
         return 0 if same_sim and out["divergencias"] == 0 else 1
+    if args.command == "testar":
+        from tcc_frota.algoritmos.protocolo import run_test
+
+        print(run_test(args.periodo, workers=args.workers, raw=args.raw, families=args.familias))
+        return 0
+    if args.command == "nsga2-busca":
+        from tcc_frota.algoritmos.protocolo import nsga2_search
+
+        print(json.dumps(nsga2_search(args.raw), ensure_ascii=False, default=str)[:2000])
+        return 0
     if args.command == "calibrar":
         from tcc_frota.algoritmos.protocolo import calibrate
 

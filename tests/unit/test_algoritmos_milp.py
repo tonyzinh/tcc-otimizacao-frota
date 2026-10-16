@@ -41,3 +41,30 @@ def test_relaxed_floor_never_costs_more_and_big_move_penalty_stops_moves():
         loose.plan(ctx(inp))
         assert loose.info["objetivo"] <= strict.info["objetivo"] + 1e-6
         assert MILPBuscaReposicionamento(1.5, 0.0, 1e4, 4.0).plan(ctx(inp)) == {}
+
+
+def test_scenario_milp_floor_per_scenario_and_cvar_not_below_mean():
+    from tcc_frota.algoritmos.milp import solve
+    from tcc_frota.algoritmos.alvos import window_demand
+    inp = instance(2)
+    lam = window_demand(inp)
+    lams = [{z: v * f for z, v in lam.items()} for f in (0.6, 1.0, 1.5)]
+    _, mean_info = solve(inp, lams, cap=1.5, beta=1.0, mu=0.0, hop=4.0, radius=4.5, objective="esperado")
+    _, cvar_info = solve(inp, lams, cap=1.5, beta=1.0, mu=0.0, hop=4.0, radius=4.5, objective="cvar")
+    for info in (mean_info, cvar_info):
+        assert info["status"] == 0
+        for served, s0 in zip(info["atendidas_modelo"], info["S0"]):
+            assert served >= s0 - 1e-5
+    assert cvar_info["objetivo"] >= mean_info["objetivo"] - 1e-6   # CVaR de custo >= média
+
+
+def test_robust_planner_is_seeded_and_uses_only_scenarios():
+    from tcc_frota.algoritmos.robusto import MILPCenarios
+    from test_algoritmos_busca import scenarios
+    inp = instance(3)
+    sc = scenarios(inp, 4)
+    c = PlanContext(inp, date(2026, 3, 16), (4, 11), "B", SIM, "fim_do_dia", sc, 3)
+    p = MILPCenarios(5, "esperado", 1.5, 0.99, 0.0, 4.0)
+    assert p.plan(c) == MILPCenarios(5, "esperado", 1.5, 0.99, 0.0, 4.0).plan(c)
+    assert p.info["cenarios"] == 5 and p.info["status"] == 0
+    assert MILPCenarios(5, "cvar", 1.5, 0.99, 0.0, 4.0).plan(ctx(inp)) == {}   # sem pseudodias: não move
