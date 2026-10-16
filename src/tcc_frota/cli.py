@@ -76,6 +76,14 @@ def main(argv: list[str] | None = None) -> int:
     final.add_argument("--out", type=Path, default=Path("reports/runs/tcc_final"))
     final.add_argument("--publish", type=Path, default=None,
                        help="copia só os agregados (CSV e result.json) para esta pasta versionável")
+    fl_export = sub.add_parser("fleetlab-export", help="v2: gera os JSON do FleetLab (uso local, dados pseudonimizados)")
+    fl_export.add_argument("--raw", type=Path, default=Path("data/raw"))
+    fl_export.add_argument("--result", type=Path, default=Path("reports/tcc_final/result.json"))
+    fl_export.add_argument("--sensitivity", type=Path, default=Path("reports/tcc_final/tab13_sensibilidade.csv"))
+    fl_export.add_argument("--out", type=Path, default=Path("reports/runs/fleetlab"))
+    fl_serve = sub.add_parser("fleetlab-serve", help="serve os JSON do FleetLab em 127.0.0.1")
+    fl_serve.add_argument("--root", type=Path, default=Path("reports/runs/fleetlab"))
+    fl_serve.add_argument("--port", type=int, default=8000)
     gold_replay = sub.add_parser("gold-replay", help="experimento D+1 real sobre o cache da Gold")
     gold_replay.add_argument("--cache", type=Path, default=Path("reports/runs/gold_cache"))
     gold_replay.add_argument("--start", type=date.fromisoformat, required=True)
@@ -168,6 +176,18 @@ def main(argv: list[str] | None = None) -> int:
 
         authorize("real", "local")
         prepare_raw(args.raw, materialize_to=args.materialize_to)
+    elif args.command == "fleetlab-export":
+        from tcc_frota.v2.fleetlab import Exporter
+
+        authorize("real", "local")
+        if "runs" not in args.out.resolve().parts:
+            raise PermissionError("a exportação do FleetLab contém dados individuais: use uma pasta em reports/runs/")
+        print(json.dumps(Exporter(args.raw, args.result, args.out).run(tab13=args.sensitivity), ensure_ascii=False))
+    elif args.command == "fleetlab-serve":
+        from tcc_frota.v2.fleetlab import serve
+
+        authorize("real", "local")
+        serve(args.root, port=args.port)
     elif args.command == "final-run":
         from tcc_frota.v2.final_run import final_run
 

@@ -72,6 +72,9 @@ class SimResult:
     requests_by_hour: dict[int, int] = field(default_factory=dict)
     pickup_km_by_hour: dict[int, float] = field(default_factory=dict)
     jobs: list[tuple[str, float, float, str]] = field(default_factory=list)  # (motorista, início, fim, tipo)
+    # Desfecho de cada recomendação: executed, absent, busy, limit, early, already_there, not_free_in_window.
+    move_outcomes: dict[str, str] = field(default_factory=dict)
+    move_origins_used: dict[str, tuple[float, float]] = field(default_factory=dict)
 
     @property
     def empty_km(self) -> float:
@@ -102,7 +105,7 @@ def _merge(intervals) -> list[tuple[float, float, float, float]]:
 def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimParams,
              window: tuple[float, float], moves: dict[str, tuple[float, float]] | None = None,
              tail_s: float = 3 * 3600, max_move_km: float = float("inf"), move_mode: str = "inicio_turno",
-             move_origins: dict[str, tuple[float, float]] | None = None) -> SimResult:
+             move_origins: dict[str, tuple[float, float]] | None = None, trace: list | None = None) -> SimResult:
     """Replay de um dia com recomendações de reposicionamento.
 
     `move_mode="inicio_turno"`: o motorista vai à zona-alvo na primeira disponibilidade da janela,
@@ -111,7 +114,9 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
     `move_origins[did]`, a última posição real de D) e começa a primeira sessão de D+1 já na zona-alvo;
     não vale para quem já trabalhava mais de 30 min antes da janela.
     Em ambos, o deslocamento real (por rua estimado) precisa respeitar `max_move_km`; caso contrário a
-    recomendação conta como não executada (não adesão). O KM executado entra no total (RN031)."""
+    recomendação conta como não executada (não adesão). O KM executado entra no total (RN031).
+    Com `trace` (lista), registra eventos para visualização: (t, tipo, motorista, pedido, (lat, lon), km).
+    O rastro não altera nenhuma decisão do replay."""
     if move_mode not in ("inicio_turno", "fim_do_dia"):
         raise ValueError("move_mode inválido")
     move_origins = move_origins or {}
@@ -124,6 +129,11 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
     res.moves_planned = len(moves)
     for d in unknown:          # recomendação para motorista que não trabalha: não executada
         moves.pop(d)
+        res.move_outcomes[d] = "absent"
+
+    def ev(t: float, kind: str, did: str | None, rid: int | None, at: tuple[float, float], km: float | None) -> None:
+        if trace is not None:
+            trace.append((t, kind, did, rid, at, km))
     horizon = w1 + tail_s
     online = {d.did: False for d in drivers}
     busy_until = {d.did: None for d in drivers}   # None = livre
@@ -171,6 +181,8 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
     def assign(did: str, r: SimRequest, t: float) -> None:
         km, total = job_seconds(did, r)
         pickup_s = 3600 * km / params.speed_kmh
+        ev(t, "dispatch", did, r.rid, pos[did], km)
+        ev(t + pickup_s, "pickup", did, r.rid, (r.lat, r.lon), None)
         res.served += 1
         res.served_ids.add(r.rid)
         res.pickup_km += km
@@ -180,6 +192,8 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
         busy_until[did] = t + total
         res.jobs.append((did, t, t + total, "corrida"))
         cancel = params.post_accept_cancel and r.post_accept_cancel
+        trip_km = 0.0 if cancel else reta_km(r.lat, r.lon, r.dlat, r.dlon) * params.road_factor
+        ev(t + total, "dropoff", did, r.rid, (r.lat, r.lon) if cancel else (r.dlat, r.dlon), trip_km)
         push(t + total, 3, "job_end", (did, (r.lat, r.lon) if cancel else (r.dlat, r.dlon)))
 
     def eligible(did: str, r: SimRequest, t: float) -> float | None:
@@ -199,13 +213,20 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
             return False
         lat, lon = pending_move.pop(did)
         if move_mode == "fim_do_dia":       # só vale ao iniciar o dia; depois disso, não adesão
+            res.move_outcomes[did] = "busy"
             return False
         if t >= w1:
+            res.move_outcomes[did] = "not_free_in_window"
             return False
         km = reta_km(pos[did][0], pos[did][1], lat, lon) * params.road_factor
         end = t + 3600 * km / params.speed_kmh
         if km <= 1e-9 or km > max_move_km + 1e-9 or commit_blocks(did, t, end):
+            res.move_outcomes[did] = ("already_there" if km <= 1e-9 else "limit" if km > max_move_km + 1e-9 else "busy")
             return False
+        res.move_outcomes[did] = "executed"
+        res.move_origins_used[did] = pos[did]
+        ev(t, "reposition_start", did, None, pos[did], km)
+        ev(end, "reposition_end", did, None, (lat, lon), None)
         res.reposition_km += km
         res.moves_executed += 1
         busy_until[did] = end
@@ -241,7 +262,17 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
                     target = pending_move.pop(did)
                     origin = move_origins.get(did) or pos[did]
                     km = reta_km(origin[0], origin[1], target[0], target[1]) * params.road_factor
+                    if first_start[did] < w0 - 1800:
+                        res.move_outcomes[did] = "early"
+                    elif km <= 1e-9:
+                        res.move_outcomes[did] = "already_there"
+                    elif km > max_move_km + 1e-9:
+                        res.move_outcomes[did] = "limit"
                     if first_start[did] >= w0 - 1800 and 1e-9 < km <= max_move_km + 1e-9:
+                        res.move_outcomes[did] = "executed"
+                        res.move_origins_used[did] = origin
+                        ev(t, "reposition_start", did, None, origin, km)
+                        ev(t, "reposition_end", did, None, target, None)
                         res.reposition_km += km
                         res.moves_executed += 1
                         res.jobs.append((did, t, t, "reposicionamento_fim_do_dia"))
@@ -252,7 +283,8 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
         elif kind == "commit_start":
             did, i = data
             s, e, lat, lon = commits[did][i]
-            pending_move.pop(did, None)   # ocupado antes da primeira disponibilidade: não executa
+            if pending_move.pop(did, None) is not None:   # ocupado antes da primeira disponibilidade
+                res.move_outcomes[did] = "busy"
             if busy_until[did] is not None:
                 raise AssertionError("compromisso sobreposto a tarefa simulada (RN017)")
             next_commit[did] = i
@@ -271,6 +303,7 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
             become_free(did, t)
         elif kind == "request":
             r = data
+            ev(t, "request_created", None, r.rid, (r.lat, r.lon), None)
             options = [(d, did) for did in online if (d := eligible(did, r, t)) is not None]
             if options:
                 _, did = min(options)
@@ -280,5 +313,9 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
                 patience = params.patience_s if r.patience_s is None else min(params.patience_s, r.patience_s)
                 push(t + patience, 5, "deadline", r.rid)
         elif kind == "deadline":
-            waiting.pop(data, None)
+            gone = waiting.pop(data, None)
+            if gone is not None:
+                ev(t, "request_unserved", None, gone.rid, (gone.lat, gone.lon), None)
+    for did in pending_move:
+        res.move_outcomes[did] = "not_free_in_window"
     return res

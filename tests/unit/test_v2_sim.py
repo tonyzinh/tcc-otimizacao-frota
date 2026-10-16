@@ -117,3 +117,19 @@ def test_end_of_day_mode_starts_session_at_target_and_counts_km_from_last_positi
     capped = simulate(reqs, drivers, P, W, {"a": (LAT, LON)}, move_mode="fim_do_dia",
                       move_origins={"a": (LAT + 0.2, LON)}, max_move_km=5.0)
     assert capped.moves_executed == 0
+
+
+def test_trace_does_not_change_results_and_records_move_outcomes():
+    reqs = [r(1, 6 * 3600), r(2, 6 * 3600 + 60, LAT + 0.3)]
+    drivers = [d("a", lat=LAT + 0.03), d("b", lat=LAT + 0.2)]
+    moves = {"a": (LAT, LON), "b": (LAT, LON), "fantasma": (LAT, LON)}
+    plain = simulate(reqs, drivers, P, W, moves, max_move_km=6.0)
+    trace: list = []
+    traced = simulate(reqs, drivers, P, W, moves, max_move_km=6.0, trace=trace)
+    assert (plain.served, plain.pickup_km, plain.reposition_km, plain.wait_s) == (
+        traced.served, traced.pickup_km, traced.reposition_km, traced.wait_s)
+    assert traced.move_outcomes == {"a": "executed", "b": "limit", "fantasma": "absent"}
+    kinds = [e[1] for e in trace]
+    assert kinds.count("request_created") == 2 and kinds.count("request_unserved") == 1
+    assert kinds.count("dispatch") == kinds.count("pickup") == kinds.count("dropoff") == 1
+    assert kinds.count("reposition_start") == kinds.count("reposition_end") == 1
