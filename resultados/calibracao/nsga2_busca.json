@@ -1,0 +1,56 @@
+{
+  "codigo": "fa55d9f",
+  "populacao": 20,
+  "geracoes": 15,
+  "finalistas": {
+    "11": {
+      "km_min": 0.3729,
+      "max_km": 1.6514,
+      "peso": 0.2444,
+      "share": 0.4314,
+      "teto": 4
+    },
+    "23": {
+      "km_min": 1.4924,
+      "max_km": 1.6115,
+      "peso": 0.2153,
+      "share": 0.8981,
+      "teto": 1
+    },
+    "37": {
+      "km_min": 1.8204,
+      "max_km": 1.5395,
+      "peso": 0.2132,
+      "share": 0.8421,
+      "teto": 4
+    },
+    "41": {
+      "km_min": 1.6821,
+      "max_km": 1.6485,
+      "peso": 0.0595,
+      "share": 1.3196,
+      "teto": 5
+    },
+    "53": {
+      "km_min": 1.2453,
+      "max_km": 1.5844,
+      "peso": 0.2334,
+      "share": 0.7117,
+      "teto": 5
+    }
+  },
+  "regras": {
+    "11": "fronteira: menor km vazio/corrida com piso",
+    "23": "fronteira: menor km vazio/corrida com piso",
+    "37": "fronteira: menor km vazio/corrida com piso",
+    "41": "fronteira: menor km vazio/corrida com piso",
+    "53": "fronteira: menor km vazio/corrida com piso"
+  },
+  "segundos": {
+    "11": 201.877326,
+    "23": 201.976438,
+    "37": 202.260342,
+    "41": 203.003119,
+    "53": 202.580884
+  }
+}

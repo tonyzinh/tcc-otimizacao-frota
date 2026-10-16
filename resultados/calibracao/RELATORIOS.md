@@ -149,3 +149,13 @@ Código `7e28d10`; calibração 2–15/03, regime B, 04–11h; baseline 1760 cor
 
 **D+0 (fora da tabela principal).** O despacho em lote (atribuição de custo mínimo a cada 30 ou 60 s) reduz o KM de busca por corrida, mas perde corridas em todas as configurações: −3,07% (lote de 30 s, raio calibrado) a −15,28% (lote de 60 s, raio − 1 km). Nenhuma configuração respeita o piso de −1%, então o finalista é o de maior razão de corridas (regra pré-registrada). **A redução do KM vazio por corrida aqui vem de recusar ou perder corridas (espera do lote além da paciência e raio menor) e não pode ser chamada de melhoria.**
 
+## nsga2
+
+Código `fa55d9f`; calibração 2–15/03, regime B, 04–11h; baseline 1760 corridas e 2.632 km vazios por corrida.
+
+| Configuração | Corridas (%) | KM vazio/corrida (%) | B/corrida | R/corrida | Mov. exec. | Dias com redução | Piso | Tempo (s/dia) |
+|---|---:|---:|---:|---:|---:|---:|:---:|---:|
+| `nsga2|pop20|ger15` **(finalista)** | +0.00 | -0.00 | 2.632 | 0.000 | 0 | 0/14 | sim | 0.03 |
+
+Busca: 5 sementes × 300 avaliações (população 20, 15 gerações) nos 14 dias de calibração; todas as 1.500 avaliações estão em resultados/nsga2_avaliacoes_calibracao.csv. Nenhuma configuração ficou abaixo do KM vazio por corrida do baseline. A extremidade de mais corridas da fronteira chegou a +1,5–1,8% de corridas com +18–21% de KM vazio por corrida. Pela regra pré-registrada, o finalista de cada semente é o ponto da fronteira com menor KM vazio por corrida e piso respeitado; nas 5 sementes isso dá configurações que não executam nenhum movimento (salto de 1,5–1,7 km, quase sempre com km mínimo por movimento próximo do salto), ou seja, o próprio baseline.
+
