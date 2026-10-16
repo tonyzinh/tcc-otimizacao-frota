@@ -11,6 +11,7 @@ Os parâmetros (simulador calibrado, modelo de previsão e seleção dos algorit
 from __future__ import annotations
 
 import json
+import re
 from collections import defaultdict
 from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
@@ -296,20 +297,28 @@ class Exporter:
         return manifest
 
 
-def serve(root: Path, host: str = "127.0.0.1", port: int = 8000,
-          origins: tuple[str, ...] = ("http://127.0.0.1:5173", "http://localhost:5173",
-                                      "http://127.0.0.1:4173", "http://localhost:4173")) -> None:
-    """Serve `root/api/<rota>.json` em `/api/<rota>` (somente GET, só na máquina local)."""
+LOCAL_ORIGIN = re.compile(r"^http://(127\.0\.0\.1|localhost)(:\d{1,5})?$")
+
+
+def serve(root: Path, host: str = "127.0.0.1", port: int = 8000) -> None:
+    """Serve `root/api/<rota>.json` em `/api/<rota>` (somente GET, só na máquina local).
+
+    O front em desenvolvimento chega pelo proxy do Vite (mesma origem); o CORS aceita apenas origens
+    locais, em qualquer porta. A porta é aberta em modo exclusivo: uma segunda instância falha em vez
+    de dividir a porta com a primeira (no Windows, SO_REUSEADDR permitiria isso)."""
+    import socket
     from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
     if host not in ("127.0.0.1", "localhost", "::1"):
         raise PermissionError("o servidor do FleetLab com dados reais só pode escutar na máquina local")
     api = (root / "api").resolve()
+    if not (api / "experiments.json").is_file():
+        raise FileNotFoundError(f"{api} sem experiments.json: rode antes `tcc-frota fleetlab-export`")
 
     class Handler(BaseHTTPRequestHandler):
         def _cors(self) -> None:
             origin = self.headers.get("Origin")
-            if origin in origins:
+            if origin and LOCAL_ORIGIN.match(origin):
                 self.send_header("Access-Control-Allow-Origin", origin)
                 self.send_header("Vary", "Origin")
 
@@ -342,7 +351,19 @@ def serve(root: Path, host: str = "127.0.0.1", port: int = 8000,
         def log_message(self, format, *args) -> None:  # sem rotas nem dados nos logs
             return
 
-    server = ThreadingHTTPServer((host, port), Handler)
+    class ExclusiveServer(ThreadingHTTPServer):
+        allow_reuse_address = False
+        daemon_threads = True
+
+        def server_bind(self) -> None:
+            if hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
+                self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+            super().server_bind()
+
+    try:
+        server = ExclusiveServer((host, port), Handler)
+    except OSError as exc:
+        raise SystemExit(f"porta {port} ocupada (outra instância do fleetlab-serve?): {exc}") from exc
     print(f"FleetLab (dados reais, uso local): http://{host}:{port}/api — Ctrl+C para encerrar", flush=True)
     try:
         server.serve_forever()
