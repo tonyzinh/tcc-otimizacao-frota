@@ -11,6 +11,12 @@
 export type ISODateTime = string
 /** Data local `YYYY-MM-DD` no fuso do experimento. */
 export type ISODate = string
+/**
+ * Método de distância. `haversine`: linha reta (dados demonstrativos e replay legado);
+ * `haversine_fator_rua`: linha reta × fator rua/reta calibrado (rodada v2). Ambos são estimativas.
+ */
+export type DistanceMethod = 'haversine' | 'haversine_fator_rua'
+
 /** Coordenada `[longitude, latitude]` em graus decimais (WGS84). */
 export type LngLat = readonly [number, number]
 /** Índice de célula H3 em hexadecimal. */
@@ -19,7 +25,7 @@ export type H3Index = string
 /** Origem dos dados exibidos. A interface sempre mostra esse rótulo. */
 export type DataKind = 'demo' | 'synthetic' | 'real'
 
-export type AlgorithmId = 'baseline' | 'guloso' | 'proporcional' | 'atribuicao_otima'
+export type AlgorithmId = 'baseline' | 'guloso' | 'proporcional' | 'atribuicao_otima' | 'regra_limiar'
 export type ProposedAlgorithmId = Exclude<AlgorithmId, 'baseline'>
 
 export interface Provenance {
@@ -46,6 +52,12 @@ export interface ExperimentParameters {
   maxPickupMinutes: number
   /** Velocidade em linha reta usada para converter distância em tempo. */
   speedKmh: number
+  /** Rodada v2 (dados reais): raio de despacho, paciência, fator rua/reta, regra de execução e regime. */
+  radiusKm?: number
+  patienceSeconds?: number
+  roadFactor?: number
+  executionRule?: string
+  regime?: 'A' | 'B' | 'C'
 }
 
 export interface Experiment {
@@ -55,7 +67,7 @@ export interface Experiment {
   timezone: string
   region: string
   h3Resolution: number
-  distanceMethod: 'haversine'
+  distanceMethod: DistanceMethod
   days: ISODate[]
   parameters: ExperimentParameters
   algorithms: AlgorithmId[]
@@ -178,7 +190,7 @@ export interface ScenarioMetrics {
   executedMoves: number
   plannedRepositionKm: number
   execution: Record<ExecutionOutcome, number>
-  distanceMethod: 'haversine'
+  distanceMethod: DistanceMethod
   dataKind: DataKind
   observedKm: null
 }

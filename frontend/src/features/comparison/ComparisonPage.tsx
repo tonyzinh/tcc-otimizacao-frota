@@ -10,7 +10,7 @@ import { Select } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip } from '@/components/ui/tooltip'
 import { AlgorithmSwatch } from '@/features/shared/AlgorithmTag'
-import { useExperimentContext } from '@/features/shared/ExperimentContext'
+import { resolveAlgorithm, useExperimentContext } from '@/features/shared/ExperimentContext'
 import { LAYER_ITEMS } from '@/features/shared/layerCatalog'
 import { FilterChips } from '@/features/shared/LayerToggles'
 import { MapFrame } from '@/features/shared/MapFrame'
@@ -33,8 +33,11 @@ const TRAILS = { accumulate: true, headSeconds: 600, kinds: new Set<Trail['kind'
 export default function ComparisonPage() {
   const { theme } = useTheme()
   const { experiment, date, names } = useExperimentContext()
-  const [a, setA] = useState<AlgorithmId>('guloso')
-  const [b, setB] = useState<AlgorithmId>('atribuicao_otima')
+  const available = experiment?.algorithms ?? []
+  const [pickA, setA] = useState<AlgorithmId>('guloso')
+  const [pickB, setB] = useState<AlgorithmId>('atribuicao_otima')
+  const a = resolveAlgorithm(available, pickA)
+  const b = resolveAlgorithm(available, pickB, a)
   const [syncOn, setSyncOn] = useState(true)
   const [offset, setOffset] = useState(90 * MINUTE)
   const [enabled, setEnabled] = useState<ReadonlySet<LayerKey>>(

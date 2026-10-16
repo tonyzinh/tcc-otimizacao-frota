@@ -1,3 +1,4 @@
+import { useStudyKind } from '@/features/shared/ExperimentContext'
 import { ArrowRight, Car, Hexagon, MapPin, Route, Waypoints, X } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { aggregateFlows } from '@/components/maps/transforms'
@@ -70,6 +71,7 @@ export function DetailPanel({
   ctx: DetailContext
 }) {
   const { snapshot, run, model, time } = ctx
+  const { real, distance } = useStudyKind()
   const zoneName = (h3: string) => {
     const z = snapshot.zones.find((x) => x.h3 === h3)
     return z ? `${z.locality} · ${z.municipality}` : 'Zona sem previsão'
@@ -87,7 +89,7 @@ export function DetailPanel({
           <Row label="Atendidas" value={`${formatNumber(m.served)} · ${formatPercent(m.coverage)}`} />
           <Row label="Espera média estimada" value={formatMinutes(m.meanWaitMinutes)} />
         </Section>
-        <Section title="KM vazio estimado (Haversine)">
+        <Section title={`KM vazio estimado (${distance})`}>
           <Row label="Pickup" value={formatKm(m.pickupKm)} />
           <Row label="Reposicionamento" value={formatKm(m.repositionKm)} />
           <Row label="Retorno" value="não medido" muted />
@@ -112,7 +114,7 @@ export function DetailPanel({
         ) : null}
         <p className="border-t border-line px-4 py-3 text-[11px] text-fg-subtle">
           Clique em zonas, veículos, solicitações ou trajetos para ver detalhes. Trajetos são curvas ilustrativas; os km vêm dos
-          eventos (linha reta Haversine).
+          eventos ({distance}).
         </p>
       </div>
     )
@@ -151,7 +153,7 @@ export function DetailPanel({
     const moves = run.movements.filter((m) => m.vehicleId === selection.id)
     return (
       <div>
-        <Heading icon={<Car />} title={selection.id} subtitle="Identificador fictício" onClose={onClose} />
+        <Heading icon={<Car />} title={selection.id} subtitle={real ? 'Rótulo pseudônimo' : 'Identificador fictício'} onClose={onClose} />
         <Section title={`Às ${formatClock(time)}`}>
           <Row label="Estado" value={frame ? VEHICLE_STATE_LABELS[frame.state] : '—'} />
           <Row label="Disponível" value={fleet ? `${formatClock(toEpoch(fleet.availableFrom))}–${formatClock(toEpoch(fleet.availableUntil))}` : 'ausente no dia'} />

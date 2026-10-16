@@ -1,3 +1,4 @@
+import { useStudyKind } from '@/features/shared/ExperimentContext'
 import { Delta, Metric } from '@/components/ui/metric'
 import { AlgorithmSwatch } from '@/features/shared/AlgorithmTag'
 import { formatKm, formatNumber, formatPercent, formatSignedPercent } from '@/lib/format'
@@ -15,6 +16,7 @@ export function KpiStrip({
   algorithms: readonly AlgorithmId[]
   names: Record<AlgorithmId, string>
 }) {
+  const { distance } = useStudyKind()
   const baseline = aggregated.baseline
   const observed = results.days.reduce((s, d) => s + d.observedTotal, 0)
   const forecast = results.days.reduce((s, d) => s + d.forecastTotal, 0)
@@ -48,7 +50,7 @@ export function KpiStrip({
           label="KM vazio · baseline"
           value={formatNumber(baseline?.emptyKmTotal ?? 0)}
           unit="km"
-          context="pickup, Haversine estimado"
+          context={`pickup, ${distance}`}
         />
       </div>
       <div className="bg-surface p-4">

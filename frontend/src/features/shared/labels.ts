@@ -1,5 +1,10 @@
-import type { ExecutionOutcome, VehicleState } from '@/types'
+import type { DistanceMethod, ExecutionOutcome, VehicleState } from '@/types'
 import type { RequestDisplayState } from '@/components/simulation/replayEngine'
+
+/** Rótulo curto do método de distância (sempre estimativa, nunca odômetro). */
+export function distanceLabel(method: DistanceMethod | undefined): string {
+  return method === 'haversine_fator_rua' ? 'Haversine × fator rua/reta' : 'Haversine'
+}
 
 export const OUTCOME_LABELS: Record<ExecutionOutcome, string> = {
   executed: 'Executada',

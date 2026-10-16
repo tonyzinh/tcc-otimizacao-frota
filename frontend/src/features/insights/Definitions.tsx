@@ -1,7 +1,9 @@
+import { useStudyKind } from '@/features/shared/ExperimentContext'
+
 const DEFINITIONS = [
   {
     term: 'Pickup',
-    text: 'Deslocamento vazio do veículo livre até a origem do passageiro. Haversine estimado entre posição e origem.',
+    text: 'Deslocamento vazio do veículo livre até a origem do passageiro. Distância estimada (DIST) entre posição e origem.',
     tag: 'estimado',
   },
   {
@@ -24,6 +26,7 @@ const DEFINITIONS = [
 ] as const
 
 export function Definitions() {
+  const { distance } = useStudyKind()
   return (
     <dl className="divide-y divide-line">
       {DEFINITIONS.map((d) => (
@@ -32,7 +35,7 @@ export function Definitions() {
             <span className="text-[13px] font-medium text-fg">{d.term}</span>
             <span className="rounded border border-line px-1.5 py-px text-[10px] text-fg-subtle">{d.tag}</span>
           </dt>
-          <dd className="text-xs text-fg-subtle">{d.text}</dd>
+          <dd className="text-xs text-fg-subtle">{d.text.replace('DIST', distance)}</dd>
         </div>
       ))}
     </dl>

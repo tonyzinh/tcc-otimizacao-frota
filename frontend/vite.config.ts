@@ -23,5 +23,7 @@ export default defineConfig({
     css: false,
     include: ['src/**/*.test.{ts,tsx}'],
     restoreMocks: true,
+    // Testes nunca dependem dos dados reais servidos localmente, mesmo com `.env.local` em modo http.
+    env: { VITE_DATA_SOURCE: 'mock' },
   },
 })

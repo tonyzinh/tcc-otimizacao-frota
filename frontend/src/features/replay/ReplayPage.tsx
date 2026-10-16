@@ -322,7 +322,7 @@ export default function ReplayPage() {
           <div className="eyebrow px-4 pb-1.5">Eventos recentes · {names[a]}</div>
           {runA.data && snapshot.data ? <EventLog run={runA.data} snapshot={snapshot.data} upToIndex={eventIndex} /> : null}
           <p className="border-t border-line px-4 py-3 text-[11px] text-fg-subtle">
-            Reprodução de eventos simulados a partir de dados fictícios. Não representa despacho em tempo real nem conexão operacional.
+            Reprodução de eventos simulados a partir de {experiment?.provenance.kind === 'real' ? 'dados reais pseudonimizados (uso local)' : 'dados fictícios'}. Não representa despacho em tempo real nem conexão operacional.
           </p>
         </div>
       </aside>

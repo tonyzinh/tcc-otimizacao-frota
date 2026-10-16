@@ -30,6 +30,7 @@
   --color-s-guloso: var(--series-guloso);
   --color-s-proporcional: var(--series-proporcional);
   --color-s-atribuicao: var(--series-atribuicao);
+  --color-s-limiar: var(--series-limiar);
   --color-s-baseline: var(--series-baseline);
 
   --text-2xs: 0.6875rem;

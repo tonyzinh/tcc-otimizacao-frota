@@ -33,7 +33,7 @@ export function ResultsTable({
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[680px] border-collapse text-[13px] whitespace-nowrap">
-        <caption className="sr-only">Resultados agregados por estratégia, KM vazio estimado por Haversine</caption>
+        <caption className="sr-only">Resultados agregados por estratégia, KM vazio estimado</caption>
         <thead>
           <tr className="border-b border-line text-left">
             {['Estratégia', 'KM vazio', 'Pickup', 'Reposic.', 'Redução', 'Cobertura', 'Δ cob.', 'Dias ok', 'Execução'].map((h, i) => (

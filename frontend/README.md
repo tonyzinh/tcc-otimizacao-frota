@@ -4,10 +4,10 @@ POC visual do TCC **Otimização da Alocação de Frota em Aplicativos de Transp
 comparação de estratégias de alocação preventiva **D+1** para reduzir o **KM vazio estimado**, com a
 cobertura de atendimento como controle.
 
-> **Todos os dados exibidos são fictícios.** Eles vêm de um gerador local determinístico em
-> `src/mocks/`. Nada é lido de `data/`, da Gold do Databricks ou do Elasticsearch, e nenhum número
-> desta interface deve ser citado como resultado do TCC. O resultado real está em
-> `docs/experimento_real.md`, na raiz do repositório.
+> **Duas origens de dados.** Por padrão (`mock`), tudo vem de um gerador local determinístico em
+> `src/mocks/` e é fictício. No modo **dados reais** (`http`), a interface lê os resultados da rodada
+> final do TCC (v2), servidos só na máquina local pelo núcleo Python; o selo "Dados reais autorizados"
+> e a faixa de aviso aparecem em todas as telas. O texto científico está em `docs/resultados_reais.md`.
 
 Esta pasta é independente do projeto científico: não importa código Python, não altera o simulador e
 não instala dependências na raiz.
@@ -85,8 +85,8 @@ consumida pelos hooks de `src/features/shared/useStudyData.ts`. A escolha da ori
 
 | Origem | Arquivo | Uso |
 |---|---|---|
-| `mock` (padrão) | `services/mockDataSource.ts` → `mocks/generator.ts` | todas as telas hoje |
-| `http` | `services/httpDataSource.ts` | futura API Python |
+| `mock` (padrão) | `services/mockDataSource.ts` → `mocks/generator.ts` | demonstração e testes |
+| `http` | `services/httpDataSource.ts` | dados reais da rodada v2 via `tcc-frota fleetlab-serve` |
 
 Componentes que hoje consomem mocks (via hooks, nunca importando `mocks/` diretamente): Topbar e
 `ExperimentProvider` (experimentos e algoritmos), Dashboard (`useExperimentResults`), Simulation Lab,
@@ -105,11 +105,38 @@ Grande Vitória e os testes do gerador/motor importam `mocks/` para validar inva
   simulador Python.
 - Trajetos são curvas ilustrativas; as distâncias exibidas são Haversine entre pontos.
 
-## Como conectar ao backend Python (futuro)
+## Dados reais da rodada v2 (uso local)
 
-1. Expor uma API (por exemplo FastAPI) que leia os artefatos **agregados e autorizados** já produzidos
-   pelo núcleo (`tcc-frota gold-replay --details` gera `result.json` e `days/<data>.json`) e responda
-   nas rotas documentadas em `services/httpDataSource.ts`:
+Na raiz do repositório, com os extratos em `data/raw/` e o `final-run` já publicado em `reports/tcc_final/`:
+
+```powershell
+$env:TCC_REAL_DATA_AUTHORIZED = 'YES'
+.venv\Scripts\python.exe -m tcc_frota.cli fleetlab-export   # gera reports/runs/fleetlab/ (ignorado pelo Git)
+.venv\Scripts\python.exe -m tcc_frota.cli fleetlab-serve    # http://127.0.0.1:8000/api, só na máquina local
+```
+
+Em outro terminal:
+
+```powershell
+cd frontend
+Copy-Item .env.example .env.local     # VITE_DATA_SOURCE=http e VITE_API_BASE_URL=http://127.0.0.1:8000/api
+npm run dev                           # http://127.0.0.1:5173
+```
+
+O que aparece:
+
+- **Experimentos:** março e setembro/2026 (dias de teste), cada um nos regimes B (escala conhecida, plano no fim de D), A (D+1 estrito às 20h) e C (oráculo, só diagnóstico). Janela 04–11h.
+- **Estratégias:** sem reposicionamento, guloso de valor marginal (α = 0,2), proporcional e regra de limiar. Os parâmetros são os congelados no `final-run` (`reports/tcc_final/result.json`); o export roda o mesmo simulador e reproduz exatamente os totais da tabela principal.
+- **Mapa e replay:** pedidos (inclusive não atendidos) e motoristas reais pseudonimizados. Motoristas aparecem como `M-001…` e pedidos como `P-0001…`; nem o pseudônimo nem o código interno saem do Python. Origem e destino com 3 casas, posição de motorista com 4. Corridas externas (agendadas e fora da janela) ocupam o motorista no simulador, mas não são desenhadas.
+- **Distância:** `haversine_fator_rua` (linha reta × fator rua/reta calibrado). Estimativa, nunca odômetro.
+
+Cuidados: os JSONs ficam em `reports/runs/fleetlab/` e o `.env.local` é ignorado pelo Git. O servidor recusa endereços fora de 127.0.0.1, só responde GET e não registra rotas nos logs. `npm run build` com `.env.local` em modo `http` gera um `dist/` que lê a API local; não publique esse build. Os testes forçam o modo `mock` (`vite.config.ts`). O mapa base continua vindo do OpenFreeMap; só a área visível é consultada, sem enviar dados do estudo.
+
+## Contrato da API (referência)
+
+1. A API local `tcc-frota fleetlab-serve` (rodada v2) já implementa este contrato a partir dos arquivos de
+   `tcc-frota fleetlab-export`. Outra API que queira substituí-la deve responder nas rotas documentadas em
+   `services/httpDataSource.ts`:
    `GET /experiments`, `/algorithms`, `/experiments/{id}/results`, `/experiments/{id}/days/{date}`,
    `/experiments/{id}/days/{date}/scenarios/{algorithmId}`, `/experiments/{id}/sensitivity`.
 2. Converter o formato Python para os contratos do frontend. `services/pythonAdapters.ts` já mapeia

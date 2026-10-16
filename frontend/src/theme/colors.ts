@@ -9,12 +9,14 @@ const SERIES: Record<Theme, Record<AlgorithmId, RGB>> = {
     guloso: [57, 135, 229],
     proporcional: [217, 89, 38],
     atribuicao_otima: [25, 158, 112],
+    regra_limiar: [204, 121, 167],
     baseline: [138, 144, 153],
   },
   light: {
     guloso: [42, 120, 214],
     proporcional: [235, 104, 52],
     atribuicao_otima: [27, 175, 122],
+    regra_limiar: [178, 74, 139],
     baseline: [137, 135, 129],
   },
 }
@@ -36,6 +38,7 @@ export const SERIES_BG: Record<AlgorithmId, string> = {
   guloso: 'bg-s-guloso',
   proporcional: 'bg-s-proporcional',
   atribuicao_otima: 'bg-s-atribuicao',
+  regra_limiar: 'bg-s-limiar',
   baseline: 'bg-s-baseline',
 }
 

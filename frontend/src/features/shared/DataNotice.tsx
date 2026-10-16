@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Tooltip } from '@/components/ui/tooltip'
 import { cn } from '@/lib/cn'
 import type { DataKind, Provenance } from '@/types'
+import { useStudyKind } from './ExperimentContext'
 
 const KIND_LABEL: Record<DataKind, string> = {
   demo: 'Dados fictícios',
@@ -27,6 +28,7 @@ export function DataKindBadge({ provenance, className }: { provenance: Provenanc
 
 /** Faixa discreta reforçando que o painel é demonstrativo e não despacho em tempo real. */
 export function DemoStrip({ className }: { className?: string }) {
+  const { real, distance } = useStudyKind()
   return (
     <div
       role="note"
@@ -37,8 +39,18 @@ export function DemoStrip({ className }: { className?: string }) {
     >
       <TriangleAlert className="mt-px size-3.5 shrink-0 text-warning" aria-hidden />
       <p>
-        <span className="font-medium text-fg">Demonstração com dados fictícios.</span> Planejamento D+1 calculado no corte de D,
-        avaliado por replay retrospectivo — não é despacho em tempo real nem medição da empresa.
+        {real ? (
+          <>
+            <span className="font-medium text-fg">Dados reais pseudonimizados, uso local.</span> Plano D+1 avaliado por simulação
+            retrospectiva com baseline calibrado; KM estimado ({distance}). Não é despacho em tempo real, economia observada nem
+            política da empresa.
+          </>
+        ) : (
+          <>
+            <span className="font-medium text-fg">Demonstração com dados fictícios.</span> Planejamento D+1 calculado no corte de D,
+            avaliado por replay retrospectivo — não é despacho em tempo real nem medição da empresa.
+          </>
+        )}
       </p>
     </div>
   )

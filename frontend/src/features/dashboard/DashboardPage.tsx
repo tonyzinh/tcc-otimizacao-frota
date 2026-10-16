@@ -1,3 +1,4 @@
+import { distanceLabel } from '@/features/shared/labels'
 import { ArrowRight } from 'lucide-react'
 import { useMemo } from 'react'
 import { Link } from 'react-router'
@@ -62,7 +63,7 @@ export default function DashboardPage() {
               <Panel className="lg:col-span-2">
                 <PanelHeader
                   title="KM vazio estimado por dia"
-                  description="Soma Haversine de pickup e reposicionamento executado. Baseline tracejado."
+                  description={`Soma de pickup e reposicionamento executado (${distanceLabel(experiment?.distanceMethod)}). Baseline tracejado.`}
                 />
                 <PanelBody>
                   <DailyEmptyKmChart days={results.data.days} algorithms={algorithms} names={names} />

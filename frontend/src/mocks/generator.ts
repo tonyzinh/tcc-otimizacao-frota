@@ -50,6 +50,8 @@ export const DEMO_PLAN_PROFILES: Record<ProposedAlgorithmId, { moveFraction: num
   guloso: { moveFraction: 0.22, focus: 1.6, distanceScaleKm: 2.5 },
   proporcional: { moveFraction: 0.18, focus: 1.0, distanceScaleKm: 3 },
   atribuicao_otima: { moveFraction: 0.16, focus: 1.2, distanceScaleKm: 2 },
+  // Não usado pelos experimentos demonstrativos; existe só para completar o contrato.
+  regra_limiar: { moveFraction: 0.2, focus: 1.4, distanceScaleKm: 2.5 },
 }
 
 type WindowKind = 'morning' | 'evening'

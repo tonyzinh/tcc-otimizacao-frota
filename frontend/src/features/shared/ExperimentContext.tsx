@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import { useDataSource, useResource } from '@/services'
-import type { Algorithm, AlgorithmId, Experiment, ISODate } from '@/types'
+import type { Algorithm, AlgorithmId, DataKind, Experiment, ISODate } from '@/types'
+import { distanceLabel } from './labels'
 
 interface ExperimentContextValue {
   experiments: Experiment[]
@@ -22,6 +23,7 @@ const FALLBACK_NAMES: Record<AlgorithmId, string> = {
   guloso: 'Guloso (DT001)',
   proporcional: 'Proporcional',
   atribuicao_otima: 'Atribuição ótima',
+  regra_limiar: 'Regra de limiar',
 }
 
 /** Seleção global de experimento e dia, compartilhada entre as páginas. */
@@ -74,4 +76,17 @@ export function useExperimentContext(): ExperimentContextValue {
   const ctx = useContext(ExperimentContext)
   if (!ctx) throw new Error('useExperimentContext precisa de <ExperimentProvider>')
   return ctx
+}
+
+/** Origem e método de distância do experimento atual; fora do provedor, assume demonstração. */
+export function useStudyKind(): { kind: DataKind; distance: string; real: boolean } {
+  const ctx = useContext(ExperimentContext)
+  const kind = ctx?.experiment?.provenance.kind ?? 'demo'
+  return { kind, distance: distanceLabel(ctx?.experiment?.distanceMethod), real: kind === 'real' }
+}
+
+/** Primeiro algoritmo disponível no experimento, preferindo `wanted` e evitando `avoid`. */
+export function resolveAlgorithm(available: readonly AlgorithmId[], wanted: AlgorithmId, avoid?: AlgorithmId): AlgorithmId {
+  if (available.includes(wanted) && wanted !== avoid) return wanted
+  return available.find((id) => id !== 'baseline' && id !== avoid) ?? available.find((id) => id !== avoid) ?? wanted
 }
