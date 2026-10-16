@@ -65,3 +65,51 @@ def test_parametric_min_km_filters_short_moves():
     loose = FluxoParametrico(0.5, 1.0, 4.0, None, 0.0).plan(ctx(inp))
     strict = FluxoParametrico(0.5, 1.0, 4.0, None, 3.5).plan(ctx(inp))
     assert all(km >= 3.5 for *_, km in strict.values()) and len(strict) <= len(loose)
+
+
+def _brute_force(inp, slots, zone_of, hop):
+    """Máximo de vagas preenchidas e, entre esses, menor km (força bruta em instância pequena)."""
+    from itertools import product
+    drivers = sorted(inp.drivers, key=lambda d: d.did)
+    best = None
+    for choice in product(range(-1, len(slots)), repeat=len(drivers)):
+        used = [c for c in choice if c >= 0]
+        if len(used) != len(set(used)):
+            continue
+        km = 0.0
+        ok = True
+        for d, c in zip(drivers, choice):
+            if c < 0 or zone_of[d.did] == slots[c]:
+                continue
+            k = reta_km(d.lat, d.lon, *inp.zones[slots[c]]) * inp.road_factor
+            if k > hop:
+                ok = False
+                break
+            km += k
+        if ok:
+            key = (-len(used), km)
+            best = key if best is None or key < best else best
+    return best
+
+
+def test_hungarian_matches_brute_force_on_small_instances():
+    from tcc_frota.algoritmos.alvos import driver_zones, targets
+    from tcc_frota.algoritmos.hungaro import HungaroPosicoesEspera
+    for seed in range(6):
+        inp = instance(seed, n_drivers=5, n_zones=4)
+        planner = HungaroPosicoesEspera("demanda", 1.0, 6.0)
+        moves = planner.plan(ctx(inp))
+        slots = [z for z, n in sorted(targets(inp, "demanda", 1.0).items()) for _ in range(n)]
+        filled, km = _brute_force(inp, slots, driver_zones(inp), 6.0)
+        assert planner.info["vagas_preenchidas"] == -filled
+        assert sum(m[2] for m in moves.values()) == pytest.approx(km, abs=1e-6)
+
+
+def test_hungarian_respects_hop_and_is_deterministic():
+    from tcc_frota.algoritmos.hungaro import HungaroPosicoesEspera
+    for seed in range(6):
+        inp = instance(seed)
+        p = HungaroPosicoesEspera("valor_marginal", 1.3, 3.0)
+        moves = p.plan(ctx(inp))
+        assert moves == p.plan(ctx(inp, 5))
+        assert all(km <= 3.0 + 1e-9 for *_, km in moves.values())
