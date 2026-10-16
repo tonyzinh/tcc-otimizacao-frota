@@ -25,3 +25,11 @@ cli("regressao", "--raw", RAW)
 # COMMAND ----------
 for family in ("fluxo_custo_minimo", "hungaro", "milp", "busca_local", "recozimento", "pso", "robusto_cenarios"):
     cli("calibrar", family, "--raw", RAW, "--workers", "4")
+
+# COMMAND ----------
+# MAGIC %md
+# MAGIC ## Guloso seletivo (não executado no workspace)
+
+# COMMAND ----------
+cli("seletivo-calibrar", "--raw", RAW, "--workers", "4")
+cli("seletivo-variantes", "--raw", RAW, "--workers", "4")
