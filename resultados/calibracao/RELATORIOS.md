@@ -82,3 +82,16 @@ Código `2389841+alteracoes`; calibração 2–15/03, regime B, 04–11h; baseli
 
 Em 70 planos por configuração (14 dias × 5 sementes), a aceitação nos pseudodias disjuntos escolheu o plano vazio em 56 a 66 casos e nunca o plano inicial (guloso ou fluxo): os movimentos que melhoram J nos pseudodias de busca não se sustentam nos outros dias históricos. O resultado no dia real fica perto do baseline: de +0,17% a +1,34% de KM vazio por corrida, nenhum dia com redução. Tempo de plano de 9 a 28 s por dia (5 sementes de 100 a 300 avaliações).
 
+## recozimento
+
+Código `05ef4eb`; calibração 2–15/03, regime B, 04–11h; baseline 1760 corridas e 2.632 km vazios por corrida.
+
+| Configuração | Corridas (%) | KM vazio/corrida (%) | B/corrida | R/corrida | Mov. exec. | Dias com redução | Piso | Tempo (s/dia) |
+|---|---:|---:|---:|---:|---:|---:|:---:|---:|
+| `sa|T0.02|r0.98` **(finalista)** | +0.02 | +0.57 | 2.636 | 0.011 | 10 | 0/14 | sim | 26.73 |
+| `sa|T0.02|r0.995` | +0.11 | +0.58 | 2.634 | 0.014 | 10 | 0/14 | sim | 29.00 |
+| `sa|T0.005|r0.995` | +0.11 | +1.00 | 2.638 | 0.021 | 18 | 0/14 | sim | 28.01 |
+| `sa|T0.005|r0.98` | +0.10 | +1.38 | 2.641 | 0.028 | 23 | 0/14 | sim | 26.51 |
+
+Mesmo padrão do LNS: nos 280 planos (4 configurações × 14 dias × 5 sementes), a aceitação escolheu o plano vazio em 236 e o melhor plano da busca em 44; nunca o guloso inicial. KM vazio por corrida de +0,57% a +1,38%, corridas de +0,02% a +0,11%, nenhum dia com redução para o finalista (T0 = 0,02; r = 0,98). Tempo de plano de 27 a 29 s por dia (5 sementes × 300 avaliações).
+

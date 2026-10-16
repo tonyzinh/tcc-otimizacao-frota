@@ -89,5 +89,26 @@
     },
     "congelado_em": "2026-10-16T15:41:30Z",
     "codigo": "23ab319"
+  },
+  "recozimento": {
+    "cenario": "sa|T0.02|r0.98",
+    "parametros": {
+      "avaliacoes": 300,
+      "max_km": 4.0,
+      "resfriamento": 0.98,
+      "t0": 0.02
+    },
+    "regra": "menor km vazio/corrida com piso de atendimento",
+    "calibracao": {
+      "corridas_base": 1760.0,
+      "corridas": 1760.4,
+      "var_corridas_pct": 0.02272727272727426,
+      "km_vazio_por_corrida_base": 2.6322677863934247,
+      "km_vazio_por_corrida": 2.647273925203586,
+      "var_km_vazio_por_corrida_pct": 0.5700840502524063,
+      "tempo_plano_medio_s": 26.727634429999828
+    },
+    "congelado_em": "2026-10-16T15:57:01Z",
+    "codigo": "05ef4eb"
   }
 }
