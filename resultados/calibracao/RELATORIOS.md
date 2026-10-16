@@ -123,3 +123,29 @@ Código `64ce556`; calibração 2–15/03, regime B, 04–11h; baseline 1760 cor
 
 Com cap = 1, β = 0,99 e μ = 0,5 km herdados do finalista 5.3 (pré-registro), o MILP por cenários quase não move: 0,6 a 2 movimentos executados em 14 dias (média das sementes). KM vazio por corrida de +0,02% a +0,11%, nenhum dia com redução. Sensibilidade a S: com valor esperado, S = 5, 10 e 20 dão +0,03%, +0,02% e +0,02%; com CVaR₀,₈, +0,11%, +0,05% e +0,08%. O tempo cresce com S (0,26 a 1,6 s por dia). Como a demanda por cenário não muda a desigualdade triangular com cap = 1, o resultado repete o de 5.3.
 
+## mpc
+
+Código `7e28d10`; calibração 2–15/03, regime B, 04–11h; baseline 1760 corridas e 2.632 km vazios por corrida.
+
+| Configuração | Corridas (%) | KM vazio/corrida (%) | B/corrida | R/corrida | Mov. exec. | Dias com redução | Piso | Tempo (s/dia) |
+|---|---:|---:|---:|---:|---:|---:|:---:|---:|
+| `mpc|H1h|a0.5` **(finalista)** | +0.00 | +0.01 | 2.632 | 0.000 | 1 | 0/14 | sim | 0.11 |
+| `mpc|H2h|a0.5` | -0.06 | +0.42 | 2.630 | 0.013 | 21 | 0/14 | sim | 0.11 |
+| `mpc|H1h|a0.2` | +0.11 | +1.90 | 2.623 | 0.059 | 76 | 1/14 | sim | 0.11 |
+| `mpc|H2h|a0.2` | +0.85 | +13.13 | 2.634 | 0.344 | 293 | 0/14 | sim | 0.13 |
+
+**Cenário intradiário (fora do escopo D+1; não entra na tabela principal).** Replanejamento a cada 30 min com o estado da frota em tempo real. O KM vazio por corrida cresce com a agressividade: +0,01% (α = 0,5, H = 1 h; 1 movimento em 14 dias), +0,42%, +1,90% e +13,13% (α = 0,2, H = 2 h; 293 movimentos, +0,85% de corridas). Nenhum dia com redução para o finalista. Saber em tempo real onde está cada motorista não mudou o sinal.
+
+## despacho
+
+Código `7e28d10`; calibração 2–15/03, regime B, 04–11h; baseline 1760 corridas e 2.632 km vazios por corrida.
+
+| Configuração | Corridas (%) | KM vazio/corrida (%) | B/corrida | R/corrida | Mov. exec. | Dias com redução | Piso | Tempo (s/dia) |
+|---|---:|---:|---:|---:|---:|---:|:---:|---:|
+| `despacho|lote60s|raio-1` | -15.28 | -24.73 | 1.981 | 0.000 | 0 | 14/14 | não | 0.00 |
+| `despacho|lote30s|raio-1` | -12.73 | -22.43 | 2.042 | 0.000 | 0 | 14/14 | não | 0.00 |
+| `despacho|lote60s|raio+0` | -4.43 | -2.12 | 2.576 | 0.000 | 0 | 10/14 | não | 0.00 |
+| `despacho|lote30s|raio+0` **(finalista)** | -3.07 | -1.69 | 2.588 | 0.000 | 0 | 11/14 | não | 0.00 |
+
+**D+0 (fora da tabela principal).** O despacho em lote (atribuição de custo mínimo a cada 30 ou 60 s) reduz o KM de busca por corrida, mas perde corridas em todas as configurações: −3,07% (lote de 30 s, raio calibrado) a −15,28% (lote de 60 s, raio − 1 km). Nenhuma configuração respeita o piso de −1%, então o finalista é o de maior razão de corridas (regra pré-registrada). **A redução do KM vazio por corrida aqui vem de recusar ou perder corridas (espera do lote além da paciência e raio menor) e não pode ser chamada de melhoria.**
+
