@@ -56,3 +56,30 @@ def read_table(cache_dir: str | Path, table: str) -> list[dict[str, object]]:
     import pyarrow.parquet as pq
 
     return pq.read_table(Path(cache_dir) / f"{table}.parquet").to_pylist()
+
+
+TABLES_V2 = ("tb_gld_replay_pedidos_v2", "tb_gld_demanda_zona_hora_v2", "tb_gld_frota_snapshot_v2",
+             "tb_gld_frota_sessoes_v2", "tb_gld_frota_motorista_hora_v2", "tb_gld_calibracao_v2",
+             "tb_gld_km_vazio_v2", "tb_gld_qualidade_v2")
+
+
+def export_gold_v2(spark, out_dir: str | Path, *, catalog_schema: str = GOLD) -> dict[str, object]:
+    """Exporta as Gold v2 inteiras (já pseudonimizadas e com coordenadas de passageiro arredondadas)."""
+    authorize("real", "local")
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    out = Path(out_dir)
+    if "runs" not in out.resolve().parts:
+        raise PermissionError("o cache da Gold real deve ficar em reports/runs/, ignorado pelo Git")
+    out.mkdir(parents=True, exist_ok=True)
+    manifest: dict[str, object] = {"source": catalog_schema, "exported_at": datetime.now(timezone.utc).isoformat(),
+                                   "tables": {}}
+    for table in TABLES_V2:
+        frame = spark.table(f"{catalog_schema}.{table}")
+        arrow = frame.toArrow() if hasattr(frame, "toArrow") else pa.Table.from_pandas(frame.toPandas())
+        pq.write_table(arrow, out / f"{table}.parquet")
+        manifest["tables"][table] = {"rows": arrow.num_rows, "columns": arrow.column_names}
+    (out / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "
+", encoding="utf-8")
+    return manifest
