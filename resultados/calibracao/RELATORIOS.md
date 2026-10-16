@@ -108,3 +108,18 @@ Código `056eb91`; calibração 2–15/03, regime B, 04–11h; baseline 1760 cor
 
 Aceitação: plano vazio em 212 de 280 planos, melhor partícula em 68, guloso inicial nunca. KM vazio por corrida de +0,92% a +1,04%, corridas de 0,00% a +0,15%. Finalista p_ficar = 0,95, w = 0,5 (+0,92%). Tempo de 26 a 36 s por dia (5 sementes × 300 avaliações).
 
+## robusto_cenarios
+
+Código `64ce556`; calibração 2–15/03, regime B, 04–11h; baseline 1760 corridas e 2.632 km vazios por corrida.
+
+| Configuração | Corridas (%) | KM vazio/corrida (%) | B/corrida | R/corrida | Mov. exec. | Dias com redução | Piso | Tempo (s/dia) |
+|---|---:|---:|---:|---:|---:|---:|:---:|---:|
+| `robusto|S10|esperado` **(finalista)** | +0.00 | +0.02 | 2.632 | 0.000 | 1 | 0/14 | sim | 0.52 |
+| `robusto|S20|esperado` | +0.00 | +0.02 | 2.632 | 0.001 | 1 | 0/14 | sim | 1.14 |
+| `robusto|S5|esperado` | +0.00 | +0.03 | 2.632 | 0.001 | 1 | 0/14 | sim | 0.26 |
+| `robusto|S10|cvar` | +0.06 | +0.05 | 2.631 | 0.003 | 2 | 1/14 | sim | 0.65 |
+| `robusto|S20|cvar` | +0.03 | +0.08 | 2.632 | 0.003 | 2 | 0/14 | sim | 1.60 |
+| `robusto|S5|cvar` | +0.02 | +0.11 | 2.632 | 0.003 | 2 | 0/14 | sim | 0.27 |
+
+Com cap = 1, β = 0,99 e μ = 0,5 km herdados do finalista 5.3 (pré-registro), o MILP por cenários quase não move: 0,6 a 2 movimentos executados em 14 dias (média das sementes). KM vazio por corrida de +0,02% a +0,11%, nenhum dia com redução. Sensibilidade a S: com valor esperado, S = 5, 10 e 20 dão +0,03%, +0,02% e +0,02%; com CVaR₀,₈, +0,11%, +0,05% e +0,08%. O tempo cresce com S (0,26 a 1,6 s por dia). Como a demanda por cenário não muda a desigualdade triangular com cap = 1, o resultado repete o de 5.3.
+

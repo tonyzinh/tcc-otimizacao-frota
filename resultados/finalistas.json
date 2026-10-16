@@ -132,5 +132,29 @@
     },
     "congelado_em": "2026-10-16T16:12:56Z",
     "codigo": "056eb91"
+  },
+  "robusto_cenarios": {
+    "cenario": "robusto|S10|esperado",
+    "parametros": {
+      "beta": 0.99,
+      "cap": 1.0,
+      "max_km": 4.0,
+      "mu": 0.5,
+      "n_cenarios": 10,
+      "objetivo": "esperado",
+      "time_limit": 60.0
+    },
+    "regra": "menor km vazio/corrida com piso de atendimento",
+    "calibracao": {
+      "corridas_base": 1760.0,
+      "corridas": 1760.0,
+      "var_corridas_pct": 0.0,
+      "km_vazio_por_corrida_base": 2.6322677863934247,
+      "km_vazio_por_corrida": 2.6327540736676185,
+      "var_km_vazio_por_corrida_pct": 0.01847408066564249,
+      "tempo_plano_medio_s": 0.5169958399987081
+    },
+    "congelado_em": "2026-10-16T16:13:59Z",
+    "codigo": "64ce556"
   }
 }
