@@ -110,5 +110,27 @@
     },
     "congelado_em": "2026-10-16T15:57:01Z",
     "codigo": "05ef4eb"
+  },
+  "pso": {
+    "cenario": "pso|p0.95|w0.5",
+    "parametros": {
+      "inercia": 0.5,
+      "iteracoes": 20,
+      "max_km": 4.0,
+      "p_ficar": 0.95,
+      "particulas": 15
+    },
+    "regra": "menor km vazio/corrida com piso de atendimento",
+    "calibracao": {
+      "corridas_base": 1760.0,
+      "corridas": 1762.4,
+      "var_corridas_pct": 0.13636363636364557,
+      "km_vazio_por_corrida_base": 2.6322677863934247,
+      "km_vazio_por_corrida": 2.656501803895915,
+      "var_km_vazio_por_corrida_pct": 0.920651676389439,
+      "tempo_plano_medio_s": 28.464158217142433
+    },
+    "congelado_em": "2026-10-16T16:12:56Z",
+    "codigo": "056eb91"
   }
 }

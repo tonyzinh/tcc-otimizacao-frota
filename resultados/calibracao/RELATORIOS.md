@@ -95,3 +95,16 @@ Código `05ef4eb`; calibração 2–15/03, regime B, 04–11h; baseline 1760 cor
 
 Mesmo padrão do LNS: nos 280 planos (4 configurações × 14 dias × 5 sementes), a aceitação escolheu o plano vazio em 236 e o melhor plano da busca em 44; nunca o guloso inicial. KM vazio por corrida de +0,57% a +1,38%, corridas de +0,02% a +0,11%, nenhum dia com redução para o finalista (T0 = 0,02; r = 0,98). Tempo de plano de 27 a 29 s por dia (5 sementes × 300 avaliações).
 
+## pso
+
+Código `056eb91`; calibração 2–15/03, regime B, 04–11h; baseline 1760 corridas e 2.632 km vazios por corrida.
+
+| Configuração | Corridas (%) | KM vazio/corrida (%) | B/corrida | R/corrida | Mov. exec. | Dias com redução | Piso | Tempo (s/dia) |
+|---|---:|---:|---:|---:|---:|---:|:---:|---:|
+| `pso|p0.95|w0.5` **(finalista)** | +0.14 | +0.92 | 2.637 | 0.020 | 16 | 0/14 | sim | 28.46 |
+| `pso|p0.8|w0.5` | +0.11 | +0.95 | 2.635 | 0.022 | 16 | 0/14 | sim | 25.52 |
+| `pso|p0.8|w0.8` | +0.15 | +1.02 | 2.640 | 0.019 | 14 | 1/14 | sim | 35.77 |
+| `pso|p0.95|w0.8` | +0.00 | +1.04 | 2.642 | 0.017 | 14 | 0/14 | sim | 35.78 |
+
+Aceitação: plano vazio em 212 de 280 planos, melhor partícula em 68, guloso inicial nunca. KM vazio por corrida de +0,92% a +1,04%, corridas de 0,00% a +0,15%. Finalista p_ficar = 0,95, w = 0,5 (+0,92%). Tempo de 26 a 36 s por dia (5 sementes × 300 avaliações).
+
