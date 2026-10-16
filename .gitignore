@@ -42,3 +42,6 @@ build/
 dist/
 
 .databricks
+
+# Parâmetros financeiros sigilosos (Fase D do guloso seletivo)
+config/custos_privado.yaml
