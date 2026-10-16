@@ -39,6 +39,7 @@ REGISTRY = {
     "recozimento": "tcc_frota.algoritmos.recozimento:RecozimentoSimulado",
     "nsga2": "tcc_frota.algoritmos.nsga2:NSGA2Finalista",
     "pso": "tcc_frota.algoritmos.pso:EnxameParticulas",
+    "guloso_seletivo": "tcc_frota.algoritmos.guloso_seletivo:GulosoSeletivo",
 }
 
 
@@ -104,6 +105,19 @@ def build_scenarios(study, period: str, target: date, window: tuple[int, int], f
     return tuple(out)
 
 
+def persistent_deficit_zones(study, target: date, window: tuple[int, int], fconfig: fc.ForecastConfig,
+                             share: float = 0.5) -> set[str]:
+    """Zonas com ao menos um pedido não atendido na janela em ≥ `share` dos dias de treino (antes do corte)."""
+    days = fc.training_dates(target, study.history, fconfig)
+    count: dict[str, int] = {}
+    for d in days:
+        zones = {r["h3_r7_origem"] for r in study.requests_by_date.get(d, [])
+                 if not r["fl_aceito"] and r["h3_r7_origem"] and window[0] <= r["hora_local"] < window[1]}
+        for z in zones:
+            count[z] = count.get(z, 0) + 1
+    return {z for z, n in count.items() if days and n >= share * len(days)}
+
+
 def _metrics(res, world_drivers: int) -> dict:
     return {"n_requests": res.n_requests, "served": res.served, "pickup_km": res.pickup_km,
             "reposition_km": res.reposition_km, "empty_km": res.empty_km, "wait_sum": sum(res.wait_s),
@@ -135,8 +149,11 @@ def evaluate_day(study, period: str, target: date, window_key: str, regime: str,
         planner = build_planner(spec)
         if getattr(planner, "needs_scenarios", False) and scenarios is None:
             scenarios = build_scenarios(study, period, target, window, fconfig)
+        extras = {}
+        if getattr(planner, "needs_deficit_zones", False):
+            extras["zonas_deficit_persistente"] = persistent_deficit_zones(study, target, window, fconfig)
         for seed in (seeds if planner.stochastic else seeds[:1]):
-            ctx = PlanContext(inputs, target, window, regime, sim, move_mode, scenarios or (), seed)
+            ctx = PlanContext(inputs, target, window, regime, sim, move_mode, scenarios or (), seed, extras)
             start = time.perf_counter()
             moves = planner.plan(ctx)
             elapsed = time.perf_counter() - start

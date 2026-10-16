@@ -40,7 +40,43 @@ def main(argv: list[str] | None = None) -> int:
     ana.add_argument("periodo", choices=["mar2026", "set2026"])
     ng = sub.add_parser("nsga2-busca", help="5.6: busca NSGA-II nos dias de calibração (uma semente por processo)")
     ng.add_argument("--raw", type=Path, default=Path("data/raw"))
+    for name in ("seletivo-calibrar", "seletivo-variantes", "seletivo-congelar", "seletivo-relatorio"):
+        sp = sub.add_parser(name, help="guloso seletivo (docs/ORCAMENTO_CONFIGURACOES.md §5)")
+        sp.add_argument("--workers", type=int, default=10)
+        sp.add_argument("--raw", type=Path, default=Path("data/raw"))
+    for name in ("seletivo-testar", "seletivo-analisar"):
+        sp = sub.add_parser(name, help="guloso seletivo: teste ou estatística de um período")
+        sp.add_argument("periodo", choices=["mar2026", "set2026"])
+        sp.add_argument("--workers", type=int, default=10)
+        sp.add_argument("--raw", type=Path, default=Path("data/raw"))
     args = parser.parse_args(argv)
+    if args.command.startswith("seletivo-") and args.command not in ("seletivo-congelar", "seletivo-relatorio", "seletivo-analisar")             and os.environ.get("TCC_REAL_DATA_AUTHORIZED") != "YES":
+        print("defina TCC_REAL_DATA_AUTHORIZED=YES (processamento local autorizado, DT010-v2)", file=sys.stderr)
+        return 2
+    if args.command.startswith("seletivo-"):
+        from tcc_frota.algoritmos import seletivo as sl
+
+        if args.command == "seletivo-calibrar":
+            out = sl.calibrate(args.workers, args.raw)
+        elif args.command == "seletivo-variantes":
+            out = sl.calibrate_variants(args.workers, args.raw)
+        elif args.command == "seletivo-congelar":
+            out = sl.freeze()
+        elif args.command == "seletivo-testar":
+            out = str(sl.run_test(args.periodo, args.workers, args.raw))
+        elif args.command == "seletivo-analisar":
+            out = sl.analyse(args.periodo)
+            for r in out:
+                print(f"{r['regime']} {r['cenario']:<26} corridas {r['corridas_atendidas_var_pct']:+6.2f}% "
+                      f"[{r['corridas_atendidas_var_pct_ic_inf']:+.2f}; {r['corridas_atendidas_var_pct_ic_sup']:+.2f}]  "
+                      f"km vazio/corrida {r['km_vazio_por_corrida_var_pct']:+6.2f}% "
+                      f"[{r['km_vazio_por_corrida_var_pct_ic_inf']:+.2f}; {r['km_vazio_por_corrida_var_pct_ic_sup']:+.2f}]  "
+                      f"p_holm {r['p_km_vazio_por_corrida_holm']:.3f}")
+            return 0
+        else:
+            out = {"motivos": sl.reasons_table(), "pareto": str(sl.pareto())}
+        print(json.dumps(out, ensure_ascii=False, default=str)[:3000])
+        return 0
     if args.command == "congelar":
         from tcc_frota.algoritmos.protocolo import freeze
 

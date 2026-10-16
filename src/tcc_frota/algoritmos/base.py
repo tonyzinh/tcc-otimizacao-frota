@@ -39,6 +39,7 @@ class PlanContext:
     move_mode: str                        # execução do regime: "inicio_turno" ou "fim_do_dia"
     scenarios: tuple[Scenario, ...] = ()  # dias anteriores a D, mesmo dia da semana
     seed: int = 0
+    extras: dict = field(default_factory=dict)   # agregados históricos anteriores ao corte (opcional)
 
     @property
     def window_s(self) -> tuple[float, float]:
