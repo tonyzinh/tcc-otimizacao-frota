@@ -80,6 +80,5 @@ def export_gold_v2(spark, out_dir: str | Path, *, catalog_schema: str = GOLD) ->
         arrow = frame.toArrow() if hasattr(frame, "toArrow") else pa.Table.from_pandas(frame.toPandas())
         pq.write_table(arrow, out / f"{table}.parquet")
         manifest["tables"][table] = {"rows": arrow.num_rows, "columns": arrow.column_names}
-    (out / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "
-", encoding="utf-8")
+    (out / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return manifest
