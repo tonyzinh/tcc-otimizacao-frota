@@ -65,3 +65,20 @@ Código `6d8552b`; calibração 2–15/03, regime B, 04–11h; baseline 1760 cor
 
 Solver: 139 de 168 instâncias com ótimo provado; 29 pararam no limite de 30 s (6 com cap 1,5 e 23 com cap 3), com gap máximo de 0,24%. Com cap = 1 (hipótese da primeira corrida) e penalidade de 0,5 km por movimento, o modelo não move ninguém em nenhum dia: pela desigualdade triangular, mover um veículo que atende uma única corrida não encurta a busca no modelo. Por isso o finalista pela regra pré-registrada é um plano vazio (igual ao baseline, 0,00%); no teste ele não pode passar no critério 1. Sem penalidade, cap = 1 move 52 vezes em 14 dias e aumenta o KM vazio por corrida em 2,3–2,5%. Com cap = 1,5 ou 3 o modelo move de 547 a 800 vezes, ganha 2,0–3,0% de corridas e aumenta o KM vazio por corrida em 24–30%: o modelo estático supõe que cada veículo atende cap corridas da nova posição, o que o simulador não confirma. A hipótese da primeira corrida (cap ≈ 1–1,5) não produziu redução.
 
+## busca_local
+
+Código `2389841+alteracoes`; calibração 2–15/03, regime B, 04–11h; baseline 1760 corridas e 2.632 km vazios por corrida.
+
+| Configuração | Corridas (%) | KM vazio/corrida (%) | B/corrida | R/corrida | Mov. exec. | Dias com redução | Piso | Tempo (s/dia) |
+|---|---:|---:|---:|---:|---:|---:|:---:|---:|
+| `lns|fluxo|E100|k2` **(finalista)** | +0.00 | +0.17 | 2.632 | 0.004 | 3 | 0/14 | sim | 8.56 |
+| `lns|fluxo|E300|k2` | +0.06 | +0.23 | 2.634 | 0.004 | 3 | 0/14 | sim | 19.79 |
+| `lns|guloso|E100|k2` | +0.00 | +0.51 | 2.636 | 0.010 | 8 | 0/14 | sim | 10.82 |
+| `lns|fluxo|E100|k4` | +0.06 | +0.55 | 2.634 | 0.013 | 11 | 0/14 | sim | 9.28 |
+| `lns|guloso|E100|k4` | +0.01 | +0.71 | 2.636 | 0.015 | 12 | 0/14 | sim | 11.41 |
+| `lns|fluxo|E300|k4` | +0.11 | +0.79 | 2.636 | 0.017 | 13 | 0/14 | sim | 22.29 |
+| `lns|guloso|E300|k2` | +0.02 | +0.79 | 2.637 | 0.016 | 13 | 0/14 | sim | 25.24 |
+| `lns|guloso|E300|k4` | -0.05 | +1.34 | 2.645 | 0.022 | 18 | 0/14 | sim | 28.19 |
+
+Em 70 planos por configuração (14 dias × 5 sementes), a aceitação nos pseudodias disjuntos escolheu o plano vazio em 56 a 66 casos e nunca o plano inicial (guloso ou fluxo): os movimentos que melhoram J nos pseudodias de busca não se sustentam nos outros dias históricos. O resultado no dia real fica perto do baseline: de +0,17% a +1,34% de KM vazio por corrida, nenhum dia com redução. Tempo de plano de 9 a 28 s por dia (5 sementes de 100 a 300 avaliações).
+
