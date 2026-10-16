@@ -13,7 +13,8 @@ const KIND_LABEL: Record<DataKind, string> = {
 
 /** Selo de proveniência. Sempre visível onde há números ou mapas. */
 export function DataKindBadge({ provenance, className }: { provenance: Provenance | undefined; className?: string }) {
-  const kind = provenance?.kind ?? 'demo'
+  const study = useStudyKind()
+  const kind = provenance?.kind ?? study.kind
   return (
     <Tooltip content={provenance?.disclaimer ?? 'Origem dos dados não informada.'}>
       <span tabIndex={0} className={cn('inline-flex rounded-[5px] outline-none', className)}>
@@ -51,6 +52,23 @@ export function DemoStrip({ className }: { className?: string }) {
             avaliado por replay retrospectivo — não é despacho em tempo real nem medição da empresa.
           </>
         )}
+      </p>
+    </div>
+  )
+}
+
+/** Aviso global quando a origem dos dados não responde (ex.: API local de dados reais desligada). */
+export function DataErrorBanner() {
+  const { real, error } = useStudyKind()
+  if (!error) return null
+  return (
+    <div role="alert" className="flex items-start gap-2 border-b border-critical/30 bg-critical/[0.08] px-4 py-2 text-xs text-fg-muted">
+      <TriangleAlert className="mt-px size-3.5 shrink-0 text-critical" aria-hidden />
+      <p>
+        <span className="font-medium text-fg">Não foi possível carregar os dados.</span> {error.message}.{' '}
+        {real
+          ? 'No modo de dados reais, deixe rodando na raiz do repositório: tcc-frota fleetlab-serve (com TCC_REAL_DATA_AUTHORIZED=YES) e recarregue a página.'
+          : 'Recarregue a página.'}
       </p>
     </div>
   )

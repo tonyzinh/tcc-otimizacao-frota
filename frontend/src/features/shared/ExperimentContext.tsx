@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
-import { useDataSource, useResource } from '@/services'
+import { useDataSource, useOptionalDataSource, useResource } from '@/services'
 import type { Algorithm, AlgorithmId, DataKind, Experiment, ISODate } from '@/types'
 import { distanceLabel } from './labels'
 
@@ -79,10 +79,13 @@ export function useExperimentContext(): ExperimentContextValue {
 }
 
 /** Origem e método de distância do experimento atual; fora do provedor, assume demonstração. */
-export function useStudyKind(): { kind: DataKind; distance: string; real: boolean } {
+export function useStudyKind(): { kind: DataKind; distance: string; real: boolean; loading: boolean; error: Error | null } {
   const ctx = useContext(ExperimentContext)
-  const kind = ctx?.experiment?.provenance.kind ?? 'demo'
-  return { kind, distance: distanceLabel(ctx?.experiment?.distanceMethod), real: kind === 'real' }
+  const source = useOptionalDataSource()
+  // Antes de o experimento chegar (ou se a API falhar), vale a fonte configurada: http = dados reais.
+  const kind = ctx?.experiment?.provenance.kind ?? (source?.kind === 'http' ? 'real' : 'demo')
+  const distance = distanceLabel(ctx?.experiment?.distanceMethod ?? (source?.kind === 'http' ? 'haversine_fator_rua' : 'haversine'))
+  return { kind, distance, real: kind === 'real', loading: ctx?.loading ?? false, error: ctx?.error ?? null }
 }
 
 /** Primeiro algoritmo disponível no experimento, preferindo `wanted` e evitando `avoid`. */

@@ -2,6 +2,7 @@ import { motion } from 'motion/react'
 import { Suspense } from 'react'
 import { Outlet, useLocation } from 'react-router'
 import { Skeleton } from '@/components/ui/feedback'
+import { DataErrorBanner } from '@/features/shared/DataNotice'
 import { MobileNav } from './MobileNav'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
@@ -23,6 +24,7 @@ export function AppShell() {
       <Sidebar className="hidden md:flex" />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar />
+        <DataErrorBanner />
         <main className="relative min-h-0 flex-1">
           <Suspense fallback={<PageFallback />}>
             <motion.div

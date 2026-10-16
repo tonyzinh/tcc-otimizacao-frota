@@ -4,7 +4,7 @@ import { createMockDataSource } from './mockDataSource'
 
 export type { FleetLabDataSource } from './dataSource'
 export { DataSourceError } from './dataSource'
-export { DataSourceProvider, useDataSource } from './DataSourceProvider'
+export { DataSourceProvider, useDataSource, useOptionalDataSource } from './DataSourceProvider'
 export { useResource, type ResourceState } from './useResource'
 
 /** Escolhe a origem dos dados pela configuração de build. O padrão é sempre o mock local. */

@@ -115,13 +115,22 @@ $env:TCC_REAL_DATA_AUTHORIZED = 'YES'
 .venv\Scripts\python.exe -m tcc_frota.cli fleetlab-serve    # http://127.0.0.1:8000/api, só na máquina local
 ```
 
-Em outro terminal:
+Em outro terminal, com um único `.env.local` contendo `VITE_DATA_SOURCE=http` e `VITE_API_BASE_URL=/api`:
 
 ```powershell
 cd frontend
-Copy-Item .env.example .env.local     # VITE_DATA_SOURCE=http e VITE_API_BASE_URL=http://127.0.0.1:8000/api
-npm run dev                           # http://127.0.0.1:5173
+npm run build; npm run preview        # mais rápido: http://127.0.0.1:4173
+# ou, para desenvolver: npm run dev   # http://127.0.0.1:5173
 ```
+
+O Vite repassa `/api` para `127.0.0.1:8000` (proxy), então não há CORS e qualquer porta funciona. Mude o destino com `FLEETLAB_API_TARGET` (só endereços locais). Mudanças no `.env.local` ou no `vite.config.ts` exigem reiniciar o Vite.
+
+**Problemas comuns:**
+
+- *Faixa vermelha "Não foi possível carregar os dados":* a API local não está rodando. Deixe `tcc-frota fleetlab-serve` aberto em outro terminal, com `TCC_REAL_DATA_AUTHORIZED=YES`.
+- *"porta 8000 ocupada":* já existe outra instância da API; feche-a (Ctrl+C no terminal dela) antes de iniciar outra.
+- *Vite subiu em 5174 ou outra porta:* já havia outro Vite aberto. Funciona igual com o proxy, mas feche o antigo para não confundir as abas.
+- *Lentidão no primeiro acesso em `npm run dev`:* o Vite pré-processa MapLibre, deck.gl e ECharts na primeira carga. Medido em 16/10/2026 com dados reais: cada tela pronta em 0,7–3,6 s no dev e em 0,6–1,8 s no `preview`.
 
 O que aparece:
 
@@ -130,7 +139,7 @@ O que aparece:
 - **Mapa e replay:** pedidos (inclusive não atendidos) e motoristas reais pseudonimizados. Motoristas aparecem como `M-001…` e pedidos como `P-0001…`; nem o pseudônimo nem o código interno saem do Python. Origem e destino com 3 casas, posição de motorista com 4. Corridas externas (agendadas e fora da janela) ocupam o motorista no simulador, mas não são desenhadas.
 - **Distância:** `haversine_fator_rua` (linha reta × fator rua/reta calibrado). Estimativa, nunca odômetro.
 
-Cuidados: os JSONs ficam em `reports/runs/fleetlab/` e o `.env.local` é ignorado pelo Git. O servidor recusa endereços fora de 127.0.0.1, só responde GET e não registra rotas nos logs. `npm run build` com `.env.local` em modo `http` gera um `dist/` que lê a API local; não publique esse build. Os testes forçam o modo `mock` (`vite.config.ts`). O mapa base continua vindo do OpenFreeMap; só a área visível é consultada, sem enviar dados do estudo.
+Cuidados: os JSONs ficam em `reports/runs/fleetlab/` e o `.env.local` é ignorado pelo Git. O servidor recusa endereços fora de 127.0.0.1, abre a porta em modo exclusivo, aceita CORS só de origens locais, só responde GET e não registra rotas nos logs. `npm run build` com `.env.local` em modo `http` gera um `dist/` que lê a API local; não publique esse build. Os testes forçam o modo `mock` (`vite.config.ts`). O mapa base continua vindo do OpenFreeMap; só a área visível é consultada, sem enviar dados do estudo.
 
 ## Contrato da API (referência)
 
@@ -150,7 +159,7 @@ Cuidados: os JSONs ficam em `reports/runs/fleetlab/` e o `.env.local` é ignorad
    ```powershell
    Copy-Item .env.example .env.local
    # VITE_DATA_SOURCE=http
-   # VITE_API_BASE_URL=http://127.0.0.1:8000/api
+   # VITE_API_BASE_URL=/api   (proxy do Vite até 127.0.0.1:8000)
    ```
 
 Antes de servir dados reais, respeite `docs/seguranca_dados.md`: apenas agregados ou dados
