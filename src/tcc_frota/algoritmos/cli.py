@@ -1,7 +1,7 @@
 """Linha de comando da bateria: `python -m tcc_frota.algoritmos.cli <comando>`.
 
-Comandos: `regressao` (referências contra o artigo). Os demais comandos (calibração, congelamento,
-teste e relatório) ficam em `protocolo.py`.
+Comandos: `regressao` (referências contra o artigo), `calibrar <família>` (grade pré-registrada nos
+dias 2–15/03) e `congelar <família>` (grava o finalista em `resultados/finalistas.json`).
 """
 from __future__ import annotations
 
@@ -19,7 +19,20 @@ def main(argv: list[str] | None = None) -> int:
     reg.add_argument("--raw", type=Path, default=Path("data/raw"))
     reg.add_argument("--daily", type=Path,
                      default=Path("reports/runs/tcc_final/20261016T013428Z/individual/dias_cenarios.csv"))
+    cal = sub.add_parser("calibrar", help="roda a grade de uma família na calibração de março")
+    cal.add_argument("familia")
+    cal.add_argument("--workers", type=int, default=12)
+    cal.add_argument("--raw", type=Path, default=Path("data/raw"))
+    cal.add_argument("--sem-registro", action="store_true", help="não grava no registro (conferência)")
+    cal.add_argument("--saida", default=None, help="nome alternativo do arquivo de linhas")
+    frz = sub.add_parser("congelar", help="congela o finalista de uma família")
+    frz.add_argument("familia")
     args = parser.parse_args(argv)
+    if args.command == "congelar":
+        from tcc_frota.algoritmos.protocolo import freeze
+
+        print(json.dumps(freeze(args.familia), ensure_ascii=False, indent=2))
+        return 0
     if os.environ.get("TCC_REAL_DATA_AUTHORIZED") != "YES":
         print("defina TCC_REAL_DATA_AUTHORIZED=YES (processamento local autorizado, DT010-v2)", file=sys.stderr)
         return 2
@@ -39,6 +52,13 @@ def main(argv: list[str] | None = None) -> int:
         out = regressao.run(study, args.daily)
         print(json.dumps({"simulador_igual": same_sim, **out}))
         return 0 if same_sim and out["divergencias"] == 0 else 1
+    if args.command == "calibrar":
+        from tcc_frota.algoritmos.protocolo import calibrate
+
+        best = calibrate(args.familia, workers=args.workers, raw=args.raw, register=not args.sem_registro,
+                         out_name=args.saida)
+        print(json.dumps(best, ensure_ascii=False, default=str))
+        return 0
     return 1
 
 

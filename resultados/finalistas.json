@@ -1,0 +1,23 @@
+{
+  "fluxo_custo_minimo": {
+    "cenario": "fluxo_custo_minimo|teto|H3|s1",
+    "parametros": {
+      "alvo": "teto",
+      "max_km": 3.0,
+      "share": 1.0,
+      "teto": 2
+    },
+    "regra": "menor km vazio/corrida com piso de atendimento",
+    "calibracao": {
+      "corridas_base": 1760.0,
+      "corridas": 1759.0,
+      "var_corridas_pct": -0.056818181818185653,
+      "km_vazio_por_corrida_base": 2.6322677863934247,
+      "km_vazio_por_corrida": 2.7404580047745566,
+      "var_km_vazio_por_corrida_pct": 4.110152429793912,
+      "tempo_plano_medio_s": 0.027807099998296638
+    },
+    "congelado_em": "2026-10-16T15:14:24Z",
+    "codigo": "d321f4d+alteracoes"
+  }
+}
