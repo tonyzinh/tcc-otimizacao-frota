@@ -1,0 +1,14 @@
+status,grupo_desfecho,conta_como_demanda,aceito,tratamento,historico56_imediatas,historico56_agendadas,mar2026_imediatas,mar2026_agendadas,historico56_set_imediatas,historico56_set_agendadas,set2026_imediatas,set2026_agendadas
+CondutorACaminho,transitorio_sem_desfecho,False,False,estado não final no extrato,3,0,0,1,1,0,0,0
+CondutorChegou,transitorio_sem_desfecho,False,False,estado não final no extrato,0,1,0,0,0,1,0,0
+CorridaCanceladaAgendamento,nao_demanda_agendamento_cancelado,False,False,agendamento cancelado,0,2406,0,1361,0,2294,0,1496
+CorridaCanceladaMotoristaPosAceite,cancelada_pos_aceite_motorista,True,True,motorista aceitou e cancelou depois,536,1681,312,1307,368,1361,177,812
+CorridaCanceladaOperador,nao_demanda_operador,False,False,cancelada pela operação,80,34,74,23,786,4,681,11
+CorridaCanceladaSolicitante,cancelada_solicitante_pre_aceite,True,False,solicitante desistiu antes do aceite,5330,4,3458,0,6121,1,3490,1
+CorridaCanceladaSolicitantePosAceite,cancelada_pos_aceite_solicitante,True,True,motorista aceitou; solicitante cancelou depois,3283,106,2168,104,2491,162,1433,128
+CorridaEncerrada,atendida,True,True,corrida concluída,20502,14055,11757,9457,13307,13766,6993,7621
+CorridaIniciada,transitorio_sem_desfecho,False,False,estado não final no extrato,0,0,2,1,0,0,0,2
+LimiteEsperaAtingido,nao_atendida_limite_espera,True,False,tempo limite de espera atingido sem aceite,923,701,653,602,931,2365,559,1191
+NaoAtendida,nao_atendida,True,False,nenhum motorista aceitou,10906,4368,6768,3197,9326,5182,6774,2926
+PagamentoRejeitado,nao_demanda_pagamento,False,False,pagamento rejeitado; não chega ao despacho,1790,150,806,65,1295,134,761,79
+Retracamento,nao_demanda_retracamento,False,False,retraçamento; semântica não homologada,702,0,462,0,523,0,290,0
