@@ -19,5 +19,26 @@
     },
     "congelado_em": "2026-10-16T15:14:24Z",
     "codigo": "d321f4d+alteracoes"
+  },
+  "hungaro": {
+    "cenario": "hungaro|teto|H3|s1",
+    "parametros": {
+      "alvo": "teto",
+      "max_km": 3.0,
+      "share": 1.0,
+      "teto": 2
+    },
+    "regra": "menor km vazio/corrida com piso de atendimento",
+    "calibracao": {
+      "corridas_base": 1760.0,
+      "corridas": 1760.0,
+      "var_corridas_pct": 0.0,
+      "km_vazio_por_corrida_base": 2.6322677863934247,
+      "km_vazio_por_corrida": 2.7914918212740885,
+      "var_km_vazio_por_corrida_pct": 6.04892996463795,
+      "tempo_plano_medio_s": 0.019684535717325553
+    },
+    "congelado_em": "2026-10-16T15:16:04Z",
+    "codigo": "53ff94f"
   }
 }
