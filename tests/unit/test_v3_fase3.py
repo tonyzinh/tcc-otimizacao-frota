@@ -64,3 +64,10 @@ def test_build_pairs_usa_o_campo_de_contabilizacao_escolhido():
     rows = [_row("2026-03-16", "a", 10, 20, repos=5, sim=100), _row("2026-03-16", analise.BASE, 10, 20, grupo="base", sim=90)]
     pr = analise.build_pairs(analise.average_seeds(rows), "empty_km_sim", "base")[("m", "04-11", "g", "a")]
     assert pr.p["empty_km"].tolist() == [100] and pr.b["empty_km"].tolist() == [90]
+
+
+def test_average_seeds_nao_mistura_pares_distintos():
+    rows = [dict(_row("2026-03-16", analise.BASE, 10, 20, grupo="base", semente=""), par="B0|rho1"),
+            dict(_row("2026-03-16", analise.BASE, 30, 60, grupo="base", semente=""), par="B1|rho1")]
+    days = analise.average_seeds(rows)
+    assert sorted((r["par"], r["served"]) for r in days) == [("B0|rho1", 10.0), ("B1|rho1", 30.0)]

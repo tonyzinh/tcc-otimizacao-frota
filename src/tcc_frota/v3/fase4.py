@@ -94,7 +94,7 @@ def finish(rows: list[dict], out: Path, reps: int = 10000, echo=print) -> dict:
                 if plan:
                     key = f"{r['par']}|{name}"
                     synth.append({**r, "cenario": analise.BASE, "grupo": "ref", "par": key, "familia": "nenhum"})
-                    synth.append({**plan, "grupo": "plano_vs_placebo", "par": key})
+                    synth.append({**plan, "grupo": f"plano_vs_placebo|{r['par']}", "par": key})
             res = analise.analyze(analise.build_pairs(synth, field, None, "par"), reps, f"plano_vs_placebo_{tag}")
             write_csv(out / f"fase4_plano_vs_placebo_{tag}_linhas.csv", res["linhas"])
             write_csv(out / f"fase4_plano_vs_placebo_{tag}_nb.csv", res["nb"])

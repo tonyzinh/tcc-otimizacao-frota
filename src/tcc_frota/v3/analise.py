@@ -24,9 +24,9 @@ def average_seeds(rows: list[dict]) -> list[dict]:
     """Média das sementes por (período, data, janela, grupo, cenário)."""
     acc: dict[tuple, list[dict]] = defaultdict(list)
     for r in rows:
-        acc[(r["periodo"], r["data"], r["janela"], r["grupo"], r["cenario"])].append(r)
+        acc[(r["periodo"], r["data"], r["janela"], r["grupo"], r["cenario"], r.get("par"))].append(r)
     out = []
-    for (periodo, data, janela, grupo, cenario), rs in acc.items():
+    for (periodo, data, janela, grupo, cenario, _par), rs in acc.items():
         row = {"periodo": periodo, "data": data, "janela": janela, "grupo": grupo, "cenario": cenario, "familia": rs[0]["familia"],
                "sementes": len(rs)}
         for extra in ("par", "mundo"):
