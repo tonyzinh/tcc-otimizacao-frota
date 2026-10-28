@@ -150,6 +150,16 @@ Fonte: `reviews/DATA_SCIENCE_AUDIT.md` (25/10/2026) e `docs/DECISOES_TECNICAS.md
 7. Baseline B0 (livres parados) não paga deslocamentos (tratado na Fase 4); há suspeita de reposicionamento que passa do fim da sessão e de assimetria de posição noturna na contabilização (a verificar antes da Fase 4).
 8. Distâncias são Haversine × fator, não viárias (lacuna M4); setembro é replicação parcial, não independente.
 
+### Esclarecimentos operacionais (2026-10-28, antes de qualquer execução da v2)
+
+Não alteram hipóteses, desfechos nem critérios; fixam detalhes que o texto acima deixava em aberto, para impedir escolha posterior.
+- E1. Entrada da Fase 1: `reports/runs/tcc_final/20261016T013428Z/individual/dias_cenarios.csv` (execução cujo `tab11` tem o mesmo SHA-256 da tag `v1-congelada`). Todo ponto recalculado deve reproduzir a `tab11` da v1 antes de ser usado.
+- E2. p bootstrap: estatística centrada, `p = (1 + #{θ*−θ̂ ≤ θ̂}) / (B+1)` para redução (e `≥` para aumento). Para a não inferioridade de ΔN% (H0: ΔN% ≤ −2%), `p = (1 + #{θ*−θ̂ ≥ θ̂+2}) / (B+1)` com θ em pontos percentuais.
+- E3. Romano–Wolf: estatísticas studentizadas por `θ̂/ep*` (erro-padrão do próprio bootstrap), mesmas reamostragens por dia em todas as linhas de um período e reamostragens independentes entre períodos; stepdown unilateral, separado por direção. Como há 8 variantes de bootstrap, **o p de decisão de cada linha é o máximo do p-RW entre as variantes** (mesma lógica do IC mais largo).
+- E4. MDE (poder 80%, bilateral 5%) = `(1,96 + 0,8416) × ep`, com `ep` do bootstrap iid por dia e, em separado, da variante mais larga.
+- E5. Fieller para `e` usa média das diferenças diárias com t de Student (n−1 g.l.); se o coeficiente quadrático for ≤ 0, o intervalo é escrito "ilimitado".
+- E6. ΔKM/corrida% é calculado como razão de somas no período (igual à v1); NB(e*) é média diária.
+
 ## 12. Desvios do pré-registro (preencher aqui, nunca apagar)
 
 | Data | Mudança | Motivo |
