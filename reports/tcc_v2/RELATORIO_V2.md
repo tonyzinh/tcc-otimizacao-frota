@@ -58,7 +58,7 @@ Contabilização primária ("origem": os dois braços começam na última posiç
 | B4 reativo | +4,6% / +4,3% | 0,3 a 32,5% | +0,1% |
 
 * **Decisões (F4, p-RW):** 0 reduções, 56 aumentos, 44 inconclusivas. Em KM absoluto, o plano soma ~12–16 km/dia a mais em mediana contra qualquer baseline.
-* O aumento relativo encolhe com B1/B3 porque o baseline realista gasta muito KM de deriva (B1 ≈ 875 e B3 ≈ 1 700 km/dia num dia de teste), que infla o denominador; o KM absoluto adicional do plano não diminui.
+* O aumento relativo encolhe com B1/B3 porque o baseline realista gasta muito KM de deriva (média ± desvio por dia de teste: B1 745,0 ± 193,5 km em março e 644,8 ± 171,6 em setembro; B3 1 437,5 ± 322,0 e 1 474,6 ± 234,4; coleta do B0 328,2 ± 115,2 e 202,9 ± 60,3 [`fase4_dias.csv`]), que infla o denominador; o KM absoluto adicional do plano não diminui.
 * **Placebo** (mesma quantidade de movimentos, motoristas e alvos aleatórios a ≤ salto máximo da origem): mediana de ΔKM/corrida +4,1% (mar, B0), próxima à dos planos (+4,9%). Plano contra placebo: 5 reduções (todas do `proporcional`, que move menos/mais perto, ou seja, custo menor, não informação de demanda), 10 aumentos, 85 inconclusivas.
 * **B4 como candidato** (sem plano) contra B0: ΔKM/corrida +8,2% (mar) e +12,6% (set) com ΔN ≈ 0: não reduz. Contra B1–B3, o KM cai 41 a 85%, mas com **perda de 4 a 8% das corridas**; isso é o custo de substituir uma deriva que também atende melhor, e não um ganho sem perda de serviço.
 * **Contabilizações alternativas (as três são reportadas; nenhuma é "o resultado"):** (i) v1 bruta: 0 reduções, 49 aumentos; (ii) "pagar nos dois braços": **24 reduções**, mas o placebo aleatório também gera 18 de 100 "reduções" nessa contabilização, portanto é artefato (seção f, D10).

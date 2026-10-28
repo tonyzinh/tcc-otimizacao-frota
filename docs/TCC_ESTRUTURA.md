@@ -23,7 +23,7 @@ Dados (março e setembro de 2026, Grande Vitória; dados agregados, local, LGPD)
 **Alimentam:** `V2_PREREGISTRO.md` §12, `V2_CONTABILIZACAO.md`, `fase1_reproducao_v1.csv`, `fase1_ic_variantes.csv`.
 
 ## 5 Caracterização do problema
-Estatísticas descritivas da operação (demanda por hora e zona, deslocamento noturno mediano 0,7 km e médio 3,5/5,6 km por motorista-dia, aceite vs. perdas, dispersão diária das diferenças), e quanto de KM vazio o baseline realista já gasta (B1 ≈ 875 e B3 ≈ 1 700 km/dia num dia de teste, vs. coleta ≈ 313 km).
+Estatísticas descritivas da operação (demanda por hora e zona, deslocamento noturno mediano 0,7 km e médio 3,5/5,6 km por motorista-dia, aceite vs. perdas, dispersão diária das diferenças), e quanto de KM vazio o baseline realista já gasta (média ± desvio-padrão por dia de teste (16 dias em março, 15 em setembro, ρ = 1, contabilização `origem`): deriva de B1 745,0 ± 193,5 km (mar) e 644,8 ± 171,6 km (set); deriva de B3 1 437,5 ± 322,0 km (mar) e 1 474,6 ± 234,4 km (set); coleta do baseline B0 328,2 ± 115,2 km (mar) e 202,9 ± 60,3 km (set) [`fase4_dias.csv`]).
 **Alimentam:** `fase1_dispersao_*.csv`, `fase4_dias.csv`, `V2_CONTABILIZACAO.md`.
 
 ## 6 Proposta
