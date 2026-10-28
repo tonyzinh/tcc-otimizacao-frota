@@ -3,7 +3,7 @@
 Proposta, não aplicada ao artigo. Arquivos de evidência em `reports/tcc_v2/` (RELATORIO_V2.md resume todos). Texto-base do problema, hipóteses e objetivos: `docs/TCC_REFORMULACAO.md`.
 
 ## 1 Introdução
-Problema (km sem passageiro, custo e emissões; **a empresa controla a frota e arca com o custo do KM vazio, e o motorista segue a recomendação com taxa de conformidade c: D-A**), pergunta falseável, hipóteses H1′–H4′, objetivos, contribuição (protocolo + diagnóstico + regra NB(e\*)) e organização. Dizer cedo que o resultado principal é um nulo bem testado e que ele é **condicional** à contabilização do regime B (os dois braços começam na última posição de D, confirmada em D-B) e a e\* sem valor de referência (D-C).
+Problema (km sem passageiro, custo e emissões; **a empresa controla a frota e arca com o custo do KM vazio, e o motorista segue a recomendação com taxa de conformidade c: D-A**), pergunta falseável, hipóteses H1′–H3′ e o critério de validação do simulador, objetivos, contribuição (protocolo + diagnóstico + regra NB(e\*)) e organização. Dizer cedo o resultado principal: **aumento robusto de KM/corrida; benefício líquido não demonstrado para e\* ≤ 30, com poder para ganhos de corridas a partir de ~1–2%** (MDE de NB(e\*) de 0,7% a 1,7% das corridas na F4 primária e até 2,6% na F1 04–11 regime B [`fase4_mde_nb.csv`, `fase1_mde_nb.csv`]). Evitar "nulo bem testado" sem esse recorte. O resultado é **condicional** à contabilização do regime B (os dois braços começam na última posição de D, confirmada em D-B) e a e\* sem valor de referência (D-C).
 **Alimentam:** nenhuma tabela; um quadro-resumo de `fase1_inferencia_linhas.csv` (0 reduções em 162, 98 aumentos) e do controle positivo.
 
 ## 2 Fundamentação teórica
@@ -39,7 +39,7 @@ Por que o reposicionamento não compensa: (i) o custo do movimento entra no nume
 **Alimentam:** `fase4_grade_rho_conformidade_nb.csv`, `fase2_controle_*_nb.csv`, `fase3_oraculo_vs_previsto_v1_linhas.csv`.
 
 ## 9 Considerações finais e trabalhos futuros
-Resposta à pergunta (H1′ refutada para e\* ≤ 30; H4′ não refutada), contribuição metodológica, e futuro: distâncias viárias (Fase 5), terceiro período independente, planejador que conheça Bk, estacionamento de curto prazo, e\* fornecido pela empresa, controle negativo com muitas zonas (ver banca, pergunta 12).
+Resposta à pergunta, uma frase por hipótese: H1′ (KM/corrida) refutada, com aumento robusto; H1′ reformulada (NB) não sustentada para e\* ≤ 30 na F4 primária, com poder para ganhos de corridas a partir de ~1–2%; H3′ refutada; critério de validação do simulador aprovado. Contribuição metodológica, e futuro: distâncias viárias (Fase 5), terceiro período independente, planejador que conheça Bk, estacionamento de curto prazo, e\* fornecido pela empresa, controle negativo com muitas zonas (ver banca, pergunta 12).
 
 ## Ética e LGPD (seção própria ou apêndice)
 Dados só agregados e processados localmente sob autorização de 14/10/2026 (restrita a processamento local); nenhum ID, coordenada individual ou bruto versionado (`reports/runs/` é ignorado); sal e flags de autorização não contornados; nada enviado ao Databricks Free Edition. O controle positivo/negativos é 100% sintético.
