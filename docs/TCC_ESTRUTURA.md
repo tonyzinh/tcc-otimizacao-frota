@@ -16,6 +16,10 @@ Reposicionamento proativo e dados de táxi/ride-hailing. Incluir a **discrepânc
 
 ## 4 Metodologia
 Dados (março e setembro de 2026, Grande Vitória; dados agregados, local, LGPD), simulador (regimes A/B/C, `fim_do_dia`, calibração, assinatura SHA-256), contabilização do KM vazio (principal: `origem`, os dois braços começam na última posição de D, confirmada em D-B; v1 bruta; "pagar nos dois" como artefato), quem arca com o custo (empresa, D-A), baselines B0–B4, ρ e conformidade, placebo, controle positivo/negativos, inferência (unidade = dia, 8 variantes de bootstrap, IC mais largo, famílias F1–F4, MDE), protocolo registrado no Git e desvios D1–D13.
+**Definição operacional de ρ e de conformidade (exemplo aritmético ilustrativo, não é dado nem resultado):**
+* ρ (recuperabilidade): fração dos pedidos não aceitos observados que um motorista livre aceitaria. Se um dia tem 10 pedidos não aceitos e ρ = 0,5, o sorteio por hash, monótono em ρ, escolhe 5 deles como aceitáveis (D11).
+* Conformidade c: probabilidade, por motorista-dia, de o motorista seguir o movimento recomendado (a empresa controla a frota, D-A). Se o plano recomenda 12 movimentos e c = 0,75, cerca de 9 são executados e só esses custam KM de reposicionamento (D11).
+* Na grade ρ ∈ {0,25; 0,5; 0,75; 1} × c ∈ {0,5; 0,75; 1}, o par ρ = 1, c = 1 é o da análise inferencial primária; as demais células são **descritivas, sem p-valores** [`fase4_grade_rho_conformidade.csv`].
 **Alimentam:** `V2_PREREGISTRO.md` §12, `V2_CONTABILIZACAO.md`, `fase1_reproducao_v1.csv`, `fase1_ic_variantes.csv`.
 
 ## 5 Caracterização do problema
