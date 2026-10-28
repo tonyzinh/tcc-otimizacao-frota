@@ -2,13 +2,13 @@
 
 Complementa `docs/perguntas_banca.md` (v1, execução `20261016T013428Z`). Evidências em `reports/tcc_v2/`.
 
-**1. O que é KM morto aqui?** KM vazio = coleta (do motorista livre ao passageiro) mais reposicionamento, estimado por Haversine × fator de rua. Não é odômetro, e a empresa não homologou uma definição (RN010, DT003). *Evidência:* `V2_CONTABILIZACAO.md`; `V2_PREREGISTRO.md` §3.
+**1. O que é KM morto aqui e de quem é o custo?** KM vazio = coleta (do motorista livre ao passageiro) mais reposicionamento, estimado por Haversine × fator de rua. Não é odômetro, e a empresa não homologou uma definição (RN010, DT003). Por premissa do autor (D-A), a empresa controla a frota e arca com combustível e custo operacional desse KM; o motorista segue a recomendação com conformidade c. A premissa não foi verificada com a empresa. *Evidência:* `V2_CONTABILIZACAO.md`; `V2_PREREGISTRO.md` §3; `TCC_REFORMULACAO.md` §1.
 
 **2. O simulador é válido?** Reproduz a v1 bit a bit com todas as opções desligadas (teste de regressão em `tests/unit/test_v3_sim.py`), tem controle positivo (ganho existe → ele aparece) e controles nulos exatos (Δ = 0). *Evidência:* `fase2_controle_positivo_fora_do_raio_*.csv`, `fase2_controle_nulos.csv`.
 
 **3. Como sei que o nulo não é falta de poder?** O protocolo detecta ΔN de 2% com poder ≥ 83% e redução de 5% do KM/corrida com ≈100%; não distingue efeitos de 0,25–0,5%. O MDE de ΔKM/corrida é ≈ 2,5–2,7% e o de ΔN ≈ 1,1–1,6%. Além disso, o resultado não é só "sem diferença": há aumentos significativos em 98/162 linhas. *Evidência:* `fase2_curva_poder.csv`, `fase1_mde.csv`.
 
-**4. Por que não aceitar o valor de e\* do artigo?** Porque e\* é política da empresa e está PENDENTE. Reportamos a grade (3 a 100) e a curva: o NB só tem IC inferior > 0 com e\* ≥ 20 na F1 (3, 9, 14 e 25 linhas em 20, 30, 50, 100) e ≥ 50 na F4 primária (2 e 5 de 100). *Evidência:* `fase1_nb.csv`, `fase4_F4_origem_nb.csv`.
+**4. Por que não há um valor de e\*?** e\* é o KM vazio extra que a empresa, que arca com o custo (D-A), aceita pagar por uma corrida adicional; é política da empresa e está PENDENTE, sem valor de referência (D-C: manter grade e curva). Reportamos a grade (3 a 100) e a curva: o NB só tem IC inferior > 0 com e\* ≥ 20 na F1 (3, 9, 14 e 25 linhas em 20, 30, 50, 100) e ≥ 50 na F4 primária (2 e 5 de 100). *Evidência:* `fase1_nb.csv`, `fase4_F4_origem_nb.csv`.
 
 **5. Por que Haversine?** Não há rede viária no projeto; usamos Haversine × fator medido nos dados (1,30 mar, 1,38 set). A Fase 5 (OSM/OSRM) não foi feita (precisa de download autorizado). Limitação M4 declarada; o fator sobe todos os cenários igualmente. *Evidência:* `RELATORIO_V2.md` §(h); `perguntas_banca.md` nº 6.
 
@@ -18,7 +18,7 @@ Complementa `docs/perguntas_banca.md` (v1, execução `20261016T013428Z`). Evid�
 
 **8. Isso vale para tempo real?** Não. Avaliamos alocação D+1 histórica (regime B: escala conhecida; oráculo é limite superior e não D+1 estrito). Tempo real e despacho estão fora do escopo; B4 (reativo) é só candidato exploratório com parâmetros fixos. *Evidência:* `fase4_candidato_B4_origem_*.csv`.
 
-**9. A "economia" que apareceu na contabilização "pagar nos dois braços"?** É artefato: o planejador parte da última posição de D, o baseline do ponto de login; um placebo de movimentos aleatórios também gera "reduções" (18 de 100 linhas, mediana −1,7%), o que não deveria ocorrer. Passamos a `start_at_origin`. Nunca citamos essa economia como resultado. *Evidência:* `fase4_placebo_pagar_nos_dois_linhas.csv`, D10.
+**9. A "economia" que apareceu na contabilização "pagar nos dois braços"? E o trecho noturno natural?** É artefato: o planejador parte da última posição de D, o baseline do ponto de login; um placebo de movimentos aleatórios também gera "reduções" (18 de 100 linhas, mediana −1,7%), o que não deveria ocorrer. A contabilização principal é `start_at_origin` (D10), **confirmada pelo autor em 28/10/2026 (D-B)**: os dois braços começam na última posição de D, como o regime B pressupõe; o nulo é condicional a essa premissa. Isso não responde se o plano poderia reduzir o trecho noturno que o motorista já faz sozinho (média 3,5 km em março e 5,6 km em setembro por motorista-dia): essa pergunta fica em aberto. Nunca citamos a economia de "pagar nos dois braços" como resultado. *Evidência:* `fase4_placebo_pagar_nos_dois_linhas.csv`, `V2_CONTABILIZACAO.md`, D10.
 
 **10. Dez planejadores e nenhum funciona: não é só má escolha de algoritmo?** Os parâmetros foram congelados da v1; o oráculo e a escada de ruído (WAPE 0,1 a 0,9) também dão 0 reduções; e o controle mostra que busca local, recozimento e PSO simplesmente ficam parados (a função objetivo, KM/corrida, rejeita os movimentos). A limitação é estrutural: o movimento soma km vazio. *Evidência:* `fase3_*`, `fase2_controle_positivo_fora_do_raio_linhas.csv`.
 
