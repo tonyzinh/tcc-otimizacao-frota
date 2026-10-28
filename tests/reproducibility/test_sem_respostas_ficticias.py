@@ -2,6 +2,7 @@
 
 Varre arquivos versionados em docs/, tabelas/ e todo *.md / *.tex; o próprio teste fica fora da busca.
 """
+
 import subprocess
 import unicodedata
 from pathlib import Path
@@ -19,8 +20,9 @@ def _norm(text: str) -> str:
 
 def _tracked() -> list[Path]:
     try:
-        out = subprocess.run(["git", "ls-files", "docs", "tabelas", "*.md", "*.tex"], cwd=ROOT,
-                             capture_output=True, text=True, check=True).stdout
+        out = subprocess.run(
+            ["git", "ls-files", "docs", "tabelas", "*.md", "*.tex"], cwd=ROOT, capture_output=True, text=True, check=True
+        ).stdout
     except (OSError, subprocess.CalledProcessError):
         pytest.skip("git indisponível")
     return [ROOT / p for p in sorted(set(out.splitlines())) if (ROOT / p).resolve() != SELF]
