@@ -50,7 +50,7 @@ Todas avaliadas por linha (planejador × período), nível de 5%, correção de 
 
 Por que "pagar nos dois braços" foi descartado como contabilização principal: nela, o plano parte da última posição de D e o baseline do ponto de login observado, e trocar um trecho noturno longo por um movimento curto "economiza" KM sem nenhuma informação de demanda. O placebo de movimentos aleatórios confirma o artefato: gera 18 de 100 "reduções" nessa contabilização (mediana −1,7%) [`fase4_placebo_pagar_nos_dois_linhas.csv`; D10 em `V2_PREREGISTRO.md`]. A contabilização é reportada como sensibilidade rotulada e nunca como resultado.
 
-**O que esse descarte não responde.** Descartar a contabilização não responde se o plano poderia reduzir o trecho noturno que o motorista já faz sozinho: no dia de teste, a média desse trecho é de 3,5 km (março) e 5,6 km (setembro) por motorista-dia, com mediana de 0,7 km [`V2_CONTABILIZACAO.md`]. Se a empresa puder influenciar onde o motorista encerra o dia, esse trecho é uma alavanca que este trabalho não mediu.
+**O que esse descarte não responde.** Descartar a contabilização não responde se o plano poderia reduzir o trecho noturno que o motorista já faz sozinho: nos dias de teste (janela 04–11), a média desse trecho é de 3,5 km (março) e 5,6 km (setembro) por motorista-dia, com mediana de 0,7 km [`V2_CONTABILIZACAO.md`]. Se a empresa puder influenciar onde o motorista encerra o dia, esse trecho é uma alavanca que este trabalho não mediu.
 
 ## 4. Objetivo geral e objetivos específicos
 

@@ -19,7 +19,7 @@ Medida do trecho natural (dias de teste, janela 04–11): mediana 0,7 km, média
 1 226 e 918 motoristas-dia, 72–76% acima de 0,2 km. É da mesma ordem do reposicionamento (limite de 3 km), logo a contabilização importa.
 
 ## Limites e leitura
-- Esta é a interpretação operacionalizada a partir da descrição do proponente; se a intenção era outra, o desvio D8 do pré-registro deve ser revisto.
+- Esta é a interpretação operacionalizada a partir da descrição do proponente (D8). **Status atual: ver "Confirmação (D-B)" no fim deste arquivo**; o histórico abaixo (D8, D10) foi mantido.
 - O trecho noturno não é "KM morto em disponibilidade" no sentido estrito; a correção mede o custo líquido de **trocar** o destino noturno do motorista. A contabilização da v1 (bruta) continua reportada ao lado.
 - A premissa do regime B (motorista aceita dormir/partir da zona-alvo sem custo de tempo) continua não verificada.
 
@@ -34,3 +34,6 @@ paga origem → alvo; o baseline não paga nada. "Pagar nos dois" (`fix_m2`) per
 (mundo `login`) é a terceira. As três são reportadas lado a lado; nenhuma é "o resultado".
 
 Resultados da Fase 3 no campo `empty_km_sim` usam "pagar nos dois" (a Fase 3 rodou antes da revisão): leia como sensibilidade sujeita ao artefato acima.
+
+## Confirmação (decisão D-B, 28/10/2026)
+O autor do TCC (Entony Jovino) **confirmou em 28/10/2026** a interpretação vigente: a contabilização principal é `start_at_origin`, em que os dois braços começam a sessão na última posição de D, como o regime B pressupõe. Isso substitui a nota "interpretação a confirmar" da seção "Limites e leitura" e do D8/D10 do pré-registro, **sem apagá-los**: D8 (m2 como "pagar nos dois braços") e D10 (revisão para `start_at_origin`) permanecem como histórico. Nenhuma reexecução é necessária, pois os resultados da Fase 4 já usam essa contabilização. O resultado é condicional a essa premissa; "pagar nos dois braços" e a v1 bruta continuam como sensibilidades rotuladas. Fonte da confirmação: mensagem do autor na sessão de 28/10/2026 (sem documento externo).
