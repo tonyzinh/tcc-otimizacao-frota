@@ -64,7 +64,7 @@ Desfechos (por par de dias, depois agregados no período):
 
 - **H1'** (efeito no KM vazio por corrida): a alocação preventiva D+1 reduz o KM vazio por corrida em relação ao baseline.
   H0: efeito ≥ 0. Teste unilateral à esquerda no efeito, mas o relatório mostra o IC bilateral e declara aumento quando ele existir.
-- **H2'** (efeito no atendimento): o plano não reduz o atendimento. Margem de não inferioridade: **ΔN% ≥ −2%** (pré-registrada, escolhida
+- **H2'** (efeito no atendimento): o plano não reduz o atendimento. Margem de não inferioridade: **ΔN% ≥ −1%** (primária; −2% como sensibilidade, desvio D1) (pré-registrada, escolhida
   como tolerância operacional pequena; não é política da empresa). Teste de não inferioridade pelo limite inferior do IC.
 
 ## 5. Estatística de decisão (Fase 1)
@@ -74,7 +74,7 @@ Desfechos (por par de dias, depois agregados no período):
 - **Regra para não escolher o bloco mais conveniente:** o IC de decisão de cada linha é o **mais largo** entre as variantes (b) e (c)
   em todos os tamanhos de bloco. As demais aparecem como sensibilidade.
 - **A razão `e` (KM vazio incremental por corrida extra) deixa de ser estatística de decisão.** Substituída por
-  `NB(e*) = ΔN_dia − Δ(B+R)_dia / e*`, em corridas-equivalentes por dia, com `e*` ∈ {5, 10, 20, 50, 100} km de KM vazio por corrida extra
+  `NB(e*) = ΔN_dia − Δ(B+R)_dia / e*`, em corridas-equivalentes por dia, com `e*` ∈ {3, 5, 10, 20, 30, 50, 100} km (desvio D2; além da curva contínua) de KM vazio por corrida extra
   (equivale à razão custo marginal por km / margem por corrida; os valores monetários são privados e não entram). IC por bootstrap por dia.
   Reporta-se também: e pontual somente se o IC de ΔN excluir zero; intervalo de Fieller (se ilimitado, é escrito "ilimitado"); IC percentil
   antigo rotulado "não recomendado".
@@ -100,7 +100,7 @@ rotuladas explicitamente como **exploratórias**, pois reutilizam os dias de tes
 
 ## 7. Regras de decisão (por linha, no nível 5%)
 
-- **Evidência de redução do KM vazio por corrida:** p-RW (na família da linha) < 0,05 **e** limite superior do IC de decisão < 0 **e** ΔN% com limite inferior ≥ −2%.
+- **Evidência de redução do KM vazio por corrida:** p-RW (na família da linha) < 0,05 **e** limite superior do IC de decisão < 0 **e** ΔN% com limite inferior ≥ −1% (sensibilidade: −2%).
 - **Evidência de aumento:** p-RW < 0,05 para o teste contrário **e** limite inferior do IC de decisão > 0.
 - **Inconclusivo:** qualquer outro caso, em particular IC contendo zero. Se o MDE do período for maior que o menor efeito de interesse
   (|ΔKM/corrida| = 5%, ΔN% = 2%), o texto diz "inconclusivo por falta de poder", não "ausência de efeito".
@@ -154,7 +154,7 @@ Fonte: `reviews/DATA_SCIENCE_AUDIT.md` (25/10/2026) e `docs/DECISOES_TECNICAS.md
 
 Não alteram hipóteses, desfechos nem critérios; fixam detalhes que o texto acima deixava em aberto, para impedir escolha posterior.
 - E1. Entrada da Fase 1: `reports/runs/tcc_final/20261016T013428Z/individual/dias_cenarios.csv` (execução cujo `tab11` tem o mesmo SHA-256 da tag `v1-congelada`). Todo ponto recalculado deve reproduzir a `tab11` da v1 antes de ser usado.
-- E2. p bootstrap: estatística centrada, `p = (1 + #{θ*−θ̂ ≤ θ̂}) / (B+1)` para redução (e `≥` para aumento). Para a não inferioridade de ΔN% (H0: ΔN% ≤ −2%), `p = (1 + #{θ*−θ̂ ≥ θ̂+2}) / (B+1)` com θ em pontos percentuais.
+- E2. p bootstrap: estatística centrada, `p = (1 + #{θ*−θ̂ ≤ θ̂}) / (B+1)` para redução (e `≥` para aumento). Para a não inferioridade de ΔN% (H0: ΔN% ≤ −1%; sensibilidade −2%), `p = (1 + #{θ*−θ̂ ≥ θ̂+1}) / (B+1)` com θ em pontos percentuais.
 - E3. Romano–Wolf: estatísticas studentizadas por `θ̂/ep*` (erro-padrão do próprio bootstrap), mesmas reamostragens por dia em todas as linhas de um período e reamostragens independentes entre períodos; stepdown unilateral, separado por direção. Como há 8 variantes de bootstrap, **o p de decisão de cada linha é o máximo do p-RW entre as variantes** (mesma lógica do IC mais largo).
 - E4. MDE (poder 80%, bilateral 5%) = `(1,96 + 0,8416) × ep`, com `ep` do bootstrap iid por dia e, em separado, da variante mais larga.
 - E5. Fieller para `e` usa média das diferenças diárias com t de Student (n−1 g.l.); se o coeficiente quadrático for ≤ 0, o intervalo é escrito "ilimitado".
@@ -165,3 +165,7 @@ Não alteram hipóteses, desfechos nem critérios; fixam detalhes que o texto ac
 | Data | Mudança | Motivo |
 |---|---|---|
 | — | nenhum até o commit deste arquivo | — |
+| 2026-10-28 | (D1) Margem de não inferioridade de ΔN% passa de −2% para **−1% (primária)**, mantendo **−2% como sensibilidade**. As regras de decisão da §7 e o teste de H2' usam −1% como critério; −2% é reportado ao lado. | Decisão do proponente, tomada **depois** de ver a Fase 1 (que usou −2%). Na Fase 1 nenhuma linha atingiu "redução", logo a mudança não altera nenhuma decisão; a Fase 1 foi reexecutada com −1% e a versão com −2% permanece no histórico do Git (`2cdba6c`). |
+| 2026-10-28 | (D2) Grade de e* ampliada para {3, 5, 10, 20, 30, 50, 100} km por corrida extra, **mais a curva contínua** de NB(e*) em e* de 2 a 200 (passo log). | Decisão do proponente, depois da Fase 1; inclui 3 e 30 por pedido. A grade original é subconjunto da nova. |
+| 2026-10-28 | (D3) Autorização de dados: o proponente autorizou o processamento **somente local e somente agregados** (`TCC_REAL_DATA_AUTHORIZED=YES` definida só nos comandos desta sessão). Nenhum bruto, ID ou coordenada individual é impresso, copiado ou commitado; saídas versionadas são agregadas por dia ou mais. | Libera Fases 3, 4 e 2 com dados reais. |
+| 2026-10-28 | (D4) Antes da Fase 4, serão corrigidos e testados dois pontos de contabilização: (m1) reposicionamento que ultrapassa o fim da sessão; (m2) assimetria de posição noturna. Detalhes na seção de desvios do `RELATORIO_V2.md` e em `docs/V2_CONTABILIZACAO.md`. | Descrição dada pelo proponente. |
