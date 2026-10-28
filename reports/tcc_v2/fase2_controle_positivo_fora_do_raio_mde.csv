@@ -1,0 +1,11 @@
+familia_testes,periodo,janela,grupo,cenario,dias,mde_km_vazio_pct,mde_atendidas_pct
+controle_positivo_fora_do_raio,fora_do_raio,04-11,positivo|fora_do_raio,busca_local,16,6.220768344888938e-16,0.0
+controle_positivo_fora_do_raio,fora_do_raio,04-11,positivo|fora_do_raio,fluxo_custo_minimo,16,17.152549046362488,80.76532501972447
+controle_positivo_fora_do_raio,fora_do_raio,04-11,positivo|fora_do_raio,guloso_a0.02,16,24.083758305039726,106.80607408268857
+controle_positivo_fora_do_raio,fora_do_raio,04-11,positivo|fora_do_raio,guloso_a0.1,16,24.083758305039726,106.80607408268857
+controle_positivo_fora_do_raio,fora_do_raio,04-11,positivo|fora_do_raio,guloso_a0.5,16,24.083758305039726,106.80607408268857
+controle_positivo_fora_do_raio,fora_do_raio,04-11,positivo|fora_do_raio,hungaro,16,17.152549046362488,80.76532501972447
+controle_positivo_fora_do_raio,fora_do_raio,04-11,positivo|fora_do_raio,proporcional,16,22.84917807757893,107.12260008647493
+controle_positivo_fora_do_raio,fora_do_raio,04-11,positivo|fora_do_raio,pso,16,6.220768344888938e-16,0.0
+controle_positivo_fora_do_raio,fora_do_raio,04-11,positivo|fora_do_raio,recozimento,16,6.220768344888938e-16,0.0
+controle_positivo_fora_do_raio,fora_do_raio,04-11,positivo|fora_do_raio,regra_limiar,16,29.327575276076747,102.04675301498486

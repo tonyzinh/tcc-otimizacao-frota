@@ -1,0 +1,5 @@
+controle,cenario,dias,movimentos_executados,max_abs_delta_atendidas,max_abs_delta_km_vazio,nota
+N1_baseline_vs_baseline,alcancavel,16,0,0.0,0.0,duas execuções independentes do baseline (determinismo)
+N2_mover_para_onde_ja_esta,alcancavel,16,0.0,0.0,0.0,alvo = posição atual
+N1_baseline_vs_baseline,fora_do_raio,16,0,0.0,0.0,duas execuções independentes do baseline (determinismo)
+N2_mover_para_onde_ja_esta,fora_do_raio,16,0.0,0.0,0.0,alvo = posição atual
