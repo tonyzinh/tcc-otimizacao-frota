@@ -4,10 +4,10 @@ Branch `v2-extensoes`; v1 congelada na tag `v1-congelada` (`de3865c`). Nada em `
 `src/tcc_frota/v3/`; os resultados estão em `reports/tcc_v2/`. Processamento local e somente agregados, conforme autorização do proponente (D3).
 
 **Resumo em uma frase:** o nulo da v1 se confirma e se fortalece. Nenhum dos 10 planejadores reduz o KM vazio por corrida em nenhum cenário
-(baselines B0–B4, oráculo de demanda, grade de recuperabilidade × conformidade); o que aparece é aumento. O protocolo tem poder para enxergar
+(baselines B0–B4, oráculo de demanda, grade de recuperabilidade × conformidade); o que aparece é aumento. Um controle positivo sintético confirma que o simulador e a inferência registram ganho quando ele existe. O protocolo tem poder para enxergar
 uma redução de ~5% do KM por corrida e um ganho de ~1–2% em corridas, então o nulo não é "falta de poder" para efeitos dessa ordem.
 
-## (a) O que foi pré-registrado e quando
+## (a) O que foi registrado no protocolo e quando
 
 `docs/V2_PREREGISTRO.md`, versionado no Git, commitado antes de qualquer execução da v2.
 
@@ -38,11 +38,12 @@ nenhuma decisão mudou (0 reduções antes e depois).
 Método: pseudopopulação com as diferenças diárias reais recentradas, efeito conhecido injetado, 1 000 réplicas por efeito, analisadas com o procedimento real
 (`fase2_curva_poder.csv`, `fase2_falsos_positivos.csv`, `fase2_curva_poder.pdf`). Uma primeira versão tinha réplicas idênticas (taxa de 0,000 sem significado); foi corrigida antes de qualquer conclusão.
 
-* **Falso positivo, amostragem iid** (realista: autocorrelação lag-1 das diferenças diárias ≈ 0,02): **5,3% a 8,4%** no nível de 5%, dentro da faixa pré-registrada [2%, 9%], mas perto do limite superior (procedimento levemente liberal com 15–16 dias). Cobertura de IC 92–95%.
+* **Falso positivo, amostragem iid** (realista: autocorrelação lag-1 das diferenças diárias ≈ 0,02): **5,3% a 8,4%** no nível de 5%, dentro da faixa definida no protocolo [2%, 9%], mas perto do limite superior (procedimento levemente liberal com 15–16 dias). Cobertura de IC 92–95%.
 * **Falso positivo sob dependência serial artificial** (blocos de 3 dias): 8,6% a 15% em parte das combinações, **fora** da faixa. Está declarado como teste de estresse; não corresponde ao que os dados mostram.
 * **Poder** (período, janela 04–11, IC mais largo): ΔN de 1% → 58% (mar) e 32% (set); 2% → 99% e 83%; 5% → 100%. Redução de KM/corrida de 2% → 51% e 27%; 5% → 100%. Para ΔN ≤ 0,5% o poder é ≤ 21%.
 * Regra pré-definida ("poder para ΔN ≤ 2% < 50% ⇒ nulo inconclusivo"): lida no ponto 2%, o poder é ≥ 83%, logo a regra **não dispara**; para efeitos de 0,25–0,5% de ΔN o protocolo **não distingue** o plano do ruído. Essa leitura do "≤ 2%" é minha; pode ser revista.
-* **Não feito:** controle positivo (b) "cenário sintético fácil" com os planejadores reais e os controles negativos no simulador (vazio × vazio e "mover para onde já está" dão Δ = 0 por construção, sem variância; "movimentos embaralhados entre dias" foi substituído pelo placebo de movimentos aleatórios, da Fase 4).
+* **Controles sintéticos (D12/D13, mundo 100% sintético, 16 dias, 10 planejadores, mesmo pipeline de inferência):** `fase2_controle_*`. **Positivo, cenário "fora do raio"** (a demanda está fora do raio de despacho da frota ociosa): o baseline atende 7 de 70 pedidos no dia de teste de fumaça e as sete variantes orientadas a demanda (proporcional, três guloso, limiar, fluxo, húngaro) sobem ΔN em +165% a +226% (IC inferior de ΔN% ≥ 123%) e NB(30) tem IC inferior de 32,1 a 43,1 corridas/dia: **o critério D13 foi atendido**, logo o simulador e a inferência registram ganho quando ele existe. Nesse mesmo cenário o KM por corrida **sobe** (+18,6% a +86,2%), a ilustração direta de por que NB(e\*) é o desfecho primário. Busca local, recozimento e PSO não se movem (Δ = 0): confirmado que avaliam e rejeitam os movimentos pelo próprio objetivo (`J_busca_vazio` < `J_busca_inicial`), não é bug. **Cenário "alcançável"** (controle neutro): ΔN = 0 e KM/corrida sobe em 4 de 10 linhas (+15% a +47%) porque o reposicionamento paga o mesmo deslocamento que o baseline pagaria na primeira coleta. **Negativos exatos:** N1 (baseline × baseline) e N2 (alvo = posição atual) dão Δ = 0 em 16 dias (`fase2_controle_nulos.csv`). **N3 (previsão sem informação) não é um nulo válido em "fora do raio"** (ΔN +94% a +153%): com 4 zonas candidatas e 12 motoristas, espalhar cobre a geografia sem informação. Registrado como falha de desenho do controle, sem reescrever o critério; no mundo real o papel de nulo fica com o placebo da Fase 4.
+* **Ainda não feito:** controle negativo com muitas zonas ou movimentos embaralhados entre dias em dados reais.
 
 ## (d) Resultado contra cada baseline (Fase 4)
 
@@ -74,12 +75,13 @@ Contabilização primária ("origem": os dois braços começam na última posiç
 * A contabilização "pagar nos dois" nesta fase traz reduções (9 de 20) que são o mesmo artefato; use só como sensibilidade.
 * **Não feito:** previsor melhorado (LightGBM/binomial negativa) e comparação H3 res. 7 × 8 (opcionais).
 
-## (f) Desvios do pré-registro e achados de método
+## (f) Desvios do protocolo registrado e achados de método
 
 D1–D11 estão em `docs/V2_PREREGISTRO.md` §12. Os que afetam leitura:
 * **D1/D2** (margem −1%, grade e\* com 3 e 30 e curva contínua), pedidos pelo proponente após a Fase 1.
 * **D9**: eram 10 planejadores, não 9 (F3 = 20, F4 = 100).
 * **D10 (m2):** a primeira operacionalização ("pagar o trecho noturno nos dois braços") produzia economia espúria: o placebo de movimentos aleatórios deu ΔKM = −21 a −31 km/dia nela, contra +36 a +39 na v1. Passou-se a `start_at_origin` (os dois braços começam na última posição de D, premissa do regime B). **A interpretação de m1/m2 é minha** a partir da descrição do proponente (`docs/V2_CONTABILIZACAO.md`) e pode ser corrigida. m1 (reposicionamento que passa do fim da sessão) só atua no modo `inicio_turno` (regime A); o regime B, usado em tudo, não é afetado.
+* **D12/D13 (controle sintético):** D12 definiu o desenho antes de rodar; D13 corrigiu o critério (KM/corrida no cenário "alcançável" era inatingível por construção; o critério positivo passou a ser ΔN e NB(30) em "fora do raio") depois de um teste de fumaça de um dia, antes da execução completa.
 * **Erros meus corrigidos durante o trabalho:** (1) duas execuções simultâneas da Fase 3 por um `nohup` que não encerrou (a segunda foi morta; resultados da primeira); (2) o controle nulo inicial da Fase 2 tinha réplicas idênticas; (3) `average_seeds` misturava baselines de ρ/Bk diferentes (teste adicionado); (4) o pareamento plano × placebo colapsava os 5 baselines (corrigido antes dos números aqui). Os resultados reportados são os pós-correção.
 * Fase 3 rodou antes da revisão D10; seu campo `empty_km_sim` é "pagar nos dois" (sensibilidade). A comparação primária da Fase 3 usa o `empty_km` da v1.
 * A autorização de dados (D3) foi usada só localmente; nenhum bruto, ID ou coordenada individual foi impresso ou versionado (`reports/runs/` é ignorado; os CSV versionados são agregados por dia ou mais).
@@ -96,11 +98,11 @@ D1–D11 estão em `docs/V2_PREREGISTRO.md` §12. Os que afetam leitura:
 
 * **Fase 5 (distâncias viárias):** não feita. Exige baixar o OSM do Espírito Santo (rede fora de pip/npm), o que pede sua autorização. Mantém-se Haversine × fator; lacuna M4 segue aberta.
 * **Fase 6 (terceiro período):** não feita. Os lotes disponíveis são `mar2026`, `set2026` e as janelas de histórico (`historico56`, `historico56_set`), usadas como treino de previsão; não há um terceiro mês independente. Setembro é replicação parcial, não independente.
-* Fase 2: controle positivo "cenário fácil" e controles negativos no simulador (ver (c)).
+* Fase 2: controle negativo com muitas zonas e movimentos embaralhados em dados reais (ver (c)); o controle positivo foi feito.
 * Fase 3 opcional (previsor melhorado, H3 7 × 8).
 * Planejadores não conhecem o baseline Bk (limitação); o B4 usa parâmetros fixos (5 min, 15 min, 3 km) sem varredura.
 * Reescrita das tabelas do artigo: gerados `reports/tcc_v2/tex/*.tex` e `numeros_v2.tex`; a integração ao artigo é manual.
 
 ## Testes
 
-`python -m pytest`: **248 passed, 1 skipped** (linha de base antes da v2: 179 passed, 1 skipped; 69 testes novos, incluindo regressão bit a bit do `simulate3` contra a v1).
+`python -m pytest`: **256 passed, 1 skipped** (linha de base antes da v2: 179 passed, 1 skipped; 77 testes novos, incluindo regressão bit a bit do `simulate3` contra a v1).
