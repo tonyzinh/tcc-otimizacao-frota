@@ -28,6 +28,14 @@ O controle positivo sintético (D12/D13) mostra que NB(e\*) detecta o ganho quan
 
 Todas avaliadas por linha (planejador × período), nível de 5%, correção de Romano–Wolf por família, IC de decisão = o mais largo entre oito variantes de bootstrap por dia.
 
+| Hipótese ou critério | Origem | Detalhe |
+|---|---|---|
+| H1′ original (KM vazio por corrida cai) | registro `dc1057e` (§4) | Resultado: 0 reduções em 162 linhas (F1) [`fase1_inferencia_linhas.csv`] |
+| H1′ reformulada (NB(e\*) > 0 para e\* ≤ 30 contra B1–B3 e placebo) | **adicionada após resultados** | NB(e\*) já constava como estatística no registro `dc1057e` (§5, e\* ∈ {5, 10, 20, 50, 100}; grade ampliada em D2). A formulação como hipótese, o corte e\* ≤ 30 e a comparação com o placebo são posteriores |
+| H2′ (não inferioridade do atendimento) | registro `dc1057e` (§4), com margem −2% | Margem −1% definida em D1, depois de ver a Fase 1 |
+| H3′ (oráculo suficiente) | **adicionada após resultados** | O oráculo (Fase 3) constava da lista de execuções do registro; a hipótese e o critério de refutação foram escritos depois |
+| Critério de validação do simulador (antes chamado H4′) | **adicionado após resultados** (D12 e D13) | Não é hipótese de pesquisa: é um teste de que o simulador e a inferência registram ganho que existe por construção |
+
 **H1′ (benefício líquido).** Para algum e\* ≤ 30 km por corrida extra, existe ao menos um planejador D+1 para o qual NB(e\*) tem IC inferior > 0 nos **dois** períodos, contra os baselines B1–B3 (deriva realista), e cuja diferença em relação ao placebo de movimentos aleatórios também é positiva.
 *Seria refutada se:* em todas as combinações, o IC inferior de NB(e\*) for ≤ 0 para e\* ≤ 30, ou se o plano não superar o placebo.
 *Observado:* refutada para e\* ≤ 30. Na F4 (contabilização primária, 100 linhas) o IC inferior de NB é > 0 em 0 linhas para e\* de 3 a 30, em 2 para e\* = 50 e em 5 para e\* = 100 [`fase4_F4_origem_nb.csv`]. Plano contra placebo: 5 reduções (todas do `proporcional`), 10 aumentos, 85 inconclusivas [`fase4_plano_vs_placebo_origem_linhas.csv`].
@@ -40,9 +48,9 @@ Todas avaliadas por linha (planejador × período), nível de 5%, correção de 
 *Seria refutada se:* com o oráculo, nenhum planejador reduzir KM/corrida.
 *Observado:* refutada: 0 reduções e 20 de 20 aumentos [`fase3_oraculo_v1_linhas.csv`]; na escada de ruído, 63 de 63 aumentos, sem inversão de sinal [`fase3_escada_v1_linhas.csv`].
 
-**H4′ (limite do simulador, controle).** O simulador e o procedimento inferencial detectam ganho quando ele existe por construção.
-*Seria refutada se:* nenhum planejador orientado a demanda mostrasse ΔN% com IC inferior > 0 e NB(30) com IC inferior > 0 no cenário "fora do raio" (critério D13).
-*Observado:* **não refutada** (sete de sete variantes orientadas a demanda passam) [`fase2_controle_positivo_fora_do_raio_*.csv`].
+**Critério de validação do simulador (antes chamado H4′; não é hipótese de pesquisa).** O simulador e o procedimento inferencial detectam ganho quando ele existe por construção.
+*Seria reprovado se:* nenhum planejador orientado a demanda mostrasse ΔN% com IC inferior > 0 e NB(30) com IC inferior > 0 no cenário "fora do raio" (critério D13).
+*Observado:* **aprovado** (sete de sete variantes orientadas a demanda passam) [`fase2_controle_positivo_fora_do_raio_*.csv`].
 
 ## 3b. Premissa do regime B e condicionalidade do resultado
 
