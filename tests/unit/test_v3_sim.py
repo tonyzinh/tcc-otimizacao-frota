@@ -86,3 +86,27 @@ def test_correcoes_nao_mudam_assinatura_nem_atendimento_sem_movimentos():
     a = simulate3(reqs, drivers, PARAMS, w, {}, move_mode="fim_do_dia", move_origins=origins)
     b = simulate3(reqs, drivers, PARAMS, w, {}, move_mode="fim_do_dia", move_origins=origins, fix_m1=True, fix_m2=True)
     assert a.signature == b.signature and a.served == b.served and a.pickup_km == b.pickup_km
+
+
+def test_m2_origem_os_dois_bracos_comecam_na_ultima_posicao_de_d():
+    start = (LAT0, LON0)
+    origin = (LAT0 + 4.0 * KM_LAT, LON0)                 # ~4 km do ponto de login
+    d = SimDriver("d0", ((4 * 3600.0 + 600, 9 * 3600.0, *start),))
+    w = (4 * 3600.0, 11 * 3600.0)
+    req = SimRequest(1, 4 * 3600.0 + 900, origin[0], origin[1], origin[0], origin[1] + 0.01, 600.0, hour=4)
+    common = dict(move_mode="fim_do_dia", move_origins={"d0": origin}, max_move_km=8.0)
+    login = simulate3([req], [d], PARAMS, w, {}, **common)
+    orig = simulate3([req], [d], PARAMS, w, {}, start_at_origin=True, **common)
+    assert orig.pickup_km == pytest.approx(0.0, abs=1e-6) and login.pickup_km > 4.0
+    # com o movimento, o plano paga origem -> alvo e o baseline nada
+    target = (LAT0 + 2.0 * KM_LAT, LON0)
+    moved = simulate3([req], [d], PARAMS, w, {"d0": target}, start_at_origin=True, **common)
+    assert moved.reposition_km == pytest.approx(reta_km(*origin, *target) * 1.3)
+    assert orig.reposition_km == 0.0
+
+
+def test_m2_origem_nao_mexe_em_quem_ja_trabalhava():
+    d = SimDriver("d0", ((3 * 3600.0, 9 * 3600.0, LAT0, LON0),))
+    out = simulate3([], [d], PARAMS, (4 * 3600.0, 11 * 3600.0), {}, move_mode="fim_do_dia",
+                    move_origins={"d0": (LAT0 + 5 * KM_LAT, LON0)}, start_at_origin=True)
+    assert out.drift_km == 0.0 and out.pickup_km == 0.0

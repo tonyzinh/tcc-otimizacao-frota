@@ -16,7 +16,7 @@ from .fase1 import ALPHA, E_STAR, _intervals, family_pvalues
 from .reamostragem import SCHEMES, indices, scheme_seed
 
 BASE = "sem_reposicionamento"
-NUM = ("n_requests", "served", "pickup_km", "reposition_km", "empty_km", "empty_km_sim", "overnight_km", "wait_sum",
+NUM = ("n_requests", "served", "pickup_km", "reposition_km", "drift_km", "empty_km", "empty_km_sim", "overnight_km", "wait_sum",
        "moves_planned", "moves_executed", "km_planejado")
 
 
@@ -29,18 +29,22 @@ def average_seeds(rows: list[dict]) -> list[dict]:
     for (periodo, data, janela, grupo, cenario), rs in acc.items():
         row = {"periodo": periodo, "data": data, "janela": janela, "grupo": grupo, "cenario": cenario, "familia": rs[0]["familia"],
                "sementes": len(rs)}
+        for extra in ("par", "mundo"):
+            if extra in rs[0]:
+                row[extra] = rs[0][extra]
         for f in NUM:
-            row[f] = sum(float(r[f]) for r in rs) / len(rs)
+            row[f] = sum(float(r.get(f, 0.0) or 0.0) for r in rs) / len(rs)
         out.append(row)
     return out
 
 
-def build_pairs(days: list[dict], empty_field: str, base_group: str | None = None) -> dict[tuple, inf.Pairs]:
+def build_pairs(days: list[dict], empty_field: str, base_group: str | None = None, match_field: str | None = None) -> dict[tuple, inf.Pairs]:
     """Pares plano × baseline por (período, janela, grupo, cenário). O baseline pode vir de outro grupo (`base_group`)."""
     base = {}
+    mk = (lambda r: r[match_field]) if match_field else (lambda r: None)
     for r in days:
         if r["cenario"] == BASE and (base_group is None or r["grupo"] == base_group):
-            base[(r["periodo"], r["data"], r["janela"])] = r
+            base[(r["periodo"], r["data"], r["janela"], mk(r))] = r
     plans: dict[tuple, dict[str, dict]] = defaultdict(dict)
     for r in days:
         if r["cenario"] != BASE:
@@ -48,7 +52,7 @@ def build_pairs(days: list[dict], empty_field: str, base_group: str | None = Non
     out = {}
     for key, by_day in plans.items():
         ds = sorted(by_day)
-        bs = [base[(key[0], d, key[1])] for d in ds]
+        bs = [base[(key[0], d, key[1], mk(by_day[d]))] for d in ds]
 
         def arrays(rs):
             a = {k: np.array([float(r[k]) for r in rs]) for k in inf.FIELDS if k != "empty_km"}

@@ -22,3 +22,15 @@ Medida do trecho natural (dias de teste, janela 04–11): mediana 0,7 km, média
 - Esta é a interpretação operacionalizada a partir da descrição do proponente; se a intenção era outra, o desvio D8 do pré-registro deve ser revisto.
 - O trecho noturno não é "KM morto em disponibilidade" no sentido estrito; a correção mede o custo líquido de **trocar** o destino noturno do motorista. A contabilização da v1 (bruta) continua reportada ao lado.
 - A premissa do regime B (motorista aceita dormir/partir da zona-alvo sem custo de tempo) continua não verificada.
+
+## Revisão (desvio D10, 28/10/2026, antes da Fase 4)
+O placebo de movimentos aleatórios mostrou que "pagar nos dois braços" (m2 como descrita acima) produz uma economia espúria:
+ΔKM do placebo = +39,1 km/dia (mar) e +35,5 (set) na contabilização da v1, e **−20,9 e −31,5** em "pagar nos dois". A causa é que o planejador do
+regime B parte da última posição de D, enquanto o mundo põe o baseline no ponto de login (3,5–5,6 km em média). Trocar um trecho noturno longo
+por um movimento curto a partir da origem "economiza" KM sem nenhuma informação de demanda.
+
+**m2 primária revisada:** `start_at_origin=True`. Os dois braços começam a sessão na última posição de D, como o regime B pressupõe. O plano
+paga origem → alvo; o baseline não paga nada. "Pagar nos dois" (`fix_m2`) permanece como sensibilidade rotulada. A contabilização bruta da v1
+(mundo `login`) é a terceira. As três são reportadas lado a lado; nenhuma é "o resultado".
+
+Resultados da Fase 3 no campo `empty_km_sim` usam "pagar nos dois" (a Fase 3 rodou antes da revisão): leia como sensibilidade sujeita ao artefato acima.
