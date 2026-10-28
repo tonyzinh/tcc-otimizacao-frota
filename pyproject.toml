@@ -16,6 +16,12 @@ parquet = ["pyarrow>=18"]
 ui = ["streamlit>=1.49,<2"]
 # Rodada v2 (final-run): H3 para zonas, NumPy para a regressão de Poisson, Matplotlib para figuras.
 v2 = ["h3>=4.1", "numpy>=1.26", "matplotlib>=3.8", "pyarrow>=18", "tzdata", "scikit-learn>=1.6"]
+# Bateria de algoritmos (scipy: linprog, milp, linear_sum_assignment) e extensão v2 do TCC, pacote `v3`
+# (statsmodels: Holm; arch: bootstrap de blocos). Antes ficavam sem declaração e vinham só do ambiente.
+algoritmos = ["tcc-frota[v2]", "scipy>=1.15"]
+extensao = ["tcc-frota[algoritmos]", "statsmodels>=0.14", "arch>=7"]
+# Ferramentas de qualidade (uso local): `ruff check .`, `ruff format --check .`, cobertura.
+qualidade = ["ruff>=0.6", "pytest-cov>=5"]
 
 [project.scripts]
 tcc-frota = "tcc_frota.cli:main"
@@ -23,6 +29,30 @@ tcc-frota-disponibilidade = "tcc_frota.availability.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 140
+# databricks/: notebooks exportados (spark, dbutils e display são globais do runtime; não executados em workspace)
+extend-exclude = ["frontend", "tcc-artigo-latex", "databricks", ".audit-deps", ".ui-deps"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "C4", "RUF"]
+# Cada regra ignorada tem motivo; o código científico não é alterado por estilo.
+ignore = [
+    "RUF001", "RUF002", "RUF003",  # ×, −, ≤, σ, κ e acentos são notação do manuscrito (docstrings em português)
+    "E501",      # linhas longas restantes são URLs, tabelas e fórmulas em docstring; o formatador já quebra o código
+    "B905",      # zip(strict=True) lançaria erro onde hoje trunca: muda comportamento
+    "B023",      # fechamentos sobre variável de laço no simulador/avaliador: revisão científica separada, não estilo
+    "B007", "B008", "C408", "C416", "E731", "E741", "RUF005", "RUF007", "RUF015", "RUF046", "RUF059",
+    "SIM105", "SIM115", "UP042", "E402",  # preferências de estilo/ordem que mexeriam em expressões numéricas ou na ordem de importação
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B", "SIM"]
+
+[tool.ruff.format]
+docstring-code-format = false
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
