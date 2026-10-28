@@ -10,7 +10,7 @@ import numpy as np
 from . import inferencia as inf
 from .reamostragem import SCHEMES, indices, scheme_seed
 
-E_STAR = (5, 10, 20, 50, 100)           # km de KM vazio por corrida extra aceitáveis (pré-registro §5)
+E_STAR = (3, 5, 10, 20, 30, 50, 100)           # km de KM vazio por corrida extra aceitáveis (pré-registro §5)
 PRIMARY_WINDOW, PRIMARY_REGIME = "04-11", "B"
 ALPHA = 0.05
 
@@ -94,6 +94,7 @@ def run(dias_csv: Path, tab11_csv: Path, out: Path, reps: int = 10000, echo=prin
     prim_idx = [i for i, r in enumerate(rows) if r["key"][1] == PRIMARY_WINDOW and r["key"][2] == PRIMARY_REGIME]
     f1 = {d: family_pvalues(rows, d, "km") for d in ("reducao", "aumento")}
     f2 = family_pvalues(rows, "nao_inferior", "n_pct")
+    f2s = family_pvalues(rows, "nao_inferior_sens", "n_pct")
     sub = [rows[i] for i in prim_idx]
     f1p = {d: family_pvalues(sub, d, "km") for d in ("reducao", "aumento")}
     f2p = family_pvalues(sub, "nao_inferior", "n_pct")
@@ -130,7 +131,7 @@ def run(dias_csv: Path, tab11_csv: Path, out: Path, reps: int = 10000, echo=prin
             "p_bruto_aumento": aum["raw"][i], "p_holm_aumento_F1": aum["holm"][i], "p_rw_aumento_F1": p_aum_rw,
             **pp,
             "atendidas_pct": n_iv.point, "atendidas_ic_decisao_inf": n_iv.lo, "atendidas_ic_decisao_sup": n_iv.hi,
-            "p_bruto_nao_inferior": f2["raw"][i], "p_holm_nao_inferior_F2": f2["holm"][i], "p_rw_nao_inferior_F2": p_ni_rw,
+            "p_bruto_nao_inferior": f2["raw"][i], "p_rw_nao_inferior_sens2pp_F2": f2s["rw"][i], "ic_inf_ok_1pp": non_inf_ok, "ic_inf_ok_2pp": bool(isfinite(n_iv.lo) and n_iv.lo >= inf.NON_INFERIORITY_SENS_PP), "p_holm_nao_inferior_F2": f2["holm"][i], "p_rw_nao_inferior_F2": p_ni_rw,
             "decisao": decisao})
         for stat, fam in (("km_vazio_pct", "km"), ("atendidas_pct", "n_pct")):
             for s in SCHEMES:
@@ -193,6 +194,17 @@ def run(dias_csv: Path, tab11_csv: Path, out: Path, reps: int = 10000, echo=prin
             if sel.any():
                 dow_rows.append({**base, "dia_semana": w, "dias": int(sel.sum()),
                                  "d_atendidas_media": float(b[sel].mean()), "d_km_vazio_media": float(a[sel].mean())})
+    # Curva contínua de NB(e*): linear em 1/e*, então as réplicas saem de ΔN e ΔKM com os mesmos índices.
+    curve = []
+    for r in rows:
+        key = r["key"]
+        for e in np.geomspace(2, 200, 41):
+            ivs = {sc: inf.summarize(r["dn"][sc].point - r["de"][sc].point / e,
+                                     r["dn"][sc].boot - r["de"][sc].boot / e) for sc in SCHEMES}
+            _, iv = inf.widest(ivs)
+            curve.append({"periodo": key[0], "janela": key[1], "regime": key[2], "cenario": key[3], "e_star": round(float(e), 4),
+                          "nb": iv.point, "ic_inf": iv.lo, "ic_sup": iv.hi})
+    write_csv(out / "fase1_nb_curva.csv", curve)
     write_csv(out / "fase1_nb.csv", nb_rows)
     write_csv(out / "fase1_e_fieller.csv", e_rows)
     write_csv(out / "fase1_mde.csv", mde_rows)

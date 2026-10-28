@@ -132,7 +132,8 @@ def test_mde_e_t_stat():
     iv = inf.Interval(-2.0, -3.0, -1.0, 0.5, np.zeros(3))
     assert inf.t_stat(iv, "reducao") == pytest.approx(4.0)
     assert inf.t_stat(iv, "aumento") == pytest.approx(-4.0)
-    assert inf.t_stat(iv, "nao_inferior") == pytest.approx(0.0)           # -2 − (−2)
+    assert inf.t_stat(iv, "nao_inferior") == pytest.approx(-2.0)          # (−2 − (−1)) / 0,5
+    assert inf.t_stat(iv, "nao_inferior_sens") == pytest.approx(0.0)      # −2 − (−2)
     assert inf.t_stat(inf.Interval(0, 0, 0, 0.0, np.zeros(3)), "reducao") == 0.0
     with pytest.raises(ValueError):
         inf.t_stat(iv, "x")

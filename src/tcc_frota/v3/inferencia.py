@@ -16,7 +16,8 @@ from scipy import stats as sps
 FIELDS = ("n_requests", "served", "pickup_km", "reposition_km", "empty_km", "wait_sum")
 BASELINE = "sem_reposicionamento"
 Z_MDE = 1.959964 + 0.841621  # 5% bilateral, poder 80%
-NON_INFERIORITY_PP = -2.0     # margem pré-registrada para ΔN%, em pontos percentuais
+NON_INFERIORITY_PP = -1.0     # margem primária para ΔN% (desvio D1); -2 pp é sensibilidade
+NON_INFERIORITY_SENS_PP = -2.0
 
 
 @dataclass(frozen=True)
@@ -125,6 +126,8 @@ def t_stat(iv: Interval, direction: str) -> float:
         return iv.point / iv.se
     if direction == "nao_inferior":
         return (iv.point - NON_INFERIORITY_PP) / iv.se
+    if direction == "nao_inferior_sens":
+        return (iv.point - NON_INFERIORITY_SENS_PP) / iv.se
     raise ValueError(direction)
 
 
@@ -133,7 +136,7 @@ def t_boot(iv: Interval, direction: str) -> np.ndarray:
     if not isfinite(iv.se) or iv.se == 0:
         return np.zeros_like(iv.boot)
     z = (iv.boot - iv.point) / iv.se
-    out = -z if direction == "reducao" else z
+    out = -z if direction == "reducao" else z  # demais direções: caudas à direita
     return np.where(np.isfinite(out), out, 0.0)
 
 
