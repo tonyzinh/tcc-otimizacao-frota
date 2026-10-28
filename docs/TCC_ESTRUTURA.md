@@ -3,7 +3,7 @@
 Proposta, não aplicada ao artigo. Arquivos de evidência em `reports/tcc_v2/` (RELATORIO_V2.md resume todos). Texto-base do problema, hipóteses e objetivos: `docs/TCC_REFORMULACAO.md`.
 
 ## 1 Introdução
-Problema (km sem passageiro, custo e emissões), pergunta falseável, hipóteses H1′–H4′, objetivos, contribuição (protocolo + diagnóstico + regra NB(e\*)) e organização. Dizer cedo que o resultado principal é um nulo bem testado.
+Problema (km sem passageiro, custo e emissões; **a empresa controla a frota e arca com o custo do KM vazio, e o motorista segue a recomendação com taxa de conformidade c: D-A**), pergunta falseável, hipóteses H1′–H4′, objetivos, contribuição (protocolo + diagnóstico + regra NB(e\*)) e organização. Dizer cedo que o resultado principal é um nulo bem testado e que ele é **condicional** à contabilização do regime B (os dois braços começam na última posição de D, confirmada em D-B) e a e\* sem valor de referência (D-C).
 **Alimentam:** nenhuma tabela; um quadro-resumo de `fase1_inferencia_linhas.csv` (0 reduções em 162, 98 aumentos) e do controle positivo.
 
 ## 2 Fundamentação teórica
@@ -15,7 +15,7 @@ Reposicionamento proativo e dados de táxi/ride-hailing. Incluir a **discrepânc
 **Alimentam:** `fase3_oraculo_v1_linhas.csv` (oráculo não reduz) como ponto de contato com a premissa de informação futura.
 
 ## 4 Metodologia
-Dados (março e setembro de 2026, Grande Vitória; dados agregados, local, LGPD), simulador (regimes A/B/C, `fim_do_dia`, calibração, assinatura SHA-256), contabilização do KM vazio (v1 bruta, `origem`, "pagar nos dois" como artefato), baselines B0–B4, ρ e conformidade, placebo, controle positivo/negativos, inferência (unidade = dia, 8 variantes de bootstrap, IC mais largo, famílias F1–F4, MDE), protocolo registrado no Git e desvios D1–D13.
+Dados (março e setembro de 2026, Grande Vitória; dados agregados, local, LGPD), simulador (regimes A/B/C, `fim_do_dia`, calibração, assinatura SHA-256), contabilização do KM vazio (principal: `origem`, os dois braços começam na última posição de D, confirmada em D-B; v1 bruta; "pagar nos dois" como artefato), quem arca com o custo (empresa, D-A), baselines B0–B4, ρ e conformidade, placebo, controle positivo/negativos, inferência (unidade = dia, 8 variantes de bootstrap, IC mais largo, famílias F1–F4, MDE), protocolo registrado no Git e desvios D1–D13.
 **Alimentam:** `V2_PREREGISTRO.md` §12, `V2_CONTABILIZACAO.md`, `fase1_reproducao_v1.csv`, `fase1_ic_variantes.csv`.
 
 ## 5 Caracterização do problema
