@@ -62,7 +62,7 @@ def build_pairs(days: list[dict], empty_field: str, base_group: str | None = Non
     return out
 
 
-def analyze(pairs: dict[tuple, inf.Pairs], reps: int = 10000, family: str = "") -> dict[str, list[dict]]:
+def analyze(pairs: dict[tuple, inf.Pairs], reps: int = 10000, family: str = "", tests: bool = True) -> dict[str, list[dict]]:
     """Mesmo pipeline da Fase 1 sobre `pairs` (uma família = todas as chaves dadas)."""
     keys = sorted(pairs)
     boot: dict[str, dict[str, np.ndarray]] = {}
@@ -79,8 +79,12 @@ def analyze(pairs: dict[tuple, inf.Pairs], reps: int = 10000, family: str = "") 
         for e in E_STAR:
             r[f"nb{e}"] = _intervals(pr, lambda p, idx=None, e=e: inf.stat_nb(p, e, idx), bi)
         rows.append(r)
-    red, aum = family_pvalues(rows, "reducao", "km"), family_pvalues(rows, "aumento", "km")
-    ni, ni2 = family_pvalues(rows, "nao_inferior", "n_pct"), family_pvalues(rows, "nao_inferior_sens", "n_pct")
+    if tests:
+        red, aum = family_pvalues(rows, "reducao", "km"), family_pvalues(rows, "aumento", "km")
+        ni, ni2 = family_pvalues(rows, "nao_inferior", "n_pct"), family_pvalues(rows, "nao_inferior_sens", "n_pct")
+    else:     # análise descritiva (sem p-valores): usado na grade ρ × conformidade
+        nan = {k: np.full(len(rows), np.nan) for k in ("raw", "holm", "rw")}
+        red = aum = ni = ni2 = nan
     lines, nb_rows, mde_rows = [], [], []
     for i, r in enumerate(rows):
         key = r["key"]
@@ -89,7 +93,9 @@ def analyze(pairs: dict[tuple, inf.Pairs], reps: int = 10000, family: str = "") 
         _, n_iv = inf.widest(r["n_pct"])
         ok1 = isfinite(n_iv.lo) and n_iv.lo >= inf.NON_INFERIORITY_PP
         ok2 = isfinite(n_iv.lo) and n_iv.lo >= inf.NON_INFERIORITY_SENS_PP
-        if red["rw"][i] < ALPHA and k_iv.hi < 0 and ok1:
+        if not tests:
+            decisao = "descritivo"
+        elif red["rw"][i] < ALPHA and k_iv.hi < 0 and ok1:
             decisao = "reducao"
         elif aum["rw"][i] < ALPHA and k_iv.lo > 0:
             decisao = "aumento"
