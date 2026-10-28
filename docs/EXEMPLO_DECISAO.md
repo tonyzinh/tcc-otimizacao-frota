@@ -45,7 +45,7 @@ Concorda com `fase2_controle_positivo_fora_do_raio_nb.csv` (NB(30) = 47,22; IC i
 
 ## Exemplo 3: controle neutro sintético (mundo "alcançável", regra de limiar; 16 dias)
 
-ΔN = 0 e Δ(B+R) = +17,45 km/dia: o plano só acrescenta KM, então NB(5) = −0,58 com IC [−0,64; −0,51] e a decisão é **não adotar** (idem em e\* = 30, NB = −0,59).
+ΔN = 0 e Δ(B+R) = +17,45 km/dia: o plano só acrescenta KM, então NB(30) = 0 − 17,45/30 = −0,58 com IC [−0,64; −0,51] e MDE de 0,09, e a decisão é **não adotar**.
 
 ## Limites
 * O IC não é corrigido para múltiplos testes e o MDE vale para o desenho de 15–16 dias; com menos dias o resultado tende a "inconclusivo".
