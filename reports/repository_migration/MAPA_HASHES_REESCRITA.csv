@@ -1,0 +1,115 @@
+hash_antigo,hash_novo,mudou,assunto
+abf4c5c9cf6f,639224d0b5d9,sim,docs: corrige rotulo de e* no exemplo 3
+49cdc51023d8,2d48428244a6,sim,docs: exemplo resolvido da calculadora de decisao
+dc0ff3c079ad,d40bf6c32521,sim,"Calculadora de decisao NB(e*): decisao.py, CLI e testes"
+8d72890213ce,4a6c9688c7e4,sim,"docs: estrutura, frases de Introducao e Consideracoes finais com recor"
+9df6f80dd891,176f8a29f258,sim,docs: banca V2 perguntas 3 (MDE de NB) e 10 (controle positivo 7 de 7)
+d619c28e85b7,ee14b7fd0529,sim,docs: explicacao F1 x F4 (contabilizacao) e MDE de NB(e*) na reformula
+2fa4b1e8a426,02508d4e26df,sim,docs: coluna Origem na tabela de hipoteses; H4' vira criterio de valid
+2394f3d16355,972c57bbda89,sim,docs: media e desvio dos dias de teste no lugar dos numeros de um dia 
+0144468284df,a06398888d56,sim,"MDE de NB(e*) (F1 e F4), mesmo metodo de fase1_mde.csv"
+e4b968e7a956,c81ad38c2ad6,sim,docs: parecer de orientacao (28/10/2026)
+7ad2d2373008,99708334270f,sim,"docs: estrutura, exemplo de rho e conformidade na Metodologia"
+0f115acf4b26,de969ced7042,sim,docs: estrutura com D-A/D-B e definicao operacional de rho e conformid
+a3d0004109cd,0255ef88a84e,sim,"docs: banca V2 (perguntas 1, 4, 9) com D-A, D-B, D-C"
+06ce67d1eba5,5ef086a756ee,sim,"docs: V2_CONTABILIZACAO com confirmacao D-B (28/10/2026), historico pr"
+1c2ad999d1d7,70ce4b320ff0,sim,"docs: reformulacao com decisoes D-A (custo/decisor), D-B (regime B) e "
+2a31a488ce59,774db0009b79,sim,RELATORIO_V2: contagem de NB>0 em e*=30
+d5ea6474efe1,ea259eef0a6b,sim,"RELATORIO_V2: controle positivo, D12/D13, linguagem do protocolo"
+30e19855c3dd,26b94c7bf933,sim,docs: 12 perguntas criticas da banca (v2)
+e29862d56412,4b4a2092be53,sim,docs: estrutura proposta do TCC
+04c561802364,0fb4f7eb2ce7,sim,docs: reformulacao academica (NB(e*) como desfecho primario)
+126005538543,9604711e2dff,sim,Controle positivo e negativos sinteticos: resultados (D12/D13)
+0723f419cd74,d0508f2a3f10,sim,D13 + controle sintetico: criterio positivo so em fora_do_raio; gerado
+472c6aa5053c,8f6f6fbcf521,sim,D12: controle positivo e controles negativos sinteticos (pre-registro 
+c574b1a1c027,f447a7ac6482,sim,"Fase 4: baselines B0-B4, grade rho x conformidade, placebo; RELATORIO_"
+ccc04b0c0cc6,beb8d052f53c,sim,"Fase 3: resultados do oraculo, escada de ruido e comparacao com a prev"
+b7ba8f25700d,998ffc68fdff,sim,"Fase 2 (semi-sintetica): falsos positivos, poder e cobertura com efeit"
+f266d4920a28,0fbc7f6dad6a,sim,"Fase 4: runner e analise (F4, placebo, candidato B4, grade rho x confo"
+747a46a17b49,0ea742eac35c,sim,"Fase 4: deriva dos livres (B1-B4), recuperabilidade, m2 revisada (star"
+647f6c216617,2d43e7b4f853,sim,"Fase 3: avaliacao com oraculo/escada, analise generica e runner; desvi"
+d9cf99eabefb,554ae0e5469a,sim,"Simulador v3 com correcoes m1/m2 opcionais, desvios D5-D8 e documento "
+338de353261b,deb1cc2e535e,sim,"Fase 1: margem -1% (sens. -2%), grade e* e curva continua de NB"
+4640db7804ee,b9918ca05b8b,sim,"Pré-registro v2: desvios D1-D4 (margem -1%, grade e*, autorização loca"
+2cdba6c7e4aa,bd14f6554a0f,sim,"Fase 1 da v2: inferência com bootstrap dependente, Romano-Wolf, Holm, "
+3b4b5cbd4dee,a2c2ff8952f8,sim,Pré-registro v2: esclarecimentos operacionais da Fase 1
+dc1057ec349e,e99413df6078,sim,Pré-registro da extensão v2 (Fase 0)
+de3865ce0844,a888227341f7,sim,Adiciona auditoria de ciência de dados do TCC
+aef7d8c5b80c,3356d48010bf,sim,"Corrige P3, P4, P5 e a limitação 4 com medições dos extratos v2"
+ac512b0a15d7,0bd76fa9606f,sim,Remove a tabela paramétrica duplicada do seletivo
+b57122ecc122,3b5ae673b90f,sim,Aponta o resultado do seletivo para a grade do Bloco 3
+b348a7818518,9d02344cf5de,sim,"Bloco 2 (exploratório): pickup das corridas extras, decomposição de e "
+bffbfe3660ab,c59cda7e7005,sim,Bloco 3: ponto de equilíbrio na grade hipotética dos autores
+cba2ce810a52,129b15779556,sim,Bloco 1 (exploratório): WAPE da previsão de demanda por célula H3 e ho
+fdafb6a9aa4c,306ea1d547b7,sim,"Registra o escopo fechado (demanda, pickup e ponto de equilíbrio) ante"
+ba6832401c78,b783784419a9,sim,Adiciona teste que impede respostas fictícias da operação em documento
+0a97b40b204e,34e9ca11f03f,sim,Refaz a grade paramétrica do ponto de equilíbrio com valores definidos
+d1cc155a60bb,dac27e53bc31,sim,Substitui perguntas à empresa por premissas e limitações e retira resp
+2ab2913291c1,5b33771052e7,sim,chore(seletivo): reproducible local script and Databricks cells (not e
+c6f7007fa157,037dedb1052c,sim,"results(seletivo): C2 moves no driver in test (Mar 16-31, Sep 16-30) -"
+8bffde905212,178cb9723144,sim,results(seletivo): calibration - C2 practically never moves; no 4.4 va
+eb13092ab5fe,1278f6a5b27d,sim,"feat(seletivo): net value per extra ride (private costs, synthetic pub"
+f35c9d9631d3,5250443cc340,sim,feat(algoritmos): selective net-saving greedy (C2) with stay-by-defaul
+0a24fede3bf8,1d39688912a9,sim,"docs(seletivo): pre-register grid, acceptance rule and spatial-forecas"
+fa88ae578f9e,1e9b9dc27228,sim,docs(seletivo): phase A audit for the selective net-saving greedy; ign
+1c0ad3e2831c,1f12a9d1b034,sim,"results(bateria): test phase (Mar 16-31, Sep 16-30) - no algorithm pas"
+9778c7f4531f,9c874387ee9f,sim,results(bateria): 5.6 NSGA-II calibration - no point of the front beat
+fa55d9f7689f,7c375d577366,sim,results(bateria): 5.9 intraday MPC and 5.11 D+0 batch dispatch calibra
+7e28d10a1289,243252054391,sim,results(bateria): 5.7 scenario-robust MILP calibration - almost no mov
+64ce55647b18,1e0e3dc77cb5,sim,results(bateria): 5.8 PSO calibration - no reduction
+056eb91b933b,bdd9cd4a0f40,sim,results(bateria): 5.5 simulated annealing calibration - no reduction
+05ef4ebc9ba3,66a3ceda699c,sim,"feat(bateria): extras test runner, local script and Databricks noteboo"
+20dadf13f026,653e4558294a,sim,results(bateria): 5.4 LNS calibration - acceptance mostly returns the 
+23ab31937ce8,b30ac7cfdf10,sim,"feat(algoritmos): report generator (criteria table, Pareto points and "
+2389841db88a,41df267b9776,sim,"feat(algoritmos): simulated annealing, PSO, NSGA-II, scenario-robust M"
+a09af4f3d3d5,d5c85a568006,sim,feat(algoritmos): 5.4 LNS evaluated in the simulator on historical pse
+bf48268db2e1,800c86332834,sim,"results(bateria): 5.3 MILP calibration - cap=1 does not move, cap>=1.5"
+6d8552b5d6d3,ec44f867b853,sim,feat(algoritmos): 5.3 MILP min(B+R) with service floor (HiGHS via scip
+81d4eba82d0e,2204bf599f00,sim,results(bateria): 5.2 Hungarian calibration - all 12 configurations ra
+53ff94f5d7b1,6cae74e92e33,sim,feat(algoritmos): 5.2 Hungarian assignment to waiting positions
+4eba02dcc0fe,772a999edd8d,sim,"feat(algoritmos): 5.1 min-cost flow between H3 zones, calibration prot"
+d321f4d21fa0,6b94f657e2ff,sim,"docs(bateria): pre-register configuration budget, selection rule and t"
+d74f9967f53c,11d5bf64f508,sim,feat(algoritmos): add single Planner interface with regression against
+5821a1082b65,ae6efe9509d7,sim,"docs(bateria): audit simulator, planners, data and tests before the al"
+7c3b9ff7b95e,37749e3dea38,sim,fix(frontend): show real-data mode and API errors instead of the demo 
+f9757252b10e,31ce479b369c,sim,fix(fleetlab): accept any local origin and refuse a shared port
+b224a3f6214b,99452cf011cf,sim,docs: explain how to open FleetLab with real data
+276c763690c1,465fa8d948ca,sim,feat(frontend): read real study data through the local API
+4fdce7657b78,33ed1646b03b,sim,feat(v2): export real study results for FleetLab and serve them locall
+6f125b31ece8,f724f65d863f,sim,"docs: write v2 results, committee questions and medallion guide"
+19b62a5ad582,38e24da8a181,sim,"docs(results): publish aggregated v2 tables, figures and result.json"
+69b86470a9c0,73423442154c,sim,"feat(v2): add reproducible final-run with calibration, selection, test"
+fd3d957b6128,dbb21b3ae8f9,sim,fix(gold): restore newline escape in v2 Gold export manifest
+589697f05524,ebc467447d5d,sim,"feat(v2): add queue-aware simulator, marginal-value greedy and paired "
+4ab841dba1da,cfc81606fcac,sim,feat(v2): forecast total immediate demand and plan fleet under three i
+ee732460be50,b9ae0f10a9c0,sim,"feat(databricks): add v2 Bronze, Silver and Gold notebooks"
+9b8d58442387,6a8f37a1ba5f,sim,feat(v2): ingest paginated Elasticsearch extracts with tested cleaning
+7b2278bd659b,719228de3c4b,sim,"chore: record Databricks inventory, legacy backup and v2 reset"
+52f883cd262f,b01f78112175,sim,Merge branch 'main' of https://github.com/tonyzinh/tcc-otimizacao-frot
+84d4f833a3ee,38600f0878be,sim,"feat(frontend): add dashboard, replay, comparison, lab and insights pa"
+d5946c9d0d7b,1e67738e5c69,sim,"feat(frontend): add UI, chart, map and replay components"
+4e0cca879b5e,4069341f8e87,sim,"feat(frontend): add domain types, data sources and mock generator"
+085ef4645994,d2e85fc34721,sim,chore(frontend): scaffold FleetLab Vite + React + TypeScript app
+9425d5a5cc04,db4bbcd43e89,sim,chore: remove Parquet schema profiling notebook
+fc2994f8061e,3ad69908fa02,sim,feat: compare allocation algorithms and add D+1 plan viewer
+58c1e223a290,3ad69908fa02,sim,feat: compare allocation algorithms and add D+1 plan viewer
+6fadd4e680e3,59741e4acb54,sim,feat: run strict D+1 replay on Databricks Gold data
+39091871e7f3,59741e4acb54,sim,feat: run strict D+1 replay on Databricks Gold data
+ebd35752154e,cf568324f151,sim,feat: add Databricks Silver and Gold layers for fleet dead-km study
+233522b03424,cf568324f151,sim,feat: add Databricks Silver and Gold layers for fleet dead-km study
+695e24924b33,192f1044c364,sim,Refactor code structure and remove redundant sections for improved rea
+4c7e35e6948a,73eeba9f781d,sim,Merge branch 'main' of https://github.com/tonyzinh/tcc-otimizacao-frot
+7ca402d2cf95,50d22596c705,sim,feat: adding bronze notebooks and performing data ingestion
+4cc2148b1336,f92737f6cd0a,sim,docs: explain availability workflow and evidence gates
+bc51313b3dc8,05226c8dc564,sim,feat: add local availability explorer
+06eb146bc9a4,26051d59bbd9,sim,feat: add conservative fleet availability pipeline
+174f5e675073,3b4538359e59,sim,docs: describe Parquet execution and data gates
+3d2ed338c360,9f2eb7c3d26f,sim,refactor: retire synthetic Databricks workflow
+8a84f87297cd,89ce3847dd6d,sim,feat: add authorized Parquet profiling and audit
+0c327e3a7c16,b2c06e3a8809,sim,docs: describe synthetic experiment and results
+b61987e08348,adbfdb9afa35,sim,test: cover fleet rules and synthetic replay
+37c936b7a257,102fdce0ea25,sim,feat: prepare synthetic Databricks pipeline
+8dfeb98664b5,f4f079f63330,sim,feat: implement preventive allocation experiment
+66a4f358f1f6,9c6073f6dba9,sim,feat: add synthetic data and quality pipeline
+4c048b6d3474,886cf7e62497,sim,chore: configure project and ignore private files
+825248a3e48e,4f933c43408e,sim,Initial commit

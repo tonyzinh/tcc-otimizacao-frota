@@ -140,7 +140,7 @@ descartar artefato de contabilização) e fases não executadas por falta de dad
 
 ## 11. Desvios conhecidos da v1 (históricos, não reescritos)
 
-Fonte: `reviews/DATA_SCIENCE_AUDIT.md` (25/10/2026) e `docs/DECISOES_TECNICAS.md`.
+Fonte: `reviews/DATA_SCIENCE_AUDIT.md` (25/10/2026; movido para `reports/thesis_audit/DATA_SCIENCE_AUDIT.md` na reorganização de 28/10/2026, conteúdo idêntico) e `docs/DECISOES_TECNICAS.md`.
 1. O critério de H1/H2 por IC foi definido depois da execução da v1; o regime B foi corrigido depois de ver o teste (DT015); a bateria e o seletivo vieram depois de um `final-run` já adverso nos mesmos dias de teste; existiu um replay exploratório com efeitos maiores cujos arquivos não existem (M-07).
 2. O conjunto de teste da v1 foi consultado muitas vezes; por isso as famílias exploratórias acima não são confirmatórias.
 3. O WAPE por zona-hora do modelo usado é 0,88–1,04, equivalente a prever zero (C-02); não houve oráculo de demanda.
