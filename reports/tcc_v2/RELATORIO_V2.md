@@ -27,7 +27,7 @@ nenhuma decisão mudou (0 reduções antes e depois).
 | Tabela v1 | Equivalente v2 | O que mudou |
 |---|---|---|
 | tab11 (162 linhas, IC percentil iid, p de permutação) | `fase1_inferencia_linhas.csv`, `fase1_comparacao_v1_v2.csv`, `fase1_ic_variantes.csv` | IC por 8 variantes de bootstrap por dia (iid, dia da semana, circular e estacionário com blocos 2/3/7); IC de decisão = o mais largo; p bruto, Holm e Romano–Wolf por família. Pontos reproduzem a v1 (diferença máx. 0,0001 pp). IC de decisão com largura ≈ a do v1 (razão média 1,01). **0 reduções, 98 aumentos significativos, 64 inconclusivas** (F1); na família primária F1p, 17 de 18 aumentos |
-| tab14 (razão `e`, IC percentil) | `fase1_nb.csv`, `fase1_nb_curva.csv`, `fase1_e_fieller.csv` | Sem razão: NB(e\*) = ΔN/dia − Δ(B+R)/dia / e\*, grade {3,5,10,20,30,50,100} e curva contínua. NB>0 com IC inteiro positivo só aparece em e\* ≥ 20 (3 linhas), 50 (14) e 100 (25). Fieller: 126 de 162 intervalos **ilimitados**; `e` pontual só em 38 linhas |
+| tab14 (razão `e`, IC percentil) | `fase1_nb.csv`, `fase1_nb_curva.csv`, `fase1_e_fieller.csv` | Sem razão: NB(e\*) = ΔN/dia − Δ(B+R)/dia / e\*, grade {3,5,10,20,30,50,100} e curva contínua. NB>0 com IC inteiro positivo só aparece em e\* ≥ 20 (3 linhas em 20, 9 em 30, 14 em 50, 25 em 100). Fieller: 126 de 162 intervalos **ilimitados**; `e` pontual só em 38 linhas |
 | (inexistente) | `fase1_mde.csv` | MDE (80%, 5%): ΔKM/corrida ≈ 2,5–2,7% e ΔN ≈ 1,1–1,6% (janela 04–11, regime B, mediana) |
 | (inexistente) | `fase1_dispersao_*.csv` | Média, desvio, mín., máx. e por dia da semana das diferenças diárias (ex.: guloso α=0,1, mar: ΔKM vazio/dia de +20 a +80 km) |
 | tab15 (escada de informação) | `fase3_*` | Oráculo e escada de WAPE (seção e) |
