@@ -7,6 +7,7 @@ Partículas iniciais: plano vazio, plano do guloso do artigo e as demais sortead
 probabilidade p_ficar). Avaliação J nos pseudodias de busca; escolha final entre guloso, gbest e vazio nos
 pseudodias de aceitação. Prioridade baixa: entra para completude com orçamento fixo (partículas × iterações).
 """
+
 from __future__ import annotations
 
 from tcc_frota.algoritmos.base import Moves, PlanContext, Planner
@@ -28,8 +29,13 @@ class EnxameParticulas(Planner):
 
     @property
     def params(self) -> dict:
-        return {"p_ficar": self.p_ficar, "inercia": self.inercia, "particulas": self.particulas,
-                "iteracoes": self.iteracoes, "max_km": self.max_km}
+        return {
+            "p_ficar": self.p_ficar,
+            "inercia": self.inercia,
+            "particulas": self.particulas,
+            "iteracoes": self.iteracoes,
+            "max_km": self.max_km,
+        }
 
     def plan(self, ctx: PlanContext) -> Moves:
         rng = seeded_rng(ctx, salt=8)
@@ -73,8 +79,11 @@ class EnxameParticulas(Planner):
             for s in swarm:
                 for d in ids:
                     lim = (k[d] + 1) / 2
-                    vel = (self.inercia * s["v"][d] + C1 * rng.random() * (s["best"][d] - s["x"][d])
-                           + C2 * rng.random() * (gbest[d] - s["x"][d]))
+                    vel = (
+                        self.inercia * s["v"][d]
+                        + C1 * rng.random() * (s["best"][d] - s["x"][d])
+                        + C2 * rng.random() * (gbest[d] - s["x"][d])
+                    )
                     s["v"][d] = max(-lim, min(lim, vel))
                     s["x"][d] = max(0.0, min(k[d] + 1 - 1e-9, s["x"][d] + s["v"][d]))
                 s["f"] = ev.objective(decode(s["x"]))
@@ -87,10 +96,18 @@ class EnxameParticulas(Planner):
         greedy = {d: z for d, z in greedy.items() if (d, z) in nb.km}
         chosen, scores = accept_on_holdout(ctx, hold, self.max_km, {"inicial": greedy, "melhor": best, "vazio": {}})
         plan = {"inicial": greedy, "melhor": best, "vazio": {}}[chosen]
-        self.info = {"status": "ok", "avaliacoes": evaluations, "J_busca_melhor": fg, "J_busca_vazio": ev.objective({}),
-                     "J_busca_inicial": ev.objective(greedy), "escolhido": chosen, "movimentos_melhor": len(best),
-                     "simulacoes": ev.simulations, **scores}
+        self.info = {
+            "status": "ok",
+            "avaliacoes": evaluations,
+            "J_busca_melhor": fg,
+            "J_busca_vazio": ev.objective({}),
+            "J_busca_inicial": ev.objective(greedy),
+            "escolhido": chosen,
+            "movimentos_melhor": len(best),
+            "simulacoes": ev.simulations,
+            **scores,
+        }
         return to_moves(ctx, plan, nb)
 
 
-__all__ = ["EnxameParticulas", "ARTICLE_GREEDY"]
+__all__ = ["ARTICLE_GREEDY", "EnxameParticulas"]

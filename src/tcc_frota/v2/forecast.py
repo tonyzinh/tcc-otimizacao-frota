@@ -5,6 +5,7 @@ dentro da janela `lookback_days`, sem as datas excluídas (Carnaval por padrão)
 Três modelos: média do mesmo dia da semana (baseline do repositório), naïve sazonal (D+1−7) e
 regressão de Poisson com efeitos de zona, hora e dia da semana mais defasagens.
 """
+
 from __future__ import annotations
 
 from collections import defaultdict
@@ -32,7 +33,7 @@ class DemandHistory:
     dates: set[date] = field(default_factory=set)
 
     @classmethod
-    def from_gold(cls, demanda_zona_hora: list[dict]) -> "DemandHistory":
+    def from_gold(cls, demanda_zona_hora: list[dict]) -> DemandHistory:
         counts: dict[tuple[date, int, str], int] = defaultdict(int)
         dates: set[date] = set()
         for row in demanda_zona_hora:
@@ -43,10 +44,9 @@ class DemandHistory:
     def value(self, day: date, hour: int, zone: str) -> int:
         return self.counts.get((day, hour, zone), 0)
 
-    def restricted(self, before: date) -> "DemandHistory":
+    def restricted(self, before: date) -> DemandHistory:
         """Cópia só com datas anteriores a `before` (para testes de não vazamento)."""
-        return DemandHistory({k: v for k, v in self.counts.items() if k[0] < before},
-                             {d for d in self.dates if d < before})
+        return DemandHistory({k: v for k, v in self.counts.items() if k[0] < before}, {d for d in self.dates if d < before})
 
 
 def cutoff_date(target: date) -> date:
@@ -65,8 +65,9 @@ def zones_in(history: DemandHistory, dates: list[date]) -> list[str]:
     return sorted({z for (d, _, z) in history.counts if d in wanted and z})
 
 
-def predict(model: str, target: date, history: DemandHistory, hours: range,
-            config: ForecastConfig = ForecastConfig()) -> dict[tuple[int, str], float]:
+def predict(
+    model: str, target: date, history: DemandHistory, hours: range, config: ForecastConfig = ForecastConfig()
+) -> dict[tuple[int, str], float]:
     """λ[(hora, zona)] para D+1. Usa apenas datas anteriores ao dia do corte."""
     train = training_dates(target, history, config)
     safe = history.restricted(cutoff_date(target))
@@ -94,8 +95,9 @@ def _lag_features(history: DemandHistory, day: date, hour: int, zone: str, exclu
     return log(1 + lag7), log(1 + mean4)
 
 
-def _poisson(target: date, history: DemandHistory, train: list[date], zones: list[str], hours: range,
-             config: ForecastConfig) -> dict[tuple[int, str], float]:
+def _poisson(
+    target: date, history: DemandHistory, train: list[date], zones: list[str], hours: range, config: ForecastConfig
+) -> dict[tuple[int, str], float]:
     import numpy as np
 
     totals = defaultdict(int)

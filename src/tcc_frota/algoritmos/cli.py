@@ -3,6 +3,7 @@
 Comandos: `regressao` (referências contra o artigo), `calibrar <família>` (grade pré-registrada nos
 dias 2–15/03) e `congelar <família>` (grava o finalista em `resultados/finalistas.json`).
 """
+
 from __future__ import annotations
 
 import argparse
@@ -17,8 +18,7 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     reg = sub.add_parser("regressao", help="referências pela interface Planner contra o final-run do artigo")
     reg.add_argument("--raw", type=Path, default=Path("data/raw"))
-    reg.add_argument("--daily", type=Path,
-                     default=Path("reports/runs/tcc_final/20261016T013428Z/individual/dias_cenarios.csv"))
+    reg.add_argument("--daily", type=Path, default=Path("reports/runs/tcc_final/20261016T013428Z/individual/dias_cenarios.csv"))
     cal = sub.add_parser("calibrar", help="roda a grade de uma família na calibração de março")
     cal.add_argument("familia")
     cal.add_argument("--workers", type=int, default=12)
@@ -50,7 +50,11 @@ def main(argv: list[str] | None = None) -> int:
         sp.add_argument("--workers", type=int, default=10)
         sp.add_argument("--raw", type=Path, default=Path("data/raw"))
     args = parser.parse_args(argv)
-    if args.command.startswith("seletivo-") and args.command not in ("seletivo-congelar", "seletivo-relatorio", "seletivo-analisar")             and os.environ.get("TCC_REAL_DATA_AUTHORIZED") != "YES":
+    if (
+        args.command.startswith("seletivo-")
+        and args.command not in ("seletivo-congelar", "seletivo-relatorio", "seletivo-analisar")
+        and os.environ.get("TCC_REAL_DATA_AUTHORIZED") != "YES"
+    ):
         print("defina TCC_REAL_DATA_AUTHORIZED=YES (processamento local autorizado, DT010-v2)", file=sys.stderr)
         return 2
     if args.command.startswith("seletivo-"):
@@ -67,11 +71,13 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "seletivo-analisar":
             out = sl.analyse(args.periodo)
             for r in out:
-                print(f"{r['regime']} {r['cenario']:<26} corridas {r['corridas_atendidas_var_pct']:+6.2f}% "
-                      f"[{r['corridas_atendidas_var_pct_ic_inf']:+.2f}; {r['corridas_atendidas_var_pct_ic_sup']:+.2f}]  "
-                      f"km vazio/corrida {r['km_vazio_por_corrida_var_pct']:+6.2f}% "
-                      f"[{r['km_vazio_por_corrida_var_pct_ic_inf']:+.2f}; {r['km_vazio_por_corrida_var_pct_ic_sup']:+.2f}]  "
-                      f"p_holm {r['p_km_vazio_por_corrida_holm']:.3f}")
+                print(
+                    f"{r['regime']} {r['cenario']:<26} corridas {r['corridas_atendidas_var_pct']:+6.2f}% "
+                    f"[{r['corridas_atendidas_var_pct_ic_inf']:+.2f}; {r['corridas_atendidas_var_pct_ic_sup']:+.2f}]  "
+                    f"km vazio/corrida {r['km_vazio_por_corrida_var_pct']:+6.2f}% "
+                    f"[{r['km_vazio_por_corrida_var_pct_ic_inf']:+.2f}; {r['km_vazio_por_corrida_var_pct_ic_sup']:+.2f}]  "
+                    f"p_holm {r['p_km_vazio_por_corrida_holm']:.3f}"
+                )
             return 0
         else:
             out = {"motivos": sl.reasons_table(), "pareto": str(sl.pareto())}
@@ -86,11 +92,13 @@ def main(argv: list[str] | None = None) -> int:
         from tcc_frota.algoritmos.protocolo import analyse_test
 
         for r in analyse_test(args.periodo):
-            print(f"{r['regime']} {r['cenario']:<28} corridas {r['corridas_atendidas_var_pct']:+6.2f}% "
-                  f"[{r['corridas_atendidas_var_pct_ic_inf']:+.2f}; {r['corridas_atendidas_var_pct_ic_sup']:+.2f}]  "
-                  f"km vazio/corrida {r['km_vazio_por_corrida_var_pct']:+6.2f}% "
-                  f"[{r['km_vazio_por_corrida_var_pct_ic_inf']:+.2f}; {r['km_vazio_por_corrida_var_pct_ic_sup']:+.2f}]  "
-                  f"p_holm {r['p_km_vazio_por_corrida_holm']:.3f}")
+            print(
+                f"{r['regime']} {r['cenario']:<28} corridas {r['corridas_atendidas_var_pct']:+6.2f}% "
+                f"[{r['corridas_atendidas_var_pct_ic_inf']:+.2f}; {r['corridas_atendidas_var_pct_ic_sup']:+.2f}]  "
+                f"km vazio/corrida {r['km_vazio_por_corrida_var_pct']:+6.2f}% "
+                f"[{r['km_vazio_por_corrida_var_pct_ic_inf']:+.2f}; {r['km_vazio_por_corrida_var_pct_ic_sup']:+.2f}]  "
+                f"p_holm {r['p_km_vazio_por_corrida_holm']:.3f}"
+            )
         return 0
     if os.environ.get("TCC_REAL_DATA_AUTHORIZED") != "YES":
         print("defina TCC_REAL_DATA_AUTHORIZED=YES (processamento local autorizado, DT010-v2)", file=sys.stderr)
@@ -104,8 +112,7 @@ def main(argv: list[str] | None = None) -> int:
         frozen = load_frozen()
         sims = {}
         for name, period in ex.PERIODS.items():
-            sims[name], _ = ex.calibrate_simulator(study, period, study.measured_parameters(period.calibration),
-                                                   echo=lambda *a: None)
+            sims[name], _ = ex.calibrate_simulator(study, period, study.measured_parameters(period.calibration), echo=lambda *a: None)
         same_sim = all(sims[k] == frozen.sims[k] for k in sims)
         print(f"simulador recalibrado igual ao congelado: {same_sim}")
         out = regressao.run(study, args.daily)
@@ -129,8 +136,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "calibrar":
         from tcc_frota.algoritmos.protocolo import calibrate
 
-        best = calibrate(args.familia, workers=args.workers, raw=args.raw, register=not args.sem_registro,
-                         out_name=args.saida)
+        best = calibrate(args.familia, workers=args.workers, raw=args.raw, register=not args.sem_registro, out_name=args.saida)
         print(json.dumps(best, ensure_ascii=False, default=str))
         return 0
     return 1

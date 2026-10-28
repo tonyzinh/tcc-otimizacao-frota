@@ -1,20 +1,26 @@
 """Algoritmos alternativos ao guloso: exatidão, limites e comparabilidade."""
+
 import random
 from dataclasses import replace
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from itertools import permutations
 
 import pytest
 
-from tcc_frota.optimization.alternatives import (
-    assignment_plan, hungarian, local_search_plan, proportional_plan, simulated_greedy_plan, target_slots,
-)
-from tcc_frota.optimization.greedy import _proxy, greedy_plan
 from tcc_frota.distance import HaversineDistance
 from tcc_frota.models import Position, Request, Vehicle
+from tcc_frota.optimization.alternatives import (
+    assignment_plan,
+    hungarian,
+    local_search_plan,
+    proportional_plan,
+    simulated_greedy_plan,
+    target_slots,
+)
+from tcc_frota.optimization.greedy import _proxy, greedy_plan
 from tcc_frota.simulation.engine import SimulationConfig
 
-START = datetime(2026, 9, 30, 10, tzinfo=timezone.utc)
+START = datetime(2026, 9, 30, 10, tzinfo=UTC)
 ZONES = {
     "a": Position("a", -20.30, -40.30),
     "b": Position("b", -20.33, -40.30),
@@ -56,9 +62,11 @@ def test_slot_planners_respect_reposition_limit(planner):
 
 
 def test_exact_assignment_never_moves_more_than_proportional_rule():
-    vehicles = [Vehicle("v0", ZONES["b"], START, START + timedelta(hours=3)),
-                Vehicle("v1", ZONES["c"], START, START + timedelta(hours=3)),
-                Vehicle("v2", ZONES["a"], START, START + timedelta(hours=3))]
+    vehicles = [
+        Vehicle("v0", ZONES["b"], START, START + timedelta(hours=3)),
+        Vehicle("v1", ZONES["c"], START, START + timedelta(hours=3)),
+        Vehicle("v2", ZONES["a"], START, START + timedelta(hours=3)),
+    ]
     kwargs = dict(capacity_per_vehicle=1.0, max_reposition_km=10.0)
     exact = assignment_plan(vehicles, ZONES, {"b": 1.0, "c": 1.0}, START, **kwargs)
     rule = proportional_plan(vehicles, ZONES, {"b": 1.0, "c": 1.0}, START, **kwargs)
@@ -69,8 +77,9 @@ def test_exact_assignment_never_moves_more_than_proportional_rule():
 def test_local_search_never_worse_than_greedy_on_its_objective():
     vehicles = fleet(3) + [Vehicle("w", ZONES["c"], START, START + timedelta(hours=3))]
     greedy = greedy_plan(vehicles, ZONES, EXPECTED, START, capacity_per_vehicle=1.0)
-    plan = local_search_plan(vehicles, ZONES, EXPECTED, START, initial=greedy, capacity_per_vehicle=1.0,
-                             max_reposition_km=15.0, iterations=300, seed=1)
+    plan = local_search_plan(
+        vehicles, ZONES, EXPECTED, START, initial=greedy, capacity_per_vehicle=1.0, max_reposition_km=15.0, iterations=300, seed=1
+    )
     assert plan.projected_pickup_km + plan.reposition_km <= greedy.projected_pickup_km + greedy.reposition_km + 1e-9
 
 
@@ -82,18 +91,22 @@ def test_simulated_greedy_gains_only_by_correcting_myopic_dispatch():
     """Em linha reta, mover e depois atender custa o mesmo que atender direto (desigualdade
     triangular). O ganho aparece quando o despacho do mais próximo faz uma escolha míope."""
     zones = {"x5": line(5), "x10": line(10)}
-    vehicles = [Vehicle("v0", line(0), START, START + timedelta(hours=3)),
-                Vehicle("v1", line(9), START, START + timedelta(hours=3))]
-    scenario = [Request("r0", START + timedelta(minutes=30), line(5), line(5), 60.0),
-                Request("r1", START + timedelta(minutes=31), line(10), line(10), 60.0)]
+    vehicles = [Vehicle("v0", line(0), START, START + timedelta(hours=3)), Vehicle("v1", line(9), START, START + timedelta(hours=3))]
+    scenario = [
+        Request("r0", START + timedelta(minutes=30), line(5), line(5), 60.0),
+        Request("r1", START + timedelta(minutes=31), line(10), line(10), 60.0),
+    ]
     config = SimulationConfig(START, START + timedelta(hours=3), speed_kmh=60, max_pickup_minutes=30)
-    plan = simulated_greedy_plan(vehicles, zones, {"x5": 1.0, "x10": 1.0}, START, scenarios=[scenario],
-                                 sim_config=config, max_reposition_km=10.0)
+    plan = simulated_greedy_plan(
+        vehicles, zones, {"x5": 1.0, "x10": 1.0}, START, scenarios=[scenario], sim_config=config, max_reposition_km=10.0
+    )
     assert plan.recommendations
     assert plan.projected_pickup_km + plan.reposition_km < plan.baseline_projected_pickup_km - 1.0
     assert plan.projected_coverage >= plan.baseline_projected_coverage
-    assert simulated_greedy_plan(vehicles, zones, {"x5": 1.0}, START, scenarios=[], sim_config=config,
-                                 max_reposition_km=10.0).recommendations == ()
+    assert (
+        simulated_greedy_plan(vehicles, zones, {"x5": 1.0}, START, scenarios=[], sim_config=config, max_reposition_km=10.0).recommendations
+        == ()
+    )
 
 
 def test_proxy_is_reported_consistently_for_alternatives():
@@ -106,8 +119,8 @@ def test_proxy_is_reported_consistently_for_alternatives():
 
 
 def test_replay_runs_every_algorithm_with_identical_inputs():
-    from tests.unit.test_gold_replay import CONFIG, TARGET, tables
     from tcc_frota.gold.replay import ALGORITHMS, GoldData, run_day
+    from tests.unit.test_gold_replay import CONFIG, TARGET, tables
 
     data = GoldData.from_rows(tables())
     signatures = set()

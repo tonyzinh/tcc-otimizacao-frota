@@ -1,8 +1,9 @@
 """Adaptador Databricks opcional. Requer Spark do ambiente; nunca envia arquivos locais."""
+
 from __future__ import annotations
 
 import re
-from datetime import date, timezone
+from datetime import UTC, date
 
 from tcc_frota.models import Position, Request, Vehicle
 from tcc_frota.synthetic.generator import SyntheticDataset
@@ -60,26 +61,38 @@ def silver_synthetic(spark, catalog: str, schema: str, run_id: str) -> dict[str,
     if requests.groupBy("request_id").count().filter("count > 1").limit(1).count():
         raise ValueError("IDs duplicados no Bronze sintético")
     clean_requests = requests.select(
-        "request_id", F.to_timestamp("created_at").alias("created_at"),
-        F.col("origin_zone").alias("zone"), F.col("origin_lat").cast("double").alias("origin_lat"),
-        F.col("origin_lon").cast("double").alias("origin_lon"), "destination_zone",
+        "request_id",
+        F.to_timestamp("created_at").alias("created_at"),
+        F.col("origin_zone").alias("zone"),
+        F.col("origin_lat").cast("double").alias("origin_lat"),
+        F.col("origin_lon").cast("double").alias("origin_lon"),
+        "destination_zone",
         F.col("destination_lat").cast("double").alias("destination_lat"),
         F.col("destination_lon").cast("double").alias("destination_lon"),
-        F.col("trip_minutes").cast("double").alias("trip_minutes"), "split", "dataset_kind",
+        F.col("trip_minutes").cast("double").alias("trip_minutes"),
+        "split",
+        "dataset_kind",
     )
     valid = (
-        F.col("request_id").isNotNull() & F.col("created_at").isNotNull()
-        & F.col("origin_lat").between(-90, 90) & F.col("origin_lon").between(-180, 180)
-        & F.col("destination_lat").between(-90, 90) & F.col("destination_lon").between(-180, 180)
-        & (F.col("trip_minutes") > 0) & F.col("split").isin("train", "test")
+        F.col("request_id").isNotNull()
+        & F.col("created_at").isNotNull()
+        & F.col("origin_lat").between(-90, 90)
+        & F.col("origin_lon").between(-180, 180)
+        & F.col("destination_lat").between(-90, 90)
+        & F.col("destination_lon").between(-180, 180)
+        & (F.col("trip_minutes") > 0)
+        & F.col("split").isin("train", "test")
     )
     rejected = clean_requests.filter(~valid).count()
     clean_requests = clean_requests.filter(valid)
     clean_vehicles = vehicles.select(
-        "vehicle_id", "zone", F.col("lat").cast("double").alias("lat"),
+        "vehicle_id",
+        "zone",
+        F.col("lat").cast("double").alias("lat"),
         F.col("lon").cast("double").alias("lon"),
         F.to_timestamp("available_from").alias("available_from"),
-        F.to_timestamp("available_until").alias("available_until"), "dataset_kind",
+        F.to_timestamp("available_until").alias("available_until"),
+        "dataset_kind",
     )
     if clean_vehicles.filter(F.col("vehicle_id").isNull() | F.col("lat").isNull() | F.col("lon").isNull()).limit(1).count():
         raise ValueError("veículo sintético inválido")
@@ -115,7 +128,13 @@ def load_synthetic_silver(spark, catalog: str, schema: str, run_id: str, seed: i
         dest = Position(row.destination_zone, row.destination_lat, row.destination_lon)
         zones.setdefault(origin.zone, origin)
         zones.setdefault(dest.zone, dest)
-        request = Request(row.request_id, row.created_at.replace(tzinfo=timezone.utc) if row.created_at.tzinfo is None else row.created_at, origin, dest, row.trip_minutes)
+        request = Request(
+            row.request_id,
+            row.created_at.replace(tzinfo=UTC) if row.created_at.tzinfo is None else row.created_at,
+            origin,
+            dest,
+            row.trip_minutes,
+        )
         (historical if row.split == "train" else evaluation).append(request)
     vehicles: list[Vehicle] = []
     for row in vehicle_rows:
@@ -123,7 +142,7 @@ def load_synthetic_silver(spark, catalog: str, schema: str, run_id: str, seed: i
             raise PermissionError("somente sintéticos")
         position = Position(row.zone, row.lat, row.lon)
         zones.setdefault(position.zone, position)
-        start = row.available_from.replace(tzinfo=timezone.utc) if row.available_from.tzinfo is None else row.available_from
-        end = row.available_until.replace(tzinfo=timezone.utc) if row.available_until.tzinfo is None else row.available_until
+        start = row.available_from.replace(tzinfo=UTC) if row.available_from.tzinfo is None else row.available_from
+        end = row.available_until.replace(tzinfo=UTC) if row.available_until.tzinfo is None else row.available_until
         vehicles.append(Vehicle(row.vehicle_id, position, start, end))
     return SyntheticDataset(zones, historical, evaluation, vehicles, target_date, seed)

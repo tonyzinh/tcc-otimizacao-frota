@@ -3,6 +3,7 @@
 Uso: TCC_REAL_DATA_AUTHORIZED=YES PYTHONPATH=src python scripts/rodar_pickup.py [--workers 10]
 Saídas: resultados/pickup/*.csv, resultados/pickup/hist_extras_comuns.png, tabelas/tab_pickup_corridas_extras.tex.
 """
+
 from __future__ import annotations
 
 import csv
@@ -34,7 +35,7 @@ def write(path: Path, rows: list[dict]) -> None:
 
 
 def specs() -> list[PlannerSpec]:
-    out = test_specs()          # referências do artigo + finalistas congelados da bateria
+    out = test_specs()  # referências do artigo + finalistas congelados da bateria
     fin = json.loads(Path("resultados/seletivo/finalistas.json").read_text(encoding="utf-8"))
     out.append(PlannerSpec("guloso_seletivo", "C2_guloso_seletivo", fin["C2"]["parametros"]))
     return out
@@ -65,7 +66,7 @@ def main(workers: int = 10) -> int:
         planner = bateria.build_planner(s)
         for period in ex.PERIODS:
             for day in ex.PERIODS[period].test:
-                for seed in (bateria.SEEDS if planner.stochastic else bateria.SEEDS[:1]):
+                for seed in bateria.SEEDS if planner.stochastic else bateria.SEEDS[:1]:
                     tasks.append((period, day, s, seed))
     with get_context("spawn").Pool(workers, initializer=bateria._init_worker, initargs=("data/raw",)) as pool:
         days = pool.map(_task, tasks)
@@ -100,11 +101,19 @@ def main(workers: int = 10) -> int:
         db = float(r["soma_prop_pickup_km"]) - float(r["soma_base_pickup_km"])
         dr = float(r["soma_prop_reposition_km"]) - float(r["soma_base_reposition_km"])
         de = float(r["soma_prop_empty_km"]) - float(r["soma_base_empty_km"])
-        row = {"periodo": period, "cenario": scen, "rotulo": "exploratorio",
-               "delta_corridas": dn, "delta_busca_km": db, "delta_repos_km": dr, "delta_vazio_km": de,
-               "b_mais_r_confere": abs(db + dr - de) < 1e-3,
-               "e_km": de / dn if dn > 0 else float("nan"), "e_busca_km": db / dn if dn > 0 else float("nan"),
-               "e_repos_km": dr / dn if dn > 0 else float("nan")}
+        row = {
+            "periodo": period,
+            "cenario": scen,
+            "rotulo": "exploratorio",
+            "delta_corridas": dn,
+            "delta_busca_km": db,
+            "delta_repos_km": dr,
+            "delta_vazio_km": de,
+            "b_mais_r_confere": abs(db + dr - de) < 1e-3,
+            "e_km": de / dn if dn > 0 else float("nan"),
+            "e_busca_km": db / dn if dn > 0 else float("nan"),
+            "e_repos_km": dr / dn if dn > 0 else float("nan"),
+        }
         for k in ("extras", "comuns", "perdidas_base", "baseline"):
             row.update({f"{k}_{s}": v for s, v in pk.summary(g[k]).items()})
         rows.append(row)
@@ -114,21 +123,32 @@ def main(workers: int = 10) -> int:
     dec, unserved = [], []
     for period in ex.PERIODS:
         real = pk.real_pickup(study, ex.PERIODS[period].test)
-        sim_base_unique = pooled[(period, "ref_proporcional")]["baseline"]   # cenário determinístico: 1 baseline por dia
-        for name, vals, extra in (("pickup_realizado_distMotorista", real["valores"],
-                                   {"aceitas": real["aceitas"], "com_campo": real["com_pickup_realizado"], "cobertura_pct": real["cobertura_pct"]}),
-                                  ("pickup_simulado_baseline_C0", sim_base_unique, {"cobertura_pct": 100.0})):
+        sim_base_unique = pooled[(period, "ref_proporcional")]["baseline"]  # cenário determinístico: 1 baseline por dia
+        for name, vals, extra in (
+            (
+                "pickup_realizado_distMotorista",
+                real["valores"],
+                {"aceitas": real["aceitas"], "com_campo": real["com_pickup_realizado"], "cobertura_pct": real["cobertura_pct"]},
+            ),
+            ("pickup_simulado_baseline_C0", sim_base_unique, {"cobertura_pct": 100.0}),
+        ):
             s = pk.summary(vals)
-            dec.append({"periodo": period, "medida": name, **extra, **s,
-                        **{f"decil_{q}0": v for q, v in zip(range(1, 10), pk.deciles(vals))}})
+            dec.append(
+                {"periodo": period, "medida": name, **extra, **s, **{f"decil_{q}0": v for q, v in zip(range(1, 10), pk.deciles(vals))}}
+            )
         unserved += [{"periodo": period, **r} for r in pk.unserved_by_distance(study, ex.PERIODS[period].test)]
     write(OUT / "pickup_realizado_decis.csv", dec)
     write(OUT / "nao_atendimento_por_distancia.csv", unserved)
     figure(days)
     latex(rows)
     for r in rows:
-        print(r["periodo"], r["cenario"], r["extras_n"], round(r["extras_mediana_km"], 2) if r["extras_n"] else "-",
-              round(r["comuns_mediana_km"], 2))
+        print(
+            r["periodo"],
+            r["cenario"],
+            r["extras_n"],
+            round(r["extras_mediana_km"], 2) if r["extras_n"] else "-",
+            round(r["comuns_mediana_km"], 2),
+        )
     return 0
 
 
@@ -157,20 +177,29 @@ def figure(days) -> None:
 
 def latex(rows) -> None:
     f = lambda x, d=2: "---" if x != x else f"{x:.{d}f}".replace(".", "{,}")
-    lines = [r"% Gerado por scripts/rodar_pickup.py — exploratório (docs/ESCOPO_FECHADO.md); simulador com dados reais.",
-             r"\begin{tabular}{llrrrrrrrr}", r"\hline",
-             r"Mês & Cenário & \multicolumn{4}{c}{Extras: pickup (km)} & \multicolumn{2}{c}{Comuns (km)} & $e$ & $e_B$ / $e_R$ \\",
-             r" & & n & média & mediana & p90 & média & mediana & (km) & (km) \\", r"\hline"]
+    lines = [
+        r"% Gerado por scripts/rodar_pickup.py — exploratório (docs/ESCOPO_FECHADO.md); simulador com dados reais.",
+        r"\begin{tabular}{llrrrrrrrr}",
+        r"\hline",
+        r"Mês & Cenário & \multicolumn{4}{c}{Extras: pickup (km)} & \multicolumn{2}{c}{Comuns (km)} & $e$ & $e_B$ / $e_R$ \\",
+        r" & & n & média & mediana & p90 & média & mediana & (km) & (km) \\",
+        r"\hline",
+    ]
     for r in rows:
         name = r["cenario"].replace("_", r"\_")
         mes = "mar" if r["periodo"] == "mar2026" else "set"
-        lines.append(f"{mes} & {name} & {r['extras_n']} & {f(r['extras_media_km'])} & {f(r['extras_mediana_km'])} & "
-                     f"{f(r['extras_p90_km'])} & {f(r['comuns_media_km'])} & {f(r['comuns_mediana_km'])} & {f(r['e_km'], 1)} & "
-                     f"{f(r['e_busca_km'], 1)} / {f(r['e_repos_km'], 1)} \\\\")
-    lines += [r"\hline", r"\multicolumn{10}{l}{\footnotesize Regime B, 04--11h, dias de teste; sementes e dias reunidos. "
-              r"$e = e_B + e_R$: KM vazio (busca + reposicionamento) por corrida extra; --- em $e$: sem ganho líquido de corridas "
-              r"($\Delta$corridas $\le 0$). Nos algoritmos estocásticos, n soma as 5 sementes. Exploratório.} \\",
-              r"\end{tabular}"]
+        lines.append(
+            f"{mes} & {name} & {r['extras_n']} & {f(r['extras_media_km'])} & {f(r['extras_mediana_km'])} & "
+            f"{f(r['extras_p90_km'])} & {f(r['comuns_media_km'])} & {f(r['comuns_mediana_km'])} & {f(r['e_km'], 1)} & "
+            f"{f(r['e_busca_km'], 1)} / {f(r['e_repos_km'], 1)} \\\\"
+        )
+    lines += [
+        r"\hline",
+        r"\multicolumn{10}{l}{\footnotesize Regime B, 04--11h, dias de teste; sementes e dias reunidos. "
+        r"$e = e_B + e_R$: KM vazio (busca + reposicionamento) por corrida extra; --- em $e$: sem ganho líquido de corridas "
+        r"($\Delta$corridas $\le 0$). Nos algoritmos estocásticos, n soma as 5 sementes. Exploratório.} \\",
+        r"\end{tabular}",
+    ]
     Path("tabelas/tab_pickup_corridas_extras.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 

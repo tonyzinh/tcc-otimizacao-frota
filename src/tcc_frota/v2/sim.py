@@ -7,6 +7,7 @@ primeira vez que o motorista fica livre na janela e seu KM entra no total (RN011
 motorista cumpre dois intervalos ocupados ao mesmo tempo (RN017). Tempos em segundos desde a
 meia-noite local do dia simulado; distâncias por rua estimadas = Haversine × fator (nunca odômetro).
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -24,10 +25,10 @@ def reta_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 
 @dataclass(frozen=True)
 class SimParams:
-    radius_km: float          # raio máximo de despacho, em linha reta
-    speed_kmh: float          # velocidade efetiva sobre a distância por rua estimada
-    road_factor: float        # distância por rua / linha reta
-    patience_s: float         # paciência máxima na fila
+    radius_km: float  # raio máximo de despacho, em linha reta
+    speed_kmh: float  # velocidade efetiva sobre a distância por rua estimada
+    road_factor: float  # distância por rua / linha reta
+    patience_s: float  # paciência máxima na fila
     post_accept_cancel: bool = False  # sensibilidade: canceladas pós-aceite não viram viagem
 
     def __post_init__(self) -> None:
@@ -44,7 +45,7 @@ class SimRequest:
     dlat: float
     dlon: float
     trip_s: float
-    patience_s: float | None = None      # desistência observada antes do aceite, se houver
+    patience_s: float | None = None  # desistência observada antes do aceite, se houver
     post_accept_cancel: bool = False
     hour: int = 0
     zone: str = ""
@@ -53,7 +54,7 @@ class SimRequest:
 @dataclass(frozen=True)
 class SimDriver:
     did: str
-    sessions: tuple[tuple[float, float, float, float], ...]       # (início, fim, lat, lon)
+    sessions: tuple[tuple[float, float, float, float], ...]  # (início, fim, lat, lon)
     commitments: tuple[tuple[float, float, float, float], ...] = ()  # (início, fim, lat_fim, lon_fim)
 
 
@@ -83,11 +84,16 @@ class SimResult:
 
 def signature(requests: list[SimRequest], drivers: list[SimDriver], params: SimParams, window: tuple[float, float]) -> str:
     """SHA-256 das entradas do mundo (sem o plano): igual nos cenários comparados (RN028)."""
-    payload = json.dumps({
-        "requests": [asdict(r) for r in sorted(requests, key=lambda r: r.rid)],
-        "drivers": [asdict(d) for d in sorted(drivers, key=lambda d: d.did)],
-        "params": asdict(params), "window": window,
-    }, sort_keys=True, default=str)
+    payload = json.dumps(
+        {
+            "requests": [asdict(r) for r in sorted(requests, key=lambda r: r.rid)],
+            "drivers": [asdict(d) for d in sorted(drivers, key=lambda d: d.did)],
+            "params": asdict(params),
+            "window": window,
+        },
+        sort_keys=True,
+        default=str,
+    )
     return hashlib.sha256(payload.encode()).hexdigest()
 
 
@@ -102,10 +108,18 @@ def _merge(intervals) -> list[tuple[float, float, float, float]]:
     return [tuple(x) for x in out]
 
 
-def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimParams,
-             window: tuple[float, float], moves: dict[str, tuple[float, float]] | None = None,
-             tail_s: float = 3 * 3600, max_move_km: float = float("inf"), move_mode: str = "inicio_turno",
-             move_origins: dict[str, tuple[float, float]] | None = None, trace: list | None = None) -> SimResult:
+def simulate(
+    requests: list[SimRequest],
+    drivers: list[SimDriver],
+    params: SimParams,
+    window: tuple[float, float],
+    moves: dict[str, tuple[float, float]] | None = None,
+    tail_s: float = 3 * 3600,
+    max_move_km: float = float("inf"),
+    move_mode: str = "inicio_turno",
+    move_origins: dict[str, tuple[float, float]] | None = None,
+    trace: list | None = None,
+) -> SimResult:
     """Replay de um dia com recomendações de reposicionamento.
 
     `move_mode="inicio_turno"`: o motorista vai à zona-alvo na primeira disponibilidade da janela,
@@ -127,16 +141,17 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
     w0, w1 = window
     res = SimResult(signature(requests, drivers, params, window), moves_planned=len(moves))
     res.moves_planned = len(moves)
-    for d in unknown:          # recomendação para motorista que não trabalha: não executada
+    for d in unknown:  # recomendação para motorista que não trabalha: não executada
         moves.pop(d)
         res.move_outcomes[d] = "absent"
 
     def ev(t: float, kind: str, did: str | None, rid: int | None, at: tuple[float, float], km: float | None) -> None:
         if trace is not None:
             trace.append((t, kind, did, rid, at, km))
+
     horizon = w1 + tail_s
     online = {d.did: False for d in drivers}
-    busy_until = {d.did: None for d in drivers}   # None = livre
+    busy_until = {d.did: None for d in drivers}  # None = livre
     pos: dict[str, tuple[float, float] | None] = {d.did: None for d in drivers}
     commits = {d.did: _merge(d.commitments) for d in drivers}
     next_commit = {d.did: 0 for d in drivers}
@@ -212,7 +227,7 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
         if did not in pending_move:
             return False
         lat, lon = pending_move.pop(did)
-        if move_mode == "fim_do_dia":       # só vale ao iniciar o dia; depois disso, não adesão
+        if move_mode == "fim_do_dia":  # só vale ao iniciar o dia; depois disso, não adesão
             res.move_outcomes[did] = "busy"
             return False
         if t >= w1:
@@ -221,7 +236,7 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
         km = reta_km(pos[did][0], pos[did][1], lat, lon) * params.road_factor
         end = t + 3600 * km / params.speed_kmh
         if km <= 1e-9 or km > max_move_km + 1e-9 or commit_blocks(did, t, end):
-            res.move_outcomes[did] = ("already_there" if km <= 1e-9 else "limit" if km > max_move_km + 1e-9 else "busy")
+            res.move_outcomes[did] = "already_there" if km <= 1e-9 else "limit" if km > max_move_km + 1e-9 else "busy"
             return False
         res.move_outcomes[did] = "executed"
         res.move_origins_used[did] = pos[did]
@@ -241,7 +256,7 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
         if try_move(did, t):
             return
         best = None
-        for rid in sorted(waiting):          # FIFO: pedido mais antigo primeiro
+        for rid in sorted(waiting):  # FIFO: pedido mais antigo primeiro
             r = waiting[rid]
             if eligible(did, r, t) is not None:
                 best = r
@@ -283,7 +298,7 @@ def simulate(requests: list[SimRequest], drivers: list[SimDriver], params: SimPa
         elif kind == "commit_start":
             did, i = data
             s, e, lat, lon = commits[did][i]
-            if pending_move.pop(did, None) is not None:   # ocupado antes da primeira disponibilidade
+            if pending_move.pop(did, None) is not None:  # ocupado antes da primeira disponibilidade
                 res.move_outcomes[did] = "busy"
             if busy_until[did] is not None:
                 raise AssertionError("compromisso sobreposto a tarefa simulada (RN017)")

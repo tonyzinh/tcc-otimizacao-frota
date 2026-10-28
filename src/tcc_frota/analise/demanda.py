@@ -10,6 +10,7 @@ corte (D = alvo − 1, excluído), sem o Carnaval, como `v2/forecast.training_da
 
 WAPE = Σ|ŷ − y| / Σy, sempre a partir dos erros por hora; faixas e global somam erros e solicitações das horas.
 """
+
 from __future__ import annotations
 
 import random
@@ -131,8 +132,7 @@ def aggregate(records: list[dict], days: list[str]) -> list[dict]:
     for r in records:
         by_day[r["data"]].append(r)
     sc = scopes()
-    sums = {name: {d: [sum(r[k] for r in by_day[d] if f(r)) for k in ("abs_err", "y", "yhat")] for d in days}
-            for name, f in sc.items()}
+    sums = {name: {d: [sum(r[k] for r in by_day[d] if f(r)) for k in ("abs_err", "y", "yhat")] for d in days} for name, f in sc.items()}
     rng = random.Random(SEED)
     samples = [[days[rng.randrange(len(days))] for _ in days] for _ in range(REPS)]
     out = []
@@ -147,9 +147,18 @@ def aggregate(records: list[dict], days: list[str]) -> list[dict]:
         boot.sort()
         lo = boot[int(0.025 * (len(boot) - 1))] if boot else float("nan")
         hi = boot[int(0.975 * (len(boot) - 1))] if boot else float("nan")
-        out.append({"escopo": name, "dias": len(days), "solicitacoes": y, "previsto": yh,
-                    "wape": e / y if y else float("nan"), "wape_ic_inf": lo, "wape_ic_sup": hi,
-                    "vies": yh / y - 1 if y else float("nan")})
+        out.append(
+            {
+                "escopo": name,
+                "dias": len(days),
+                "solicitacoes": y,
+                "previsto": yh,
+                "wape": e / y if y else float("nan"),
+                "wape_ic_inf": lo,
+                "wape_ic_sup": hi,
+                "vies": yh / y - 1 if y else float("nan"),
+            }
+        )
     return out
 
 

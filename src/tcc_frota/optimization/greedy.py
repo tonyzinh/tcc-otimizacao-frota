@@ -3,6 +3,7 @@
 Cada veículo oferece `capacity_per_vehicle` atendimentos estimados na faixa. Isso
 é uma aproximação acadêmica, não uma regra operacional da empresa.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -35,7 +36,7 @@ def _proxy(
     total = sum(demand.values())
     if total <= 0:
         return 0.0, None
-    remaining = {vehicle_id: capacity for vehicle_id in locations}
+    remaining = dict.fromkeys(locations, capacity)
     pickup = covered = 0.0
     for zone_id in sorted(demand):
         need = demand[zone_id]
@@ -78,8 +79,11 @@ def greedy_plan(
     if any(zone not in zones or value < 0 or not isfinite(value) for zone, value in expected_by_zone.items()):
         raise ValueError("previsão inválida")
     eligible = {
-        v.vehicle_id: v for v in vehicles
-        if v.active and v.driver_ready and v.position is not None
+        v.vehicle_id: v
+        for v in vehicles
+        if v.active
+        and v.driver_ready
+        and v.position is not None
         and v.available_from <= start_at < v.available_until
         and not any(c.vehicle_id == v.vehicle_id and c.start <= start_at < c.end for c in commitments)
     }
@@ -117,9 +121,11 @@ def greedy_plan(
                     continue
                 improvement = (current_pickup + reposition) - (pickup + reposition + distance)
                 candidate = (improvement, vehicle_id, zone_id, distance, pickup, coverage)
-                if improvement > 1e-9 and (best is None or improvement > best[0] + 1e-9 or (
-                    abs(improvement - best[0]) <= 1e-9 and (vehicle_id, zone_id) < (best[1], best[2])
-                )):
+                if improvement > 1e-9 and (
+                    best is None
+                    or improvement > best[0] + 1e-9
+                    or (abs(improvement - best[0]) <= 1e-9 and (vehicle_id, zone_id) < (best[1], best[2]))
+                ):
                     best = candidate
         if best is None:
             break

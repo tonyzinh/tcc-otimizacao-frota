@@ -9,6 +9,7 @@ planejadores que avaliam planos no simulador; o dia D+1 real só é simulado pel
 Os adaptadores `GulosoMarginal`, `Proporcional` e `RegraLimiar` chamam as funções de
 `tcc_frota.v2.policy` sem alterá-las (teste de regressão em `tests/unit/test_algoritmos_base.py`).
 """
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -18,7 +19,7 @@ from datetime import date
 from tcc_frota.v2.policy import PlanInputs, marginal_greedy, proportional, threshold_rule
 from tcc_frota.v2.sim import SimDriver, SimParams, SimRequest, reta_km
 
-Moves = dict[str, tuple[float, float, float]]   # motorista -> (lat, lng, km por rua estimado)
+Moves = dict[str, tuple[float, float, float]]  # motorista -> (lat, lng, km por rua estimado)
 
 
 @dataclass(frozen=True)
@@ -31,15 +32,15 @@ class Scenario:
 
 @dataclass(frozen=True)
 class PlanContext:
-    inputs: PlanInputs                    # frota do regime, zonas, demanda prevista, κ, fator rua/reta
-    target: date                          # D+1
-    window: tuple[int, int]               # horas locais [início, fim)
-    regime: str                           # "A" ou "B" (C só diagnóstico)
-    sim: SimParams                        # simulador calibrado do período (conhecido no corte)
-    move_mode: str                        # execução do regime: "inicio_turno" ou "fim_do_dia"
+    inputs: PlanInputs  # frota do regime, zonas, demanda prevista, κ, fator rua/reta
+    target: date  # D+1
+    window: tuple[int, int]  # horas locais [início, fim)
+    regime: str  # "A" ou "B" (C só diagnóstico)
+    sim: SimParams  # simulador calibrado do período (conhecido no corte)
+    move_mode: str  # execução do regime: "inicio_turno" ou "fim_do_dia"
     scenarios: tuple[Scenario, ...] = ()  # dias anteriores a D, mesmo dia da semana
     seed: int = 0
-    extras: dict = field(default_factory=dict)   # agregados históricos anteriores ao corte (opcional)
+    extras: dict = field(default_factory=dict)  # agregados históricos anteriores ao corte (opcional)
 
     @property
     def window_s(self) -> tuple[float, float]:
@@ -67,15 +68,13 @@ class Planner(ABC):
         return {"max_km": self.max_km}
 
     @abstractmethod
-    def plan(self, ctx: PlanContext) -> Moves:
-        ...
+    def plan(self, ctx: PlanContext) -> Moves: ...
 
 
 def with_km(inputs: PlanInputs, moves: dict[str, tuple[float, float]]) -> Moves:
     """Acrescenta o km por rua estimado (mesma regra dos planejadores) a cada movimento."""
     by = {d.did: d for d in inputs.drivers}
-    return {did: (lat, lon, reta_km(by[did].lat, by[did].lon, lat, lon) * inputs.road_factor)
-            for did, (lat, lon) in moves.items()}
+    return {did: (lat, lon, reta_km(by[did].lat, by[did].lon, lat, lon) * inputs.road_factor) for did, (lat, lon) in moves.items()}
 
 
 def latlon(moves: Moves) -> dict[str, tuple[float, float]]:

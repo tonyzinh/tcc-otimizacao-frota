@@ -15,7 +15,14 @@ def ref_pairs():
     served_b = rng.poisson(60, 16).astype(float)
     n_req = served_b + rng.poisson(50, 16)
     empty_b = served_b * 2.5 + rng.normal(0, 8, 16)
-    mk = lambda s, e: {"n_requests": n_req, "served": s, "pickup_km": e, "reposition_km": np.zeros(16), "empty_km": e, "wait_sum": np.zeros(16)}
+    mk = lambda s, e: {
+        "n_requests": n_req,
+        "served": s,
+        "pickup_km": e,
+        "reposition_km": np.zeros(16),
+        "empty_km": e,
+        "wait_sum": np.zeros(16),
+    }
     served_p = served_b + rng.normal(0.3, 2, 16)
     empty_p = empty_b + rng.normal(10, 6, 16)
     return inf.Pairs(("m", "04-11", "B", "x"), DAYS, mk(served_b, empty_b), mk(served_p, empty_p))

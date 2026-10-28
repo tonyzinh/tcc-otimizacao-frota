@@ -1,4 +1,5 @@
 """Comandos locais de auditoria e reconstrução; saídas individuais são opt-in."""
+
 from __future__ import annotations
 
 import argparse
@@ -13,22 +14,36 @@ from tcc_frota.availability.evaluation import evaluate_candidate_proxy
 from tcc_frota.availability.forecast import HistoricalCandidateBaseline
 from tcc_frota.availability.io import iter_rows
 from tcc_frota.availability.location import last_vehicle_positions
-from tcc_frota.availability.rides import ride_intervals
 from tcc_frota.availability.relationships import relationship_coverage
+from tcc_frota.availability.rides import ride_intervals
 from tcc_frota.availability.statuses import status_intervals
 from tcc_frota.availability.timeline import reconstruct_timeline, summarize_timeline
 
-
 RIDE_COLUMNS = (
-    "CD_SOLICITACAO", "CD_VEICULO", "CD_MOTORISTA",
-    "DT_INICIO_REALIZADA", "DT_FIM_REALIZADA", "TX_STATUS",
+    "CD_SOLICITACAO",
+    "CD_VEICULO",
+    "CD_MOTORISTA",
+    "DT_INICIO_REALIZADA",
+    "DT_FIM_REALIZADA",
+    "TX_STATUS",
 )
 STATUS_COLUMNS = (
-    "CD_LOG_STATUS_MOTORISTA", "CD_MOTORISTA", "CD_VEICULO", "TX_STATUS",
-    "inicio_evento", "fim_evento", "qualidade_intervalo", "qualidade_relacionamento", "placa",
+    "CD_LOG_STATUS_MOTORISTA",
+    "CD_MOTORISTA",
+    "CD_VEICULO",
+    "TX_STATUS",
+    "inicio_evento",
+    "fim_evento",
+    "qualidade_intervalo",
+    "qualidade_relacionamento",
+    "placa",
 )
 COBLI_POSITION_COLUMNS = (
-    "placa", "TYPE", "END_ADDRESS_DATETIME", "END_ADDRESS_LATITUDE", "END_ADDRESS_LONGITUDE",
+    "placa",
+    "TYPE",
+    "END_ADDRESS_DATETIME",
+    "END_ADDRESS_LATITUDE",
+    "END_ADDRESS_LONGITUDE",
 )
 
 
@@ -91,7 +106,9 @@ def main(argv: list[str] | None = None) -> int:
         for contract in CONTRACTS:
             if args.dataset and args.dataset != contract.name:
                 continue
-            result = diagnose_source(args.data_root, contract, timezone=args.timezone, period_start=args.from_date, period_end=args.through_date)
+            result = diagnose_source(
+                args.data_root, contract, timezone=args.timezone, period_start=args.from_date, period_end=args.through_date
+            )
             results.append(result)
             print(json.dumps(result, ensure_ascii=False, sort_keys=True))
         if args.output:
@@ -136,21 +153,28 @@ def main(argv: list[str] | None = None) -> int:
         midnight = datetime.combine(args.target_date, time.min, tzinfo=cutoff.tzinfo)
         predictions = [
             model.predict(vehicle, midnight + timedelta(hours=hour), min_observed_hours=args.min_observed_hours)
-            for vehicle in sorted(vehicles) for hour in range(24)
+            for vehicle in sorted(vehicles)
+            for hour in range(24)
         ]
         location_audit: dict[str, int] = {}
         cobli_paths = locate_source(args.data_root, "cobli_eventos")
         if cobli_paths and status_evidence:
             positions, location_audit = last_vehicle_positions(
-                _rows(cobli_paths, COBLI_POSITION_COLUMNS), status_evidence,
-                timezone=args.timezone, cutoff=cutoff,
+                _rows(cobli_paths, COBLI_POSITION_COLUMNS),
+                status_evidence,
+                timezone=args.timezone,
+                cutoff=cutoff,
                 max_age_minutes=args.max_position_age_minutes,
             )
             predictions = [
-                replace(item, region=positions[item.vehicle_id].region,
-                        location_age_minutes=positions[item.vehicle_id].age_minutes_at_cutoff,
-                        location_method=positions[item.vehicle_id].method)
-                if item.vehicle_id in positions else item
+                replace(
+                    item,
+                    region=positions[item.vehicle_id].region,
+                    location_age_minutes=positions[item.vehicle_id].age_minutes_at_cutoff,
+                    location_method=positions[item.vehicle_id].method,
+                )
+                if item.vehicle_id in positions
+                else item
                 for item in predictions
             ]
         available = sum(item.candidate_probability is not None for item in predictions)
@@ -174,22 +198,30 @@ def main(argv: list[str] | None = None) -> int:
                     row = asdict(item)
                     row["target"] = item.target.isoformat()
                     stream.write(json.dumps(row, ensure_ascii=False) + "\n")
-        print(json.dumps({
-            "target_date": args.target_date.isoformat(),
-            "cutoff": cutoff.isoformat(),
-            "lookback_days": args.lookback_days,
-            "vehicles_with_historical_evidence": len(vehicles),
-            "vehicle_hour_slots": len(predictions),
-            "candidate_probability_estimated_slots": available,
-            "availability_probability_estimated_slots": 0,
-            "vehicle_hour_slots_with_region_proxy": sum(item.region is not None for item in predictions),
-            "candidate_slots_with_region_proxy": sum(item.region is not None and item.candidate_probability is not None for item in predictions),
-            "location_audit": location_audit,
-            "ride_audit": ride_audit,
-            "status_audit": status_audit,
-            "backtest": evaluation,
-            "interpretation": "taxa histórica de candidatura Online sem ocupação identificada; não é chance validada de disponibilidade",
-        }, ensure_ascii=False, sort_keys=True))
+        print(
+            json.dumps(
+                {
+                    "target_date": args.target_date.isoformat(),
+                    "cutoff": cutoff.isoformat(),
+                    "lookback_days": args.lookback_days,
+                    "vehicles_with_historical_evidence": len(vehicles),
+                    "vehicle_hour_slots": len(predictions),
+                    "candidate_probability_estimated_slots": available,
+                    "availability_probability_estimated_slots": 0,
+                    "vehicle_hour_slots_with_region_proxy": sum(item.region is not None for item in predictions),
+                    "candidate_slots_with_region_proxy": sum(
+                        item.region is not None and item.candidate_probability is not None for item in predictions
+                    ),
+                    "location_audit": location_audit,
+                    "ride_audit": ride_audit,
+                    "status_audit": status_audit,
+                    "backtest": evaluation,
+                    "interpretation": "taxa histórica de candidatura Online sem ocupação identificada; não é chance validada de disponibilidade",
+                },
+                ensure_ascii=False,
+                sort_keys=True,
+            )
+        )
         return 0
     result = {
         "dataset": "corridas_v1",

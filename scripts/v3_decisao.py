@@ -1,4 +1,5 @@
 """Calculadora de decisão NB(e*) sobre um CSV diário agregado (ex.: reports/tcc_v2/fase4_dias.csv). Exemplo em docs/EXEMPLO_DECISAO.md."""
+
 import argparse
 import sys
 from dataclasses import asdict
@@ -9,6 +10,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 if __name__ == "__main__":
     from tcc_frota.v3 import decisao
+
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--csv", type=Path, default=ROOT / "reports/tcc_v2/fase4_dias.csv")
     ap.add_argument("--periodo", required=True)

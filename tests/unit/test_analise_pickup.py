@@ -1,12 +1,12 @@
 """Bloco 2 (exploratório): funções puras do módulo de pickup."""
+
 import math
 
 from tcc_frota.analise import pickup as pk
 
 
 def test_pickups_keeps_only_dispatch_events():
-    trace = [(0.0, "dispatch", "d1", 1, (0, 0), 2.5), (5.0, "move", "d2", None, (0, 0), 1.0),
-             (9.0, "dispatch", "d2", 2, (0, 0), 4.0)]
+    trace = [(0.0, "dispatch", "d1", 1, (0, 0), 2.5), (5.0, "move", "d2", None, (0, 0), 1.0), (9.0, "dispatch", "d2", 2, (0, 0), 4.0)]
     assert pk._pickups(trace) == {1: 2.5, 2: 4.0}
 
 

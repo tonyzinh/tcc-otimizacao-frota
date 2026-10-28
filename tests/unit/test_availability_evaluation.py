@@ -14,7 +14,9 @@ def test_backtest_ignores_unknown_and_scores_only_observed_proxy():
         CandidateForecast("v3", at, 0.9, None, 4, 1, "proxy"),
     ]
     observed = [
-        TimelineSegment("v1", at, at + timedelta(hours=1), OperationalState.ONLINE_SEM_OCUPACAO_IDENTIFICADA, "CANDIDATO", ("status",), False, None),
+        TimelineSegment(
+            "v1", at, at + timedelta(hours=1), OperationalState.ONLINE_SEM_OCUPACAO_IDENTIFICADA, "CANDIDATO", ("status",), False, None
+        ),
         TimelineSegment("v2", at, at + timedelta(hours=1), OperationalState.EM_CORRIDA, "OBSERVADO", ("rides",), False, None),
         TimelineSegment("v3", at, at + timedelta(hours=1), OperationalState.DESCONHECIDO, "SEM_EVIDENCIA", (), False, None),
     ]

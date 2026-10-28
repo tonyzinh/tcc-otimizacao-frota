@@ -1,7 +1,8 @@
 """Regras de limpeza da v2 (Fase 1): cada regra tem um teste com dados artificiais."""
+
 import json
 import os
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
 import pytest
 
@@ -13,10 +14,19 @@ SALT = "sal-de-teste-com-16+"
 
 
 def req(codigo=1, status="NaoAtendida", agendamento=None, lat="-20.31987", lng="-40.33811", **extra):
-    base = {"codigo": codigo, "tX_STATUS": status, "tX_TP_SOLICITACAO": "TempoReal", "cD_TIPO_SERVICO": 1,
-            "dT_REGISTRO": "2026-03-10T05:00:00.1234567-03:00", "dT_AGENDAMENTO": agendamento,
-            "tX_ORIGEM_LAT": lat, "tX_ORIGEM_LNG": lng, "tX_DESTINO_LAT": "-20.29", "tX_DESTINO_LNG": "-40.30",
-            "logStatus": [{"dT_REGISTRO": "2026-03-10T05:02:00-03:00", "tX_STATUS": status}]}
+    base = {
+        "codigo": codigo,
+        "tX_STATUS": status,
+        "tX_TP_SOLICITACAO": "TempoReal",
+        "cD_TIPO_SERVICO": 1,
+        "dT_REGISTRO": "2026-03-10T05:00:00.1234567-03:00",
+        "dT_AGENDAMENTO": agendamento,
+        "tX_ORIGEM_LAT": lat,
+        "tX_ORIGEM_LNG": lng,
+        "tX_DESTINO_LAT": "-20.29",
+        "tX_DESTINO_LNG": "-40.30",
+        "logStatus": [{"dT_REGISTRO": "2026-03-10T05:02:00-03:00", "tX_STATUS": status}],
+    }
     base.update(extra)
     return base
 
@@ -30,13 +40,23 @@ def test_timestamp_with_seven_decimals_and_offset_is_local():
         rules.parse_ts("2026-03-01 00:01:52")
 
 
-@pytest.mark.parametrize("status,demanda,aceito", [
-    ("CorridaEncerrada", True, True), ("NaoAtendida", True, False), ("LimiteEsperaAtingido", True, False),
-    ("CorridaCanceladaSolicitante", True, False), ("CorridaCanceladaSolicitantePosAceite", True, True),
-    ("CorridaCanceladaMotoristaPosAceite", True, True), ("PagamentoRejeitado", False, False),
-    ("CorridaCanceladaOperador", False, False), ("Retracamento", False, False),
-    ("CorridaCanceladaAgendamento", False, False), ("CorridaIniciada", False, False), ("Inventado", False, False),
-])
+@pytest.mark.parametrize(
+    "status,demanda,aceito",
+    [
+        ("CorridaEncerrada", True, True),
+        ("NaoAtendida", True, False),
+        ("LimiteEsperaAtingido", True, False),
+        ("CorridaCanceladaSolicitante", True, False),
+        ("CorridaCanceladaSolicitantePosAceite", True, True),
+        ("CorridaCanceladaMotoristaPosAceite", True, True),
+        ("PagamentoRejeitado", False, False),
+        ("CorridaCanceladaOperador", False, False),
+        ("Retracamento", False, False),
+        ("CorridaCanceladaAgendamento", False, False),
+        ("CorridaIniciada", False, False),
+        ("Inventado", False, False),
+    ],
+)
 def test_status_treatment_table(status, demanda, aceito):
     t = rules.treatment(status)
     assert (t.demanda, t.aceito) == (demanda, aceito)
@@ -83,8 +103,7 @@ def _batch(tmp_path, hits, tag="mar2026"):
     folder = tmp_path / f"dados_{tag}" / f"dados_{tag}"
     folder.mkdir(parents=True)
     (folder / f"req_{tag}_p01.json").write_text(json.dumps({"hits": {"hits": [{"_source": h} for h in hits]}}), encoding="utf-8")
-    manifest = {"tag": tag, "fases": {"req": {"lidos": len(hits), "total": len(hits), "ok": True,
-                                              "arquivos": [f"req_{tag}_p01.json"]}}}
+    manifest = {"tag": tag, "fases": {"req": {"lidos": len(hits), "total": len(hits), "ok": True, "arquivos": [f"req_{tag}_p01.json"]}}}
     (folder / f"manifest_{tag}.json").write_text(json.dumps(manifest), encoding="utf-8")
     return folder
 
@@ -109,29 +128,36 @@ def test_discovery_accepts_nested_and_backslash_names_and_rejects_bad_manifests(
     name = "dados_set2026\\req_set2026_p01.json" if os.sep == "/" else "sub/req_set2026_p01.json"
     (flat / name).parent.mkdir(exist_ok=True)
     (flat / name).write_text(json.dumps({"hits": {"hits": []}}), encoding="utf-8")
-    (flat / "manifest_set2026.json").write_text(json.dumps({"tag": "set2026", "fases": {"req": {
-        "lidos": 0, "total": 0, "ok": True, "arquivos": ["req_set2026_p01.json"]}}}), encoding="utf-8")
+    (flat / "manifest_set2026.json").write_text(
+        json.dumps({"tag": "set2026", "fases": {"req": {"lidos": 0, "total": 0, "ok": True, "arquivos": ["req_set2026_p01.json"]}}}),
+        encoding="utf-8",
+    )
     bad = tmp_path / "historico56"
     bad.mkdir()
-    (bad / "manifest_historico56.json").write_text(json.dumps({"tag": "historico56", "fases": {"req": {
-        "lidos": 9, "total": 10, "ok": True, "arquivos": ["req_historico56_p01.json"]}}}), encoding="utf-8")
+    (bad / "manifest_historico56.json").write_text(
+        json.dumps(
+            {"tag": "historico56", "fases": {"req": {"lidos": 9, "total": 10, "ok": True, "arquivos": ["req_historico56_p01.json"]}}}
+        ),
+        encoding="utf-8",
+    )
     found = raw.discover(tmp_path)
     assert found["mar2026"].ok and found["set2026"].ok
     assert not found["historico56"].ok and len(found["historico56"].problems) == 2
     with pytest.raises(FileNotFoundError):
         raw.prepare_raw(tmp_path, echo=lambda *_: None)
-    accepted = raw.prepare_raw(tmp_path, required=("mar2026", "set2026"), materialize_to=tmp_path / "norm",
-                               echo=lambda *_: None)
+    accepted = raw.prepare_raw(tmp_path, required=("mar2026", "set2026"), materialize_to=tmp_path / "norm", echo=lambda *_: None)
     assert set(accepted) == {"mar2026", "set2026"}
     assert (tmp_path / "norm" / "set2026" / "req_set2026_p01.json").is_file()
 
 
 def test_replay_universe_filters_are_counted():
     silver = Silver()
-    rows = [request_row(req(codigo=1), "t", "f", 1, SALT),
-            request_row(req(codigo=2, agendamento="2026-03-12T07:00:00-03:00"), "t", "f", 1, SALT),
-            request_row(req(codigo=3, status="PagamentoRejeitado"), "t", "f", 1, SALT),
-            request_row(req(codigo=4, lat="-19.5"), "t", "f", 1, SALT)]
+    rows = [
+        request_row(req(codigo=1), "t", "f", 1, SALT),
+        request_row(req(codigo=2, agendamento="2026-03-12T07:00:00-03:00"), "t", "f", 1, SALT),
+        request_row(req(codigo=3, status="PagamentoRejeitado"), "t", "f", 1, SALT),
+        request_row(req(codigo=4, lat="-19.5"), "t", "f", 1, SALT),
+    ]
     silver.solicitacoes = rows
     gold = Gold()
     replay_universe(silver, gold)
@@ -142,11 +168,26 @@ def test_replay_universe_filters_are_counted():
 
 def test_sessions_split_on_gap_and_unavailable_state():
     t0 = datetime(2026, 3, 10, 5, tzinfo=rules.TZ)
-    states = [(0, 1), (10, 3), (20, 1), (60, 1), (70, 5), (80, 1)]   # lacuna de 40 min e Indisponível
-    silver = Silver(posicoes=[{"tag_lote": "t", "ts_snapshot": t0 + timedelta(minutes=m), "motorista_pseud": "d1",
-                               "estado": s, "passageiro_embarcado": False, "lat": -20.3, "lon": -40.3, "h3_r7": "x",
-                               "h3_r8": "y", "fl_coordenada_valida": True, "fl_posicao_atual": True} for m, s in states])
+    states = [(0, 1), (10, 3), (20, 1), (60, 1), (70, 5), (80, 1)]  # lacuna de 40 min e Indisponível
+    silver = Silver(
+        posicoes=[
+            {
+                "tag_lote": "t",
+                "ts_snapshot": t0 + timedelta(minutes=m),
+                "motorista_pseud": "d1",
+                "estado": s,
+                "passageiro_embarcado": False,
+                "lat": -20.3,
+                "lon": -40.3,
+                "h3_r7": "x",
+                "h3_r8": "y",
+                "fl_coordenada_valida": True,
+                "fl_posicao_atual": True,
+            }
+            for m, s in states
+        ]
+    )
     gold = Gold()
     fleet_tables(silver, gold)
     spans = [(s["ts_inicio"].minute, s["qtd_fotos"]) for s in gold.frota_sessoes]
-    assert spans == [(0, 3), (0, 1), (20, 1)]   # 05:00–05:30, 06:00, 06:20
+    assert spans == [(0, 3), (0, 1), (20, 1)]  # 05:00–05:30, 06:00, 06:20

@@ -1,9 +1,9 @@
 import math
 
+from tcc_frota.algoritmos.base import PlannerSpec
 from tcc_frota.v2.sim import reta_km
 from tcc_frota.v3 import controle as c
 from tcc_frota.v3.fase2_controle import EXPERIMENTS
-from tcc_frota.algoritmos.base import PlannerSpec
 
 
 def test_zona_quente_a_hop_km_do_centro():
@@ -60,6 +60,7 @@ def test_experimentos_declarados():
 
 def test_linhas_de_controles_nulos_tem_mesmas_colunas():
     from tcc_frota.v3 import fase2_controle as f
+
     rows = f.nulls([PlannerSpec("proporcional", "proporcional", {"max_km": 3.0})])
     assert len({tuple(r) for r in rows}) == 1
     assert all(r["max_abs_delta_atendidas"] == 0 and r["max_abs_delta_km_vazio"] == 0 for r in rows)

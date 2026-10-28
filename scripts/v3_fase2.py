@@ -1,12 +1,14 @@
 """Fase 2 (semi-sintética) da v2: falsos positivos, poder e cobertura com efeito injetado conhecido. Não relê data/raw."""
+
 import argparse
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from tcc_frota.v3 import fase2, inferencia as inf  # noqa: E402
-from tcc_frota.v3.fase1 import write_csv  # noqa: E402
+from tcc_frota.v3 import fase2
+from tcc_frota.v3 import inferencia as inf
+from tcc_frota.v3.fase1 import write_csv
 
 REFS = ("guloso_marginal_a0.1", "proporcional")
 

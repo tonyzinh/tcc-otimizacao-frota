@@ -7,6 +7,7 @@ motoristas movidos, reconstruir k motoristas (ficar ou destino sorteado ∝ λ_z
 movimento — e o vizinho substitui o atual só se J (ver `cenarios.py`) diminuir nos pseudodias de busca.
 No fim, os pseudodias de aceitação (disjuntos) decidem entre plano inicial, melhor plano e plano vazio.
 """
+
 from __future__ import annotations
 
 from tcc_frota.algoritmos.base import GulosoMarginal, Moves, PlanContext, Planner
@@ -66,8 +67,18 @@ class BuscaLocalLNS(Planner):
                     best, f_best = cand, f
         chosen, scores = accept_on_holdout(ctx, hold, self.max_km, {"inicial": start, "melhor": best, "vazio": {}})
         plan = {"inicial": start, "melhor": best, "vazio": {}}[chosen]
-        self.info = {"status": "ok", "pseudodias_busca": len(search), "pseudodias_aceitacao": len(hold),
-                     "J_busca_inicial": ev.objective(start), "J_busca_melhor": f_best, "J_busca_vazio": ev.objective({}),
-                     "aceitos": accepted, "simulacoes": ev.simulations, "escolhido": chosen,
-                     "movimentos_inicial": len(start), "movimentos_melhor": len(best), **scores}
+        self.info = {
+            "status": "ok",
+            "pseudodias_busca": len(search),
+            "pseudodias_aceitacao": len(hold),
+            "J_busca_inicial": ev.objective(start),
+            "J_busca_melhor": f_best,
+            "J_busca_vazio": ev.objective({}),
+            "aceitos": accepted,
+            "simulacoes": ev.simulations,
+            "escolhido": chosen,
+            "movimentos_inicial": len(start),
+            "movimentos_melhor": len(best),
+            **scores,
+        }
         return to_moves(ctx, plan, nb)

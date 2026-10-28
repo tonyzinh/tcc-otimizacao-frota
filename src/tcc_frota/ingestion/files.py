@@ -1,10 +1,11 @@
 """Leitores locais com portão explícito para extratos reais."""
+
 from __future__ import annotations
 
 import csv
 import os
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator
 
 
 def authorize(dataset_kind: str, destination: str = "local") -> None:
@@ -22,9 +23,7 @@ def read_rows(path: str | Path, *, dataset_kind: str = "synthetic", destination:
     source = Path(path)
     known_real_names = {"app_solicitacao_hist.csv", "app_estimativa_preco.csv"}
     repository_data = Path(__file__).resolve().parents[3] / "data"
-    if dataset_kind == "synthetic" and (
-        source.name.lower() in known_real_names or source.resolve().parent == repository_data.resolve()
-    ):
+    if dataset_kind == "synthetic" and (source.name.lower() in known_real_names or source.resolve().parent == repository_data.resolve()):
         raise PermissionError("extrato local real não pode ser declarado sintético")
     authorize(dataset_kind, destination)
     if not source.is_file():

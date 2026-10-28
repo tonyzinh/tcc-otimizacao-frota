@@ -3,6 +3,7 @@
 Linhas são dicionários com tipos Python. Coordenadas de origem/destino de passageiros saem com
 3 casas; identificadores de motorista saem pseudonimizados; nenhuma função imprime linhas.
 """
+
 from __future__ import annotations
 
 from collections import Counter, defaultdict
@@ -111,8 +112,9 @@ def build_requests(batches: dict[str, Batch], salt: str, silver: Silver) -> None
             silver.ingested[f"{tag}:req"] += 1
             row = request_row(source, tag, file_name, page, salt)
             for item in source.get("logStatus") or []:
-                silver.status.append({"codigo": row["codigo"], "status": item.get("tX_STATUS"),
-                                      "ts_status": rules.parse_ts(item.get("dT_REGISTRO"))})
+                silver.status.append(
+                    {"codigo": row["codigo"], "status": item.get("tX_STATUS"), "ts_status": rules.parse_ts(item.get("dT_REGISTRO"))}
+                )
             previous = by_code.get(row["codigo"])
             if previous is not None:
                 silver.losses["dedup_codigo"] += 1
@@ -137,16 +139,18 @@ def build_history(batches: dict[str, Batch], salt: str, silver: Silver) -> None:
             silver.ingested[f"{tag}:hist"] += 1
             lat = rules.coordinate(source.get("origemLat"))
             lon = rules.coordinate(source.get("origemLng"))
-            silver.historico.append({
-                "codigo": int(source["codigo"]),
-                "status": source.get("status"),
-                "ts_registro": rules.parse_ts(source.get("dataRegistro")),
-                "dist_motorista_m": source.get("distMotorista"),
-                "eta_motorista_s": source.get("etaMotorista"),
-                "motorista_pseud": rules.pseudonym(source.get("idMotorista"), salt),
-                "lat_origem": rules.round3(lat),
-                "lon_origem": rules.round3(lon),
-            })
+            silver.historico.append(
+                {
+                    "codigo": int(source["codigo"]),
+                    "status": source.get("status"),
+                    "ts_registro": rules.parse_ts(source.get("dataRegistro")),
+                    "dist_motorista_m": source.get("distMotorista"),
+                    "eta_motorista_s": source.get("etaMotorista"),
+                    "motorista_pseud": rules.pseudonym(source.get("idMotorista"), salt),
+                    "lat_origem": rules.round3(lat),
+                    "lon_origem": rules.round3(lon),
+                }
+            )
 
 
 def build_fleet(batches: dict[str, Batch], salt: str, silver: Silver) -> None:
@@ -167,36 +171,39 @@ def build_fleet(batches: dict[str, Batch], salt: str, silver: Silver) -> None:
                     counts["qtdComPassageiro" if offer.get("passageiroEmbarcado") else "qtdACaminho"] += 1
                 else:
                     counts[{1: "qtdOnline", 4: "qtdSelecionado", 5: "qtdIndisponivel"}.get(state, "outro")] += 1
-                silver.posicoes.append({
-                    "tag_lote": tag,
-                    "snapshot": source.get("codigo"),
-                    "ts_snapshot": taken,
-                    "motorista_pseud": rules.pseudonym(offer.get("codigo"), salt),
-                    "estado": state,
-                    "estado_label": rules.DRIVER_STATES.get(state, "DESCONHECIDO"),
-                    "passageiro_embarcado": bool(offer.get("passageiroEmbarcado")),
-                    "lat": round(lat, 4) if lat is not None else None,
-                    "lon": round(lon, 4) if lon is not None else None,
-                    "h3_r7": offer.get("h3Index"),
-                    "h3_r8": rules.h3_cell(lat, lon, 8) if valid else None,
-                    "idade_posicao_s": age,
-                    "fl_coordenada_valida": valid,
-                    "fl_posicao_atual": age is not None and -60 <= age <= 300,
-                })
+                silver.posicoes.append(
+                    {
+                        "tag_lote": tag,
+                        "snapshot": source.get("codigo"),
+                        "ts_snapshot": taken,
+                        "motorista_pseud": rules.pseudonym(offer.get("codigo"), salt),
+                        "estado": state,
+                        "estado_label": rules.DRIVER_STATES.get(state, "DESCONHECIDO"),
+                        "passageiro_embarcado": bool(offer.get("passageiroEmbarcado")),
+                        "lat": round(lat, 4) if lat is not None else None,
+                        "lon": round(lon, 4) if lon is not None else None,
+                        "h3_r7": offer.get("h3Index"),
+                        "h3_r8": rules.h3_cell(lat, lon, 8) if valid else None,
+                        "idade_posicao_s": age,
+                        "fl_coordenada_valida": valid,
+                        "fl_posicao_atual": age is not None and -60 <= age <= 300,
+                    }
+                )
             snapshot_counts[source.get("codigo")] = counts
         for _, _, source in iter_hits(batch, "sum"):
             silver.ingested[f"{tag}:sum"] += 1
             counts = snapshot_counts.get(source.get("codigo"))
             keys = ("qtdOnline", "qtdACaminho", "qtdComPassageiro", "qtdSelecionado", "qtdIndisponivel")
-            silver.sumarios.append({
-                "tag_lote": tag,
-                "codigo": source.get("codigo"),
-                "ts": rules.parse_ts(source.get("dataHora")),
-                **{key: source.get(key) for key in keys + ("qtdOffline", "qtdAproveitamento")},
-                "fl_tem_foto": counts is not None,
-                "fl_consistente_com_posicoes": None if counts is None else all(
-                    counts.get(key, 0) == source.get(key) for key in keys),
-            })
+            silver.sumarios.append(
+                {
+                    "tag_lote": tag,
+                    "codigo": source.get("codigo"),
+                    "ts": rules.parse_ts(source.get("dataHora")),
+                    **{key: source.get(key) for key in keys + ("qtdOffline", "qtdAproveitamento")},
+                    "fl_tem_foto": counts is not None,
+                    "fl_consistente_com_posicoes": None if counts is None else all(counts.get(key, 0) == source.get(key) for key in keys),
+                }
+            )
 
 
 def build_overnight(silver: Silver) -> None:
@@ -214,16 +221,20 @@ def build_overnight(silver: Silver) -> None:
     out = []
     for (driver, day), end in sorted(last.items()):
         nxt = first.get((driver, date.fromordinal(day.toordinal() + 1)))
-        out.append({
-            "motorista_pseud": driver,
-            "data_local": day,
-            "ts_ultima": end["ts_snapshot"],
-            "lat_ultima": end["lat"], "lon_ultima": end["lon"], "h3_r7_ultima": end["h3_r7"],
-            "ts_primeira_dia_seguinte": nxt["ts_snapshot"] if nxt else None,
-            "lat_primeira_dia_seguinte": nxt["lat"] if nxt else None,
-            "lon_primeira_dia_seguinte": nxt["lon"] if nxt else None,
-            "km_reta_dormida": _km(end["lat"], end["lon"], nxt["lat"], nxt["lon"]) if nxt else None,
-        })
+        out.append(
+            {
+                "motorista_pseud": driver,
+                "data_local": day,
+                "ts_ultima": end["ts_snapshot"],
+                "lat_ultima": end["lat"],
+                "lon_ultima": end["lon"],
+                "h3_r7_ultima": end["h3_r7"],
+                "ts_primeira_dia_seguinte": nxt["ts_snapshot"] if nxt else None,
+                "lat_primeira_dia_seguinte": nxt["lat"] if nxt else None,
+                "lon_primeira_dia_seguinte": nxt["lon"] if nxt else None,
+                "km_reta_dormida": _km(end["lat"], end["lon"], nxt["lat"], nxt["lon"]) if nxt else None,
+            }
+        )
     silver.dormida = out
 
 
@@ -249,19 +260,23 @@ def build_rides(silver: Silver, road_factor: float) -> None:
                 snap = by_driver[driver][i]
                 if (req["ts_aceite"] - snap["ts_snapshot"]).total_seconds() <= 600 and snap["estado"] in (1, 4):
                     km_reta = _km(snap["lat"], snap["lon"], req["lat_origem"], req["lon_origem"])
-        silver.corridas.append({
-            "codigo": req["codigo"],
-            "motorista_pseud": driver,
-            "fl_imediata": req["fl_imediata"],
-            "data_base": req["data_base"],
-            "ts_aceite": req["ts_aceite"], "ts_chegada": req["ts_chegada"],
-            "ts_inicio": req["ts_inicio"], "ts_fim": req["ts_fim"],
-            "fl_tempos_ordenados": req["fl_tempos_ordenados"],
-            "km_busca_reta_foto": km_reta,
-            "km_busca_estimado": km_reta * road_factor if km_reta is not None else None,
-            "dist_percorrida_km": req["dist_percorrida_km"],
-            "dur_viagem_s": req["dur_viagem_s"],
-        })
+        silver.corridas.append(
+            {
+                "codigo": req["codigo"],
+                "motorista_pseud": driver,
+                "fl_imediata": req["fl_imediata"],
+                "data_base": req["data_base"],
+                "ts_aceite": req["ts_aceite"],
+                "ts_chegada": req["ts_chegada"],
+                "ts_inicio": req["ts_inicio"],
+                "ts_fim": req["ts_fim"],
+                "fl_tempos_ordenados": req["fl_tempos_ordenados"],
+                "km_busca_reta_foto": km_reta,
+                "km_busca_estimado": km_reta * road_factor if km_reta is not None else None,
+                "dist_percorrida_km": req["dist_percorrida_km"],
+                "dur_viagem_s": req["dur_viagem_s"],
+            }
+        )
 
 
 def build_silver(batches: dict[str, Batch], salt: str, road_factor: float = 1.42) -> Silver:

@@ -3,17 +3,17 @@
 Os registros e identificadores permanecem em reports/runs. O relatório público
 contém apenas contagens e nomes de campos, nunca valores de documentos.
 """
+
 from __future__ import annotations
 
 import hashlib
 import json
 import sqlite3
 from collections import Counter
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator
 
 from tcc_frota.ingestion.files import authorize
-
 
 DATASETS = ("solicitacoes", "ofertas", "sumarios")
 MONTHS = tuple(f"{year}-{month:02d}" for year, start, end in ((2025, 10, 12), (2026, 1, 9)) for month in range(start, end + 1))
@@ -57,8 +57,15 @@ def discover(raw_root: Path) -> list[dict[str, object]]:
                 reason = "month_missing"
             elif valid and not data.is_file():
                 reason = "data_missing"
-            inventory.append({"dataset": dataset, "month": month, "status": "ready" if valid and data.is_file() else reason,
-                              "declared_documents": declared, "data_path": data})
+            inventory.append(
+                {
+                    "dataset": dataset,
+                    "month": month,
+                    "status": "ready" if valid and data.is_file() else reason,
+                    "declared_documents": declared,
+                    "data_path": data,
+                }
+            )
     return inventory
 
 
@@ -104,8 +111,9 @@ def _signature(inventory: list[dict[str, object]]) -> str:
         assert isinstance(path, Path)
         stat = path.stat()
         manifest = path.parent / "manifest.json"
-        details.append((entry["dataset"], entry["month"], stat.st_size, stat.st_mtime_ns,
-                        hashlib.sha256(manifest.read_bytes()).hexdigest()))
+        details.append(
+            (entry["dataset"], entry["month"], stat.st_size, stat.st_mtime_ns, hashlib.sha256(manifest.read_bytes()).hexdigest())
+        )
     return hashlib.sha256(json.dumps(details).encode()).hexdigest()[:16]
 
 
@@ -139,9 +147,17 @@ def process_local(raw_root: Path, output_root: Path) -> dict[str, object]:
     try:
         for entry in inventory:
             dataset, month, status = str(entry["dataset"]), str(entry["month"]), str(entry["status"])
-            summary: dict[str, object] = {"dataset": dataset, "month": month, "status": status,
-                                          "declared_documents": entry["declared_documents"], "read_documents": 0,
-                                          "unique_documents": 0, "duplicate_documents": 0, "fields": {}, "invalid": {}}
+            summary: dict[str, object] = {
+                "dataset": dataset,
+                "month": month,
+                "status": status,
+                "declared_documents": entry["declared_documents"],
+                "read_documents": 0,
+                "unique_documents": 0,
+                "duplicate_documents": 0,
+                "fields": {},
+                "invalid": {},
+            }
             coverage.append(summary)
             if status != "ready":
                 continue
@@ -156,10 +172,18 @@ def process_local(raw_root: Path, output_root: Path) -> dict[str, object]:
             invalid: Counter[str] = Counter()
             # Bronze references the immutable raw JSONL; copying multi-GB originals
             # would create another sensitive copy without adding information.
-            (target / "source.json").write_text(json.dumps({
-                "source": str(path), "bytes": path.stat().st_size,
-                "manifest_sha256": hashlib.sha256((path.parent / "manifest.json").read_bytes()).hexdigest(),
-            }, ensure_ascii=False) + "\n", encoding="utf-8")
+            (target / "source.json").write_text(
+                json.dumps(
+                    {
+                        "source": str(path),
+                        "bytes": path.stat().st_size,
+                        "manifest_sha256": hashlib.sha256((path.parent / "manifest.json").read_bytes()).hexdigest(),
+                    },
+                    ensure_ascii=False,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
             with (silver / "documents.jsonl").open("w", encoding="utf-8") as silver_stream:
                 for _, item in iter_jsonl(path):
                     summary["read_documents"] = int(summary["read_documents"]) + 1
@@ -170,8 +194,15 @@ def process_local(raw_root: Path, output_root: Path) -> dict[str, object]:
                         continue
                     fields.update(payload.keys())
                     for key, value in payload.items():
-                        kind = ("null" if value is None else "array" if isinstance(value, list)
-                                else "object" if isinstance(value, dict) else type(value).__name__)
+                        kind = (
+                            "null"
+                            if value is None
+                            else "array"
+                            if isinstance(value, list)
+                            else "object"
+                            if isinstance(value, dict)
+                            else type(value).__name__
+                        )
                         types.setdefault(key, Counter())[kind] += 1
                     marker = _marker(item, payload)
                     try:
@@ -191,7 +222,10 @@ def process_local(raw_root: Path, output_root: Path) -> dict[str, object]:
                 summary["status"] = "count_mismatch"
     finally:
         index.close()
-    report = {"run_id": run.name, "coverage": coverage,
-              "note": "Campos são nomes observados, sem semântica validada; Gold e simulação real exigem mapeamento confirmado."}
+    report = {
+        "run_id": run.name,
+        "coverage": coverage,
+        "note": "Campos são nomes observados, sem semântica validada; Gold e simulação real exigem mapeamento confirmado.",
+    }
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return report

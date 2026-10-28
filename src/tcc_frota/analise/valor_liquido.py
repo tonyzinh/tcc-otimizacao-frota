@@ -9,6 +9,7 @@ com esses valores vai só para `reports/runs/seletivo/` (ignorado). O que se pub
 definida pelos autores (docs/PREMISSAS_E_LIMITACOES.md, seção 3; valores hipotéticos, não da empresa) e o *e*
 de cada cenário, que vem da simulação. Limitação registrada: o custo gravado pelo SQL da empresa difere do recalculado.
 """
+
 from __future__ import annotations
 
 import csv
@@ -60,9 +61,17 @@ def scenario_e() -> list[dict]:
                 if r["regime"] != "B":
                     continue
                 e = float(r["km_vazio_incremental_por_corrida_extra"])
-                rows.append({"fonte": source, "mes": m, "cenario": r["cenario"], "corridas_extras_por_dia": float(r["corridas_extras_por_dia"]),
-                             "e_km_vazio_por_corrida_extra": e, "e_ic_inf": float(r["km_vazio_incremental_por_corrida_extra_ic_inf"]),
-                             "e_ic_sup": float(r["km_vazio_incremental_por_corrida_extra_ic_sup"])})
+                rows.append(
+                    {
+                        "fonte": source,
+                        "mes": m,
+                        "cenario": r["cenario"],
+                        "corridas_extras_por_dia": float(r["corridas_extras_por_dia"]),
+                        "e_km_vazio_por_corrida_extra": e,
+                        "e_ic_inf": float(r["km_vazio_incremental_por_corrida_extra_ic_inf"]),
+                        "e_ic_sup": float(r["km_vazio_incremental_por_corrida_extra_ic_sup"]),
+                    }
+                )
     return rows
 
 
@@ -84,17 +93,25 @@ def private_table(costs: dict, es: list[dict]) -> list[dict]:
             for r in es:
                 e = r["e_km_vazio_por_corrida_extra"]
                 ok = e == e and e < e_star
-                out.append({"base_margem": base, "velocidade_kmh": v, "custo_km_vazio": c, "e_estrela_km": e_star, **r,
-                            "valor_liquido_por_corrida_extra": (margin - e * c) if e == e else float("nan"),
-                            "e_menor_que_e_estrela": ok})
+                out.append(
+                    {
+                        "base_margem": base,
+                        "velocidade_kmh": v,
+                        "custo_km_vazio": c,
+                        "e_estrela_km": e_star,
+                        **r,
+                        "valor_liquido_por_corrida_extra": (margin - e * c) if e == e else float("nan"),
+                        "e_menor_que_e_estrela": ok,
+                    }
+                )
     return out
 
 
 # Grade hipotética definida pelos autores (docs/PREMISSAS_E_LIMITACOES.md, seção 3). Não são valores da empresa.
-GRID_MARGINS = (10.0, 15.0, 20.0, 25.0, 30.0)   # R$ por corrida, antes do km vazio
-GRID_R_KM = (0.5, 1.0, 1.5)                      # R$/km
-GRID_R_MIN = (0.15, 0.30, 0.45)                  # R$/min
-GRID_SPEEDS = (14.0, 17.0, 20.0)                 # km/h do deslocamento vazio
+GRID_MARGINS = (10.0, 15.0, 20.0, 25.0, 30.0)  # R$ por corrida, antes do km vazio
+GRID_R_KM = (0.5, 1.0, 1.5)  # R$/km
+GRID_R_MIN = (0.15, 0.30, 0.45)  # R$/min
+GRID_SPEEDS = (14.0, 17.0, 20.0)  # km/h do deslocamento vazio
 GRID_NOTE = "Valores hipotéticos definidos pelos autores; não são da empresa."
 EQ_GRID_TEX = Path("tabelas/tab_equilibrio_grade.tex")
 EQ_SCEN_TEX = Path("tabelas/tab_equilibrio_cenarios.tex")
@@ -120,14 +137,26 @@ def _br(x: float, d: int = 2) -> str:
 def grid_tex(path: Path) -> Path:
     """e* (km) por combinação de custo (linhas, em ordem de c_v) e margem (colunas)."""
     combos = sorted({(c["r_km"], c["r_min"], c["v_kmh"], c["c_v"]) for c in grid_cells()}, key=lambda t: (t[3], t))
-    lines = [r"% Gerado por tcc_frota.analise.valor_liquido — " + GRID_NOTE,
-             r"\begin{tabular}{rrrr" + "r" * len(GRID_MARGINS) + "}", r"\hline",
-             r"$r_{km}$ (R\$/km) & $r_{min}$ (R\$/min) & $v$ (km/h) & $c_v$ (R\$/km) & "
-             + " & ".join(f"$e^*$, M = {int(m)}" for m in GRID_MARGINS) + r" \\", r"\hline"]
+    lines = [
+        r"% Gerado por tcc_frota.analise.valor_liquido — " + GRID_NOTE,
+        r"\begin{tabular}{rrrr" + "r" * len(GRID_MARGINS) + "}",
+        r"\hline",
+        r"$r_{km}$ (R\$/km) & $r_{min}$ (R\$/min) & $v$ (km/h) & $c_v$ (R\$/km) & "
+        + " & ".join(f"$e^*$, M = {int(m)}" for m in GRID_MARGINS)
+        + r" \\",
+        r"\hline",
+    ]
     for r_km, r_min, v, c in combos:
         lines.append(f"{_br(r_km)} & {_br(r_min)} & {int(v)} & {_br(c)} & " + " & ".join(_br(m / c, 1) for m in GRID_MARGINS) + r" \\")
-    lines += [r"\hline", r"\multicolumn{" + str(4 + len(GRID_MARGINS)) + r"}{l}{\footnotesize " + GRID_NOTE
-              + r" $e^*$ em km; M = margem por corrida (R\$).} \\", r"\end{tabular}"]
+    lines += [
+        r"\hline",
+        r"\multicolumn{"
+        + str(4 + len(GRID_MARGINS))
+        + r"}{l}{\footnotesize "
+        + GRID_NOTE
+        + r" $e^*$ em km; M = margem por corrida (R\$).} \\",
+        r"\end{tabular}",
+    ]
     path.parent.mkdir(exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return path
@@ -144,22 +173,38 @@ def classify(es: list[dict]) -> list[dict]:
         else:
             n = sum(e < c["e_estrela_km"] for c in cells)
             n_hi = sum(hi == hi and hi < c["e_estrela_km"] for c in cells)
-            label = ("compensa em toda a grade" if n == len(cells) else "compensa em nenhuma célula" if n == 0
-                     else "compensa em parte da grade")
-        out.append({**r, "celulas_grade": len(cells), "celulas_e_menor_e_estrela": n,
-                    "celulas_ic_sup_menor_e_estrela_exploratorio": n_hi, "classificacao": label})
+            label = (
+                "compensa em toda a grade" if n == len(cells) else "compensa em nenhuma célula" if n == 0 else "compensa em parte da grade"
+            )
+        out.append(
+            {
+                **r,
+                "celulas_grade": len(cells),
+                "celulas_e_menor_e_estrela": n,
+                "celulas_ic_sup_menor_e_estrela_exploratorio": n_hi,
+                "classificacao": label,
+            }
+        )
     return out
 
 
 def scenarios_tex(rows: list[dict], path: Path) -> Path:
-    lines = [r"% Gerado por tcc_frota.analise.valor_liquido — grade: " + GRID_NOTE,
-             r"\begin{tabular}{llrrrl}", r"\hline",
-             r"Mês & Cenário & $e$ (km) [IC 95\%] & Células com $e < e^*$ & IC sup. $< e^*$ (expl.) & Leitura \\", r"\hline"]
+    lines = [
+        r"% Gerado por tcc_frota.analise.valor_liquido — grade: " + GRID_NOTE,
+        r"\begin{tabular}{llrrrl}",
+        r"\hline",
+        r"Mês & Cenário & $e$ (km) [IC 95\%] & Células com $e < e^*$ & IC sup. $< e^*$ (expl.) & Leitura \\",
+        r"\hline",
+    ]
     for r in rows:
         e = r["e_km_vazio_por_corrida_extra"]
         cell_e = "---" if e != e else f"{_br(e, 1)} [{_br(r['e_ic_inf'], 1)}; {_br(r['e_ic_sup'], 1)}]"
         n = "---" if r["celulas_e_menor_e_estrela"] is None else f"{r['celulas_e_menor_e_estrela']}/{r['celulas_grade']}"
-        nh = "---" if r["celulas_ic_sup_menor_e_estrela_exploratorio"] is None else f"{r['celulas_ic_sup_menor_e_estrela_exploratorio']}/{r['celulas_grade']}"
+        nh = (
+            "---"
+            if r["celulas_ic_sup_menor_e_estrela_exploratorio"] is None
+            else f"{r['celulas_ic_sup_menor_e_estrela_exploratorio']}/{r['celulas_grade']}"
+        )
         name = r["cenario"].replace("_", r"\_")
         lines.append(f"{r['mes']} & {name} & {cell_e} & {n} & {nh} & {r['classificacao']} \\\\")
     lines += [r"\hline", r"\end{tabular}"]

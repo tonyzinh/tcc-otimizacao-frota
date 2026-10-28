@@ -1,9 +1,10 @@
 """Auditoria agregada sem registrar valores pessoais."""
+
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import Iterable, Mapping
 
 
 @dataclass(frozen=True)
@@ -23,7 +24,7 @@ class AuditSummary:
 
 
 def audit_rows(rows: Iterable[Mapping[str, object]], required: tuple[str, ...], key: str | None = None) -> AuditSummary:
-    missing = Counter({name: 0 for name in required})
+    missing = Counter(dict.fromkeys(required, 0))
     seen: set[str] = set()
     duplicates = 0
     count = 0

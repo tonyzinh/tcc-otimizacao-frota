@@ -1,11 +1,12 @@
 """Última posição Cobli ligada por placa e tempo a um único veículo."""
+
 from __future__ import annotations
 
 import math
 from collections import Counter, defaultdict
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Iterable, Mapping
 
 from tcc_frota.availability.diagnostics import missing_value, timestamp
 from tcc_frota.availability.timeline import EvidenceInterval
@@ -72,10 +73,7 @@ def last_vehicle_positions(
         matches = {item.vehicle_id for item in by_plate[plate] if item.start <= at < item.end}
         method = "cobli_endpoint_active_status_grid_0.05_degree"
         if len(matches) != 1:
-            matches = {
-                item.vehicle_id for item in by_plate[plate]
-                if item.start < cutoff and item.end > cutoff - timedelta(hours=24)
-            }
+            matches = {item.vehicle_id for item in by_plate[plate] if item.start < cutoff and item.end > cutoff - timedelta(hours=24)}
             method = "cobli_endpoint_unique_plate_24h_grid_0.05_degree"
         if len(matches) != 1:
             audit["unmatched_or_ambiguous_plate_at_time"] += 1

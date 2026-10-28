@@ -1,4 +1,5 @@
 """Replay cronológico sintético, sem informação futura no plano D+1."""
+
 from __future__ import annotations
 
 import hashlib
@@ -9,8 +10,15 @@ from datetime import datetime, timedelta
 
 from tcc_frota.distance import HaversineDistance, PositionDistance, between_km
 from tcc_frota.models import (
-    Commitment, Event, Position, Recommendation, Request, ScenarioResult,
-    Vehicle, VehicleState, aware,
+    Commitment,
+    Event,
+    Position,
+    Recommendation,
+    Request,
+    ScenarioResult,
+    Vehicle,
+    VehicleState,
+    aware,
 )
 
 
@@ -131,10 +139,16 @@ def simulate(
             active_commitments.discard(vehicle_id)
             positions[vehicle_id] = commitment.end_position
             vehicle = by_vehicle[vehicle_id]
-            states[vehicle_id] = VehicleState.LIVRE if (
-                vehicle.active and vehicle.driver_ready and positions[vehicle_id] is not None
-                and vehicle.available_from <= at < vehicle.available_until
-            ) else VehicleState.INDISPONIVEL
+            states[vehicle_id] = (
+                VehicleState.LIVRE
+                if (
+                    vehicle.active
+                    and vehicle.driver_ready
+                    and positions[vehicle_id] is not None
+                    and vehicle.available_from <= at < vehicle.available_until
+                )
+                else VehicleState.INDISPONIVEL
+            )
             result.events.append(Event(at, kind, vehicle_id))
         elif kind == "reposition_start":
             recommendation = item

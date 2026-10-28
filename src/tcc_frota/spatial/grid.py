@@ -1,4 +1,5 @@
 """Grade determinística ajustada apenas com dados anteriores ao corte."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -34,6 +35,7 @@ def fit_grid(requests: list[Request], cutoff: datetime, cell_degrees: float = 0.
         bins.setdefault(key, []).append(pos)
     zones = {
         key: Position(key, sum(p.lat for p in points) / len(points), sum(p.lon for p in points) / len(points))
-        for key, points in bins.items() if len(points) >= min_samples
+        for key, points in bins.items()
+        if len(points) >= min_samples
     }
     return Grid(cell_degrees, zones, len(trained))

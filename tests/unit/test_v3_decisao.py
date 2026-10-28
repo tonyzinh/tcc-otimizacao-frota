@@ -18,12 +18,14 @@ def _dias(served, km):
 def _mundo(delta_n, delta_km, ruido=0.0, seed=3):
     rng = np.random.default_rng(seed)
     base = _dias(100 + rng.normal(0, ruido, 16), 300 + rng.normal(0, ruido, 16))
-    plano = _dias(np.array(base.atendidas) + delta_n + rng.normal(0, ruido, 16), np.array(base.km_vazio) + delta_km + rng.normal(0, ruido, 16))
+    plano = _dias(
+        np.array(base.atendidas) + delta_n + rng.normal(0, ruido, 16), np.array(base.km_vazio) + delta_km + rng.normal(0, ruido, 16)
+    )
     return plano, base
 
 
 def test_adotar_quando_ganho_de_corridas_supera_o_custo():
-    plano, base = _mundo(delta_n=20, delta_km=100, ruido=1)        # NB(30) ≈ 20 − 100/30 > 0
+    plano, base = _mundo(delta_n=20, delta_km=100, ruido=1)  # NB(30) ≈ 20 − 100/30 > 0
     d = dc.decidir(30, plano, base, reps=500)
     assert d.decisao == dc.ADOTAR and d.ic_inf > 0
     assert d.nb == pytest.approx(20 - 100 / 30, abs=1.0)
@@ -37,7 +39,7 @@ def test_nao_adotar_quando_so_ha_custo():
 
 
 def test_e_star_altera_a_decisao():
-    plano, base = _mundo(delta_n=2, delta_km=60, ruido=0.5)         # NB = 2 − 60/e
+    plano, base = _mundo(delta_n=2, delta_km=60, ruido=0.5)  # NB = 2 − 60/e
     assert dc.decidir(10, plano, base, reps=500).decisao == dc.NAO_ADOTAR
     assert dc.decidir(100, plano, base, reps=500).decisao == dc.ADOTAR
 
@@ -62,7 +64,11 @@ def test_validacoes():
     with pytest.raises(ValueError):
         dc.decidir(30, dc.DiasAgregados(DATAS[::-1], plano.atendidas, plano.km_vazio), base)
     with pytest.raises(ValueError):
-        dc.decidir(30, dc.DiasAgregados(DATAS[:4], plano.atendidas[:4], plano.km_vazio[:4]), dc.DiasAgregados(DATAS[:4], base.atendidas[:4], base.km_vazio[:4]))
+        dc.decidir(
+            30,
+            dc.DiasAgregados(DATAS[:4], plano.atendidas[:4], plano.km_vazio[:4]),
+            dc.DiasAgregados(DATAS[:4], base.atendidas[:4], base.km_vazio[:4]),
+        )
     with pytest.raises(ValueError):
         dc.decidir(30, dc.DiasAgregados(DATAS, (-1.0,) * 16, plano.km_vazio), base)
 
@@ -70,8 +76,21 @@ def test_validacoes():
 def test_dias_de_csv_exige_baseline_unico(tmp_path):
     campos = ["periodo", "data", "grupo", "cenario", "par", "served", "empty_km"]
     rows = [{"periodo": "p", "data": d.isoformat(), "grupo": "g", "cenario": "x", "par": "a", "served": 10, "empty_km": 5} for d in DATAS]
-    rows += [{"periodo": "p", "data": d.isoformat(), "grupo": "base", "cenario": "sem_reposicionamento", "par": "a", "served": 9, "empty_km": 5} for d in DATAS]
-    rows += [{"periodo": "p", "data": DATAS[0].isoformat(), "grupo": "base2", "cenario": "sem_reposicionamento", "par": "a", "served": 9, "empty_km": 5}]
+    rows += [
+        {"periodo": "p", "data": d.isoformat(), "grupo": "base", "cenario": "sem_reposicionamento", "par": "a", "served": 9, "empty_km": 5}
+        for d in DATAS
+    ]
+    rows += [
+        {
+            "periodo": "p",
+            "data": DATAS[0].isoformat(),
+            "grupo": "base2",
+            "cenario": "sem_reposicionamento",
+            "par": "a",
+            "served": 9,
+            "empty_km": 5,
+        }
+    ]
     f = tmp_path / "d.csv"
     with open(f, "w", encoding="utf-8", newline="") as h:
         w = csv.DictWriter(h, campos)
@@ -90,11 +109,15 @@ def test_dias_de_csv_exige_baseline_unico(tmp_path):
 
 def test_reproduz_a_linha_da_fase4():
     """Mesma linha de `fase4_F4_origem_nb.csv` (set/2026, proporcional contra B0, e*=30): ponto e IC idênticos."""
-    plano, base = dc.dias_de_csv(ROOT / "reports/tcc_v2/fase4_dias.csv", periodo="set2026", cenario="proporcional",
-                                 grupo="origem|B0|rho1|c1", par="origem|B0|rho1")
+    plano, base = dc.dias_de_csv(
+        ROOT / "reports/tcc_v2/fase4_dias.csv", periodo="set2026", cenario="proporcional", grupo="origem|B0|rho1|c1", par="origem|B0|rho1"
+    )
     d = dc.decidir(30, plano, base, reps=10000, rotulo="set2026")
-    ref = next(r for r in csv.DictReader(open(ROOT / "reports/tcc_v2/fase4_F4_origem_nb.csv", encoding="utf-8"))
-               if r["periodo"] == "set2026" and r["grupo"] == "origem|B0|rho1|c1" and r["cenario"] == "proporcional" and float(r["e_star"]) == 30)
+    ref = next(
+        r
+        for r in csv.DictReader(open(ROOT / "reports/tcc_v2/fase4_F4_origem_nb.csv", encoding="utf-8"))
+        if r["periodo"] == "set2026" and r["grupo"] == "origem|B0|rho1|c1" and r["cenario"] == "proporcional" and float(r["e_star"]) == 30
+    )
     assert d.nb == pytest.approx(float(ref["nb"]), abs=1e-4)
     assert d.ic_inf == pytest.approx(float(ref["ic_inf"]), abs=1e-3) and d.ic_sup == pytest.approx(float(ref["ic_sup"]), abs=1e-3)
     assert d.decisao == dc.INCONCLUSIVO

@@ -5,14 +5,15 @@ os arquivos de cada fase e as contagens `lidos`/`total`. Os `.zip` gerados no Wi
 criar pasta duplicada (`dados_x/dados_x/`) ou nomes com barra invertida
 (`dados_x\\req_x_p01.json`); a descoberta aceita essas formas sem alterar os originais.
 """
+
 from __future__ import annotations
 
 import hashlib
 import json
 import shutil
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterator
 
 REQUIRED_TAGS = ("mar2026", "historico56", "set2026", "historico56_set")
 PHASES = ("req", "hist", "snap", "sum")
@@ -49,7 +50,7 @@ def _index_folder(folder: Path) -> dict[str, Path]:
 
 def read_batch(manifest_path: Path) -> Batch:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    tag = str(manifest.get("tag") or _base_name(manifest_path)[len("manifest_"):-len(".json")])
+    tag = str(manifest.get("tag") or _base_name(manifest_path)[len("manifest_") : -len(".json")])
     folder = manifest_path.parent
     index = _index_folder(folder)
     batch = Batch(tag, folder, manifest)
@@ -82,8 +83,9 @@ def discover(root: str | Path) -> dict[str, Batch]:
     return found
 
 
-def prepare_raw(root: str | Path, required: tuple[str, ...] = REQUIRED_TAGS, *,
-                materialize_to: str | Path | None = None, echo=print) -> dict[str, Batch]:
+def prepare_raw(
+    root: str | Path, required: tuple[str, ...] = REQUIRED_TAGS, *, materialize_to: str | Path | None = None, echo=print
+) -> dict[str, Batch]:
     """Lista lotes encontrados, ausentes e rejeitados; falha se faltar algum lote exigido.
 
     Com `materialize_to`, copia cada lote aceito para `<destino>/<tag>/` com o nome original do
@@ -111,8 +113,7 @@ def prepare_raw(root: str | Path, required: tuple[str, ...] = REQUIRED_TAGS, *,
                         shutil.copy2(source, destination)
             manifest_name = f"manifest_{tag}.json"
             if not (target / manifest_name).exists():
-                (target / manifest_name).write_text(json.dumps(batch.manifest, ensure_ascii=False, indent=2),
-                                                    encoding="utf-8")
+                (target / manifest_name).write_text(json.dumps(batch.manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     return accepted
 
 

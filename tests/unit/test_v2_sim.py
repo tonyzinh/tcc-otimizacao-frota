@@ -1,4 +1,5 @@
 """Simulador v2 (Fase 4): fila, raio, ocupação, KM de reposicionamento e entradas idênticas."""
+
 import random
 
 import pytest
@@ -62,11 +63,20 @@ def test_no_driver_serves_two_jobs_at_once_random_instances():
             cs = []
             if rng.random() < 0.5:
                 s = rng.uniform(4, 10) * 3600
-                cs.append((s, s + rng.uniform(600, 3600), LAT + rng.uniform(-.05, .05), LON))
-            drivers.append(d(f"d{k}", start=rng.uniform(3, 6) * 3600, lat=LAT + rng.uniform(-.05, .05),
-                             lon=LON + rng.uniform(-.05, .05), commits=cs))
-        reqs = [r(i, rng.uniform(4, 11) * 3600, LAT + rng.uniform(-.05, .05), LON + rng.uniform(-.05, .05),
-                  trip=rng.uniform(300, 1800)) for i in range(60)]
+                cs.append((s, s + rng.uniform(600, 3600), LAT + rng.uniform(-0.05, 0.05), LON))
+            drivers.append(
+                d(
+                    f"d{k}",
+                    start=rng.uniform(3, 6) * 3600,
+                    lat=LAT + rng.uniform(-0.05, 0.05),
+                    lon=LON + rng.uniform(-0.05, 0.05),
+                    commits=cs,
+                )
+            )
+        reqs = [
+            r(i, rng.uniform(4, 11) * 3600, LAT + rng.uniform(-0.05, 0.05), LON + rng.uniform(-0.05, 0.05), trip=rng.uniform(300, 1800))
+            for i in range(60)
+        ]
         moves = {f"d{k}": (LAT + 0.01, LON) for k in range(0, 6, 2)}
         res = simulate(reqs, drivers, P, W, moves)
         _no_overlap(res)
@@ -110,12 +120,12 @@ def test_end_of_day_mode_starts_session_at_target_and_counts_km_from_last_positi
     res = simulate(reqs, drivers, P, W, {"a": (LAT, LON)}, move_mode="fim_do_dia", move_origins={"a": origin})
     assert res.moves_executed == 1
     assert res.reposition_km == pytest.approx(reta_km(*origin, LAT, LON) * 1.4)
-    assert res.pickup_km == pytest.approx(0.0, abs=1e-9)          # começou o dia na zona-alvo
-    early = simulate(reqs, [d("a", start=2 * 3600, lat=LAT + 0.03)], P, W, {"a": (LAT, LON)},
-                     move_mode="fim_do_dia", move_origins={"a": origin})
-    assert early.moves_executed == 0                                 # já trabalhava antes da janela
-    capped = simulate(reqs, drivers, P, W, {"a": (LAT, LON)}, move_mode="fim_do_dia",
-                      move_origins={"a": (LAT + 0.2, LON)}, max_move_km=5.0)
+    assert res.pickup_km == pytest.approx(0.0, abs=1e-9)  # começou o dia na zona-alvo
+    early = simulate(
+        reqs, [d("a", start=2 * 3600, lat=LAT + 0.03)], P, W, {"a": (LAT, LON)}, move_mode="fim_do_dia", move_origins={"a": origin}
+    )
+    assert early.moves_executed == 0  # já trabalhava antes da janela
+    capped = simulate(reqs, drivers, P, W, {"a": (LAT, LON)}, move_mode="fim_do_dia", move_origins={"a": (LAT + 0.2, LON)}, max_move_km=5.0)
     assert capped.moves_executed == 0
 
 
@@ -127,7 +137,11 @@ def test_trace_does_not_change_results_and_records_move_outcomes():
     trace: list = []
     traced = simulate(reqs, drivers, P, W, moves, max_move_km=6.0, trace=trace)
     assert (plain.served, plain.pickup_km, plain.reposition_km, plain.wait_s) == (
-        traced.served, traced.pickup_km, traced.reposition_km, traced.wait_s)
+        traced.served,
+        traced.pickup_km,
+        traced.reposition_km,
+        traced.wait_s,
+    )
     assert traced.move_outcomes == {"a": "executed", "b": "limit", "fantasma": "absent"}
     kinds = [e[1] for e in trace]
     assert kinds.count("request_created") == 2 and kinds.count("request_unserved") == 1

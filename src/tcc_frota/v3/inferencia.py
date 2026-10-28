@@ -2,6 +2,7 @@
 
 Substitui a razão `e` como estatística de decisão (docs/V2_PREREGISTRO.md §5). Unidade de reamostragem: o dia.
 """
+
 from __future__ import annotations
 
 import csv
@@ -16,13 +17,14 @@ from scipy import stats as sps
 FIELDS = ("n_requests", "served", "pickup_km", "reposition_km", "empty_km", "wait_sum")
 BASELINE = "sem_reposicionamento"
 Z_MDE = 1.959964 + 0.841621  # 5% bilateral, poder 80%
-NON_INFERIORITY_PP = -1.0     # margem primária para ΔN% (desvio D1); -2 pp é sensibilidade
+NON_INFERIORITY_PP = -1.0  # margem primária para ΔN% (desvio D1); -2 pp é sensibilidade
 NON_INFERIORITY_SENS_PP = -2.0
 
 
 @dataclass(frozen=True)
 class Pairs:
     """Métricas por dia do baseline (`b`) e do plano (`p`) para uma linha (período, janela, regime, cenário)."""
+
     key: tuple[str, str, str, str]
     dates: tuple[date, ...]
     b: dict[str, np.ndarray]
@@ -48,9 +50,12 @@ def load_pairs(path: str | Path) -> dict[tuple[str, str, str, str], Pairs]:
             b_rows = [base[(key[0], key[1], key[2], d)] for d in ordered]
         except KeyError as err:
             raise ValueError(f"dia sem baseline pareado: {err}") from None
-        out[key] = Pairs(key, tuple(ordered),
-                         {k: np.array([r[k] for r in b_rows]) for k in FIELDS},
-                         {k: np.array([days[d][k] for d in ordered]) for k in FIELDS})
+        out[key] = Pairs(
+            key,
+            tuple(ordered),
+            {k: np.array([r[k] for r in b_rows]) for k in FIELDS},
+            {k: np.array([days[d][k] for d in ordered]) for k in FIELDS},
+        )
     return out
 
 
@@ -102,8 +107,7 @@ def summarize(point, boot: np.ndarray) -> Interval:
     v = boot[np.isfinite(boot)]
     if len(v) < 0.9 * len(boot):
         return Interval(float(point), float("nan"), float("nan"), float("nan"), boot)
-    return Interval(float(point), float(np.percentile(v, 2.5)), float(np.percentile(v, 97.5)),
-                    float(np.std(v, ddof=1)), boot)
+    return Interval(float(point), float(np.percentile(v, 2.5)), float(np.percentile(v, 97.5)), float(np.std(v, ddof=1)), boot)
 
 
 def widest(intervals: dict[str, Interval]) -> tuple[str, Interval]:
@@ -159,6 +163,7 @@ def romano_wolf(t_obs: np.ndarray, t_boots: np.ndarray) -> np.ndarray:
 
 def holm(pvalues: np.ndarray) -> np.ndarray:
     from statsmodels.stats.multitest import multipletests
+
     return multipletests(pvalues, alpha=0.05, method="holm")[1]
 
 

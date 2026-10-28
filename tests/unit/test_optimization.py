@@ -1,12 +1,11 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
 from tcc_frota.models import Commitment, Position, Vehicle
 from tcc_frota.optimization.greedy import greedy_plan
 
-
-START = datetime(2026, 1, 2, 7, tzinfo=timezone.utc)
+START = datetime(2026, 1, 2, 7, tzinfo=UTC)
 A = Position("a", -20.30, -40.30)
 B = Position("b", -20.33, -40.28)
 

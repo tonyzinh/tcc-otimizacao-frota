@@ -10,23 +10,27 @@ Separação de informação (RN020):
 
 Distâncias: Haversine estimado (mesmo estimador nos dois cenários). Não é rodagem observada.
 """
+
 from __future__ import annotations
 
 import hashlib
 import json
 from collections import Counter, defaultdict
+from collections.abc import Iterable, Mapping
 from dataclasses import asdict, dataclass, field, replace
 from datetime import date, datetime, time, timedelta
 from statistics import median
 from time import perf_counter
-from typing import Iterable, Mapping
 from zoneinfo import ZoneInfo
 
 from tcc_frota.distance import CachedDistance, HaversineDistance, between_km
 from tcc_frota.evaluation.metrics import compare
 from tcc_frota.models import Commitment, Position, Recommendation, Request, Vehicle
 from tcc_frota.optimization.alternatives import (
-    assignment_plan, local_search_plan, proportional_plan, simulated_greedy_plan,
+    assignment_plan,
+    local_search_plan,
+    proportional_plan,
+    simulated_greedy_plan,
 )
 from tcc_frota.optimization.greedy import Plan, greedy_plan
 from tcc_frota.simulation.engine import SimulationConfig, simulate
@@ -77,7 +81,7 @@ class GoldData:
     first_date: date | None = None
 
     @classmethod
-    def from_rows(cls, tables: Mapping[str, Iterable[Row]], timezone: str = "America/Sao_Paulo") -> "GoldData":
+    def from_rows(cls, tables: Mapping[str, Iterable[Row]], timezone: str = "America/Sao_Paulo") -> GoldData:
         tz = ZoneInfo(timezone)
         zones = list(tables["tb_dim_zonas_h3"])
         presence: dict[date, list[Row]] = defaultdict(list)
@@ -121,8 +125,9 @@ def training_days(target: date, config: RealExperimentConfig, first_available: d
     return (same, False) if same else (sorted(days), True)
 
 
-def forecast_zones(demand: Iterable[Row], target: date, config: RealExperimentConfig,
-                   first_available: date | None = None) -> tuple[dict[str, float], int]:
+def forecast_zones(
+    demand: Iterable[Row], target: date, config: RealExperimentConfig, first_available: date | None = None
+) -> tuple[dict[str, float], int]:
     """Média de corridas TempoReal por zona r7 no horizonte, só com dias anteriores ao corte."""
     days, _ = training_days(target, config, first_available)
     allowed = set(days)
@@ -158,11 +163,12 @@ def predicted_fleet(data: GoldData, target: date, config: RealExperimentConfig) 
     return fleet
 
 
-def oracle_fleet(world: "World", start: datetime, end: datetime) -> list[Vehicle]:
+def oracle_fleet(world: World, start: datetime, end: datetime) -> list[Vehicle]:
     """Diagnóstico: frota livre e posições reais em D+1. Viola o corte; nunca é resultado D+1."""
     busy = {c.vehicle_id for c in world.commitments if c.start <= start < c.end}
     return [
-        Vehicle(v.vehicle_id.split("#")[0], v.position, start, end) for v in world.vehicles
+        Vehicle(v.vehicle_id.split("#")[0], v.position, start, end)
+        for v in world.vehicles
         if v.available_from <= start < v.available_until and v.vehicle_id not in busy and v.position is not None
     ]
 
@@ -185,8 +191,7 @@ def calibrate(data: GoldData, target: date, config: RealExperimentConfig) -> dic
             if ride["ts_inicio"].astimezone(tz).hour in hours:
                 trips += 1
     driver_hours = sum(
-        1 for day in days for row in data.presence_by_date.get(day, ())
-        if row["hora_local"] in hours and row["fl_disponivel_na_hora"]
+        1 for day in days for row in data.presence_by_date.get(day, ()) if row["hora_local"] in hours and row["fl_disponivel_na_hora"]
     )
     if not speeds or not pickup_minutes or not driver_hours:
         raise ValueError("treino insuficiente para calibrar")
@@ -222,7 +227,8 @@ def build_world(data: GoldData, target: date, config: RealExperimentConfig) -> W
     end = start + timedelta(hours=config.horizon_hours)
     excluded: Counter[str] = Counter()
     first_position = {
-        row["id_motorista_pseud"]: row for row in data.presence_by_date.get(target, ())
+        row["id_motorista_pseud"]: row
+        for row in data.presence_by_date.get(target, ())
         if row["hora_local"] == config.plan_hour and row["lat_primeira"] is not None
     }
     vehicles: list[Vehicle] = []
@@ -242,8 +248,7 @@ def build_world(data: GoldData, target: date, config: RealExperimentConfig) -> W
         if position is None:
             excluded["sessao_sem_posicao"] += 1
             continue
-        vehicle = Vehicle(f"{session['id_motorista_pseud']}#{session['seq_sessao']}", position,
-                          available_from, session["ts_fim"])
+        vehicle = Vehicle(f"{session['id_motorista_pseud']}#{session['seq_sessao']}", position, available_from, session["ts_fim"])
         vehicles.append(vehicle)
         vehicle_of_driver[session["id_motorista_pseud"]].append(vehicle)
 
@@ -259,11 +264,9 @@ def build_world(data: GoldData, target: date, config: RealExperimentConfig) -> W
         origin = _position(data, ride["lat_origem"], ride["lon_origem"], r7=ride["h3_r7_origem"])
         destination = _position(data, ride["lat_destino"], ride["lon_destino"], r7=ride["h3_r7_destino"])
         if ride["ts_aceite"] < start < ride["ts_fim"]:
-            owner = [v for v in vehicle_of_driver.get(ride["id_motorista_pseud"], ())
-                     if v.available_from <= start < v.available_until]
+            owner = [v for v in vehicle_of_driver.get(ride["id_motorista_pseud"], ()) if v.available_from <= start < v.available_until]
             if owner and destination is not None:
-                commitments.append(Commitment(owner[0].vehicle_id, ride["ts_aceite"], ride["ts_fim"],
-                                              "corrida_em_andamento", destination))
+                commitments.append(Commitment(owner[0].vehicle_id, ride["ts_aceite"], ride["ts_fim"], "corrida_em_andamento", destination))
             continue
         if not start <= instant < end:
             continue
@@ -274,12 +277,18 @@ def build_world(data: GoldData, target: date, config: RealExperimentConfig) -> W
         observed["rides"] += 1
         observed["km_pickup_reta"] += float(ride["km_pickup_reta"] or 0.0)
         observed["km_gps_pickup"] += float(ride["km_gps_pickup"] or 0.0)
-    return World(sorted(requests, key=lambda r: (r.created_at, r.request_id)), vehicles,
-                 tuple(sorted(commitments, key=lambda c: (c.vehicle_id, c.start))), observed, dict(excluded))
+    return World(
+        sorted(requests, key=lambda r: (r.created_at, r.request_id)),
+        vehicles,
+        tuple(sorted(commitments, key=lambda c: (c.vehicle_id, c.start))),
+        observed,
+        dict(excluded),
+    )
 
 
-def materialize(plan: Plan, world: World, start: datetime, speed_kmh: float, max_reposition_km: float,
-                tolerance: timedelta = timedelta(0)) -> tuple[tuple[Recommendation, ...], dict[str, int]]:
+def materialize(
+    plan: Plan, world: World, start: datetime, speed_kmh: float, max_reposition_km: float, tolerance: timedelta = timedelta(0)
+) -> tuple[tuple[Recommendation, ...], dict[str, int]]:
     """Aplica o plano do corte aos motoristas previstos que ficam livres até `start + tolerance`.
 
     O instante e a origem vêm do mundo observado, igual nos dois cenários: início da sessão ou fim
@@ -293,9 +302,10 @@ def materialize(plan: Plan, world: World, start: datetime, speed_kmh: float, max
     limit = start + tolerance
     applied = []
     for rec in plan.recommendations:
-        candidates = sorted((v for v in by_driver.get(rec.vehicle_id, ())
-                             if v.available_from <= limit and v.available_until > start),
-                            key=lambda v: v.available_from)
+        candidates = sorted(
+            (v for v in by_driver.get(rec.vehicle_id, ()) if v.available_from <= limit and v.available_until > start),
+            key=lambda v: v.available_from,
+        )
         if not candidates:
             status["motorista_ausente"] += 1
             continue
@@ -334,50 +344,71 @@ def run_day(data: GoldData, target: date, config: RealExperimentConfig, *, detai
     world = build_world(data, target, config)
     fleet = oracle_fleet(world, start, end) if config.oracle_fleet else predicted_fleet(data, target, config)
     estimator = CachedDistance(HaversineDistance())
-    sim = SimulationConfig(start, end, speed_kmh=calibration["speed_kmh"],
-                           max_pickup_minutes=calibration["max_pickup_minutes"])
+    sim = SimulationConfig(start, end, speed_kmh=calibration["speed_kmh"], max_pickup_minutes=calibration["max_pickup_minutes"])
     clock = perf_counter()
-    plan = build_plan(data, target, config, fleet, zones, expected, start, calibration, sim, estimator) \
-        if fleet and zones else None
+    plan = build_plan(data, target, config, fleet, zones, expected, start, calibration, sim, estimator) if fleet and zones else None
     plan_seconds = perf_counter() - clock
     recommendations, execution = (
-        materialize(plan, world, start, calibration["speed_kmh"], config.max_reposition_km,
-                    timedelta(minutes=config.execution_tolerance_minutes))
-        if plan else ((), {})
+        materialize(
+            plan, world, start, calibration["speed_kmh"], config.max_reposition_km, timedelta(minutes=config.execution_tolerance_minutes)
+        )
+        if plan
+        else ((), {})
     )
-    baseline = simulate("baseline_sem_reposicionamento", world.requests, world.vehicles, sim,
-                        commitments=world.commitments, estimator=estimator)
-    proposed = simulate(f"preventivo_{config.algorithm}_d1", world.requests, world.vehicles, sim,
-                        commitments=world.commitments, recommendations=recommendations, estimator=estimator)
+    baseline = simulate(
+        "baseline_sem_reposicionamento", world.requests, world.vehicles, sim, commitments=world.commitments, estimator=estimator
+    )
+    proposed = simulate(
+        f"preventivo_{config.algorithm}_d1",
+        world.requests,
+        world.vehicles,
+        sim,
+        commitments=world.commitments,
+        recommendations=recommendations,
+        estimator=estimator,
+    )
     result = compare(baseline, proposed, minimum_coverage=None, dataset_kind="real_gold_databricks")
     observed_coverage = len(world.requests)
-    result.update({
-        "target_date": target.isoformat(),
-        "information_basis": ("diagnostico_oraculo_frota_real_d1_viola_corte" if config.oracle_fleet
-                              else "d1_estrito_frota_prevista_no_corte"),
-        "cutoff": cutoff_for(target, config).isoformat(),
-        "window": [start.isoformat(), end.isoformat()],
-        "training_days": n_days,
-        "calibration": calibration,
-        "forecast": {"zones": len(expected), "expected_rides": round(sum(expected.values()), 3),
-                     "observed_rides_in_window": observed_coverage},
-        "algorithm": config.algorithm,
-        "plan": {"predicted_fleet": len(fleet), "recommendations": len(plan.recommendations) if plan else 0,
-                 "plan_seconds": round(plan_seconds, 3),
-                 "planned_reposition_km": round(plan.reposition_km, 6) if plan else 0.0,
-                 "projected_pickup_saving_km": (round(plan.baseline_projected_pickup_km - plan.projected_pickup_km, 6)
-                                                if plan else 0.0),
-                 "execution": execution},
-        "world": {"requests": len(world.requests), "vehicles": len(world.vehicles),
-                  "commitments_in_progress": len(world.commitments), "excluded": world.excluded},
-        "historical_reference": {
-            "label": "politica real observada; metodo e despacho diferentes, nao comparavel como reducao",
-            **{k: round(v, 6) if isinstance(v, float) else v for k, v in world.observed.items()},
-        },
-    })
+    result.update(
+        {
+            "target_date": target.isoformat(),
+            "information_basis": (
+                "diagnostico_oraculo_frota_real_d1_viola_corte" if config.oracle_fleet else "d1_estrito_frota_prevista_no_corte"
+            ),
+            "cutoff": cutoff_for(target, config).isoformat(),
+            "window": [start.isoformat(), end.isoformat()],
+            "training_days": n_days,
+            "calibration": calibration,
+            "forecast": {
+                "zones": len(expected),
+                "expected_rides": round(sum(expected.values()), 3),
+                "observed_rides_in_window": observed_coverage,
+            },
+            "algorithm": config.algorithm,
+            "plan": {
+                "predicted_fleet": len(fleet),
+                "recommendations": len(plan.recommendations) if plan else 0,
+                "plan_seconds": round(plan_seconds, 3),
+                "planned_reposition_km": round(plan.reposition_km, 6) if plan else 0.0,
+                "projected_pickup_saving_km": (round(plan.baseline_projected_pickup_km - plan.projected_pickup_km, 6) if plan else 0.0),
+                "execution": execution,
+            },
+            "world": {
+                "requests": len(world.requests),
+                "vehicles": len(world.vehicles),
+                "commitments_in_progress": len(world.commitments),
+                "excluded": world.excluded,
+            },
+            "historical_reference": {
+                "label": "politica real observada; metodo e despacho diferentes, nao comparavel como reducao",
+                **{k: round(v, 6) if isinstance(v, float) else v for k, v in world.observed.items()},
+            },
+        }
+    )
     if details:
-        result["details"] = day_details(expected, zones, fleet, plan, recommendations, world, start,
-                                        set(baseline.served_ids), set(proposed.served_ids))
+        result["details"] = day_details(
+            expected, zones, fleet, plan, recommendations, world, start, set(baseline.served_ids), set(proposed.served_ids)
+        )
     return result
 
 
@@ -390,16 +421,34 @@ def day_details(expected, zones, fleet, plan, applied, world, start, served_base
     return {
         "zonas": [{**_point(zones[z]), "demanda_prevista": round(v, 3)} for z, v in sorted(expected.items())],
         "frota_prevista": [{"motorista": v.vehicle_id, **_point(v.position)} for v in fleet],
-        "planejadas": [{"motorista": r.vehicle_id, "de": _point(r.origin), "para": _point(r.destination),
-                        "km": round(r.distance_km, 3)} for r in (plan.recommendations if plan else ())],
-        "executadas": [{"motorista": r.vehicle_id.split("#")[0], "de": _point(r.origin), "para": _point(r.destination),
-                        "km": round(r.distance_km, 3), "inicio": r.start_at.isoformat()} for r in applied],
-        "frota_real_inicio": [{"motorista": v.vehicle_id.split("#")[0], **_point(v.position),
-                               "disponivel_desde": v.available_from.isoformat()}
-                              for v in world.vehicles if v.available_from <= start],
-        "pedidos": [{"instante": r.created_at.isoformat(), **_point(r.origin),
-                     "atendido_baseline": r.request_id in served_base,
-                     "atendido_preventivo": r.request_id in served_prop} for r in world.requests],
+        "planejadas": [
+            {"motorista": r.vehicle_id, "de": _point(r.origin), "para": _point(r.destination), "km": round(r.distance_km, 3)}
+            for r in (plan.recommendations if plan else ())
+        ],
+        "executadas": [
+            {
+                "motorista": r.vehicle_id.split("#")[0],
+                "de": _point(r.origin),
+                "para": _point(r.destination),
+                "km": round(r.distance_km, 3),
+                "inicio": r.start_at.isoformat(),
+            }
+            for r in applied
+        ],
+        "frota_real_inicio": [
+            {"motorista": v.vehicle_id.split("#")[0], **_point(v.position), "disponivel_desde": v.available_from.isoformat()}
+            for v in world.vehicles
+            if v.available_from <= start
+        ],
+        "pedidos": [
+            {
+                "instante": r.created_at.isoformat(),
+                **_point(r.origin),
+                "atendido_baseline": r.request_id in served_base,
+                "atendido_preventivo": r.request_id in served_prop,
+            }
+            for r in world.requests
+        ],
     }
 
 
@@ -416,29 +465,54 @@ def training_scenarios(data: GoldData, target: date, config: RealExperimentConfi
     return scenarios
 
 
-def build_plan(data: GoldData, target: date, config: RealExperimentConfig, fleet: list[Vehicle],
-               zones: dict[str, Position], expected: dict[str, float], start: datetime,
-               calibration: Mapping[str, float], sim: SimulationConfig, estimator) -> Plan:
+def build_plan(
+    data: GoldData,
+    target: date,
+    config: RealExperimentConfig,
+    fleet: list[Vehicle],
+    zones: dict[str, Position],
+    expected: dict[str, float],
+    start: datetime,
+    calibration: Mapping[str, float],
+    sim: SimulationConfig,
+    estimator,
+) -> Plan:
     """Despacha para o algoritmo escolhido; todos usam só informação do corte."""
     capacity = max(calibration["capacity_per_vehicle"], 1e-6)
     common = dict(max_reposition_km=config.max_reposition_km, estimator=estimator)
     if config.algorithm in {"guloso", "busca_local"}:
-        plan = greedy_plan(fleet, zones, expected, start, capacity_per_vehicle=capacity,
-                           min_coverage=config.min_coverage, max_pickup_km=config.max_pickup_km,
-                           speed_kmh=calibration["speed_kmh"], **common)
+        plan = greedy_plan(
+            fleet,
+            zones,
+            expected,
+            start,
+            capacity_per_vehicle=capacity,
+            min_coverage=config.min_coverage,
+            max_pickup_km=config.max_pickup_km,
+            speed_kmh=calibration["speed_kmh"],
+            **common,
+        )
         if config.algorithm == "guloso":
             return plan
-        return local_search_plan(fleet, zones, expected, start, initial=plan, capacity_per_vehicle=capacity,
-                                 max_pickup_km=config.max_pickup_km, min_coverage=config.min_coverage,
-                                 seed=target.toordinal(), **common)
+        return local_search_plan(
+            fleet,
+            zones,
+            expected,
+            start,
+            initial=plan,
+            capacity_per_vehicle=capacity,
+            max_pickup_km=config.max_pickup_km,
+            min_coverage=config.min_coverage,
+            seed=target.toordinal(),
+            **common,
+        )
     if config.algorithm == "proporcional":
-        return proportional_plan(fleet, zones, expected, start, capacity_per_vehicle=capacity,
-                                 max_pickup_km=config.max_pickup_km, **common)
+        return proportional_plan(fleet, zones, expected, start, capacity_per_vehicle=capacity, max_pickup_km=config.max_pickup_km, **common)
     if config.algorithm == "atribuicao_otima":
-        return assignment_plan(fleet, zones, expected, start, capacity_per_vehicle=capacity,
-                               max_pickup_km=config.max_pickup_km, **common)
-    return simulated_greedy_plan(fleet, zones, expected, start, scenarios=training_scenarios(data, target, config),
-                                 sim_config=sim, **common)
+        return assignment_plan(fleet, zones, expected, start, capacity_per_vehicle=capacity, max_pickup_km=config.max_pickup_km, **common)
+    return simulated_greedy_plan(
+        fleet, zones, expected, start, scenarios=training_scenarios(data, target, config), sim_config=sim, **common
+    )
 
 
 _WORKER_DATA: GoldData | None = None
@@ -456,8 +530,9 @@ def _run_day_worker(target: date, config: RealExperimentConfig, details: bool = 
     return run_day(_WORKER_DATA, target, config, details=details)
 
 
-def run_period(cache_dir: str, first: date, last: date, config: RealExperimentConfig,
-               *, workers: int = 1, details: bool = False) -> dict[str, object]:
+def run_period(
+    cache_dir: str, first: date, last: date, config: RealExperimentConfig, *, workers: int = 1, details: bool = False
+) -> dict[str, object]:
     """Executa cada dia de forma independente (corte próprio) e agrega só dias comparáveis."""
     if last < first or workers < 1:
         raise ValueError("período ou paralelismo inválido")
@@ -484,7 +559,5 @@ def run_period(cache_dir: str, first: date, last: date, config: RealExperimentCo
         "proposed_served": sum(d["proposed"]["served"] for d in days),
         "requests": sum(d["baseline"]["requests"] for d in days),
     }
-    run_id = hashlib.sha256(json.dumps([asdict(config), first.isoformat(), last.isoformat()],
-                                       sort_keys=True).encode()).hexdigest()[:12]
-    return {"run_id": run_id, "config": asdict(config), "period": [first.isoformat(), last.isoformat()],
-            "totals": totals, "days": days}
+    run_id = hashlib.sha256(json.dumps([asdict(config), first.isoformat(), last.isoformat()], sort_keys=True).encode()).hexdigest()[:12]
+    return {"run_id": run_id, "config": asdict(config), "period": [first.isoformat(), last.isoformat()], "totals": totals, "days": days}

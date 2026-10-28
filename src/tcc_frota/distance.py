@@ -1,9 +1,11 @@
 """Unidades e proveniência de distâncias RN006–RN008, RN012."""
+
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from math import asin, cos, isfinite, radians, sin, sqrt
-from typing import Callable, Protocol
+from typing import Protocol
 
 from .models import Position
 

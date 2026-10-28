@@ -1,4 +1,5 @@
 """Simulador estendido: idêntico ao da v2 sem ganchos; lote, raio e épocas sem ocupação simultânea."""
+
 import random
 
 from tcc_frota.algoritmos.sim_estendido import simulate_ext
@@ -10,22 +11,42 @@ W = (4 * 3600.0, 11 * 3600.0)
 
 def world(seed):
     rng = random.Random(seed)
-    reqs = [SimRequest(i, rng.uniform(*W), -20.3 + rng.uniform(-.05, .05), -40.3 + rng.uniform(-.05, .05),
-                       -20.3 + rng.uniform(-.05, .05), -40.3 + rng.uniform(-.05, .05), rng.uniform(300, 1500),
-                       rng.choice([None, 60.0, 200.0]), False, 5) for i in range(60)]
+    reqs = [
+        SimRequest(
+            i,
+            rng.uniform(*W),
+            -20.3 + rng.uniform(-0.05, 0.05),
+            -40.3 + rng.uniform(-0.05, 0.05),
+            -20.3 + rng.uniform(-0.05, 0.05),
+            -40.3 + rng.uniform(-0.05, 0.05),
+            rng.uniform(300, 1500),
+            rng.choice([None, 60.0, 200.0]),
+            False,
+            5,
+        )
+        for i in range(60)
+    ]
     drivers = []
     for k in range(12):
         s = rng.uniform(3 * 3600, 6 * 3600)
         commits = ((s + 3600, s + 4000, -20.3, -40.3),) if k % 4 == 0 else ()
-        drivers.append(SimDriver(f"d{k}", ((s, s + 5 * 3600, -20.3 + rng.uniform(-.05, .05), -40.3 + rng.uniform(-.05, .05)),), commits))
-    moves = {f"d{k}": (-20.3 + rng.uniform(-.03, .03), -40.3 + rng.uniform(-.03, .03)) for k in range(0, 12, 3)}
+        drivers.append(
+            SimDriver(f"d{k}", ((s, s + 5 * 3600, -20.3 + rng.uniform(-0.05, 0.05), -40.3 + rng.uniform(-0.05, 0.05)),), commits)
+        )
+    moves = {f"d{k}": (-20.3 + rng.uniform(-0.03, 0.03), -40.3 + rng.uniform(-0.03, 0.03)) for k in range(0, 12, 3)}
     return reqs, drivers, moves
 
 
 def same(a, b):
-    return (a.served, a.served_ids, round(a.pickup_km, 9), round(a.reposition_km, 9), a.moves_executed,
-            a.move_outcomes, a.signature) == (b.served, b.served_ids, round(b.pickup_km, 9), round(b.reposition_km, 9),
-                                              b.moves_executed, b.move_outcomes, b.signature)
+    return (a.served, a.served_ids, round(a.pickup_km, 9), round(a.reposition_km, 9), a.moves_executed, a.move_outcomes, a.signature) == (
+        b.served,
+        b.served_ids,
+        round(b.pickup_km, 9),
+        round(b.reposition_km, 9),
+        b.moves_executed,
+        b.move_outcomes,
+        b.signature,
+    )
 
 
 def test_identical_to_v2_without_hooks():
@@ -54,8 +75,15 @@ def test_batch_dispatch_radius_and_epochs_keep_invariants():
         lote = simulate_ext(reqs, drivers, P, W, dispatch="lote", batch_s=30.0)
         small = simulate_ext(reqs, drivers, P, W, dispatch_radius_km=1.0)
         assert lote.signature == base.signature == small.signature
-        epoch = simulate_ext(reqs, drivers, P, W, epochs=tuple(W[0] + 1800 * k for k in range(14)),
-                             epoch_planner=lambda t, idle, busy: {d: (-20.3, -40.3) for d in idle}, max_move_km=3.0)
+        epoch = simulate_ext(
+            reqs,
+            drivers,
+            P,
+            W,
+            epochs=tuple(W[0] + 1800 * k for k in range(14)),
+            epoch_planner=lambda t, idle, busy: dict.fromkeys(idle, (-20.3, -40.3)),
+            max_move_km=3.0,
+        )
         for res in (lote, small, epoch):
             _no_overlap(res)
             assert res.reposition_km >= 0 and res.served <= res.n_requests
@@ -63,9 +91,11 @@ def test_batch_dispatch_radius_and_epochs_keep_invariants():
 
 
 def test_mpc_epoch_plan_moves_only_idle_within_hop():
+    from test_v2_policy import instance
+
     from tcc_frota.algoritmos.mpc import epoch_times, plan_epoch
     from tcc_frota.v2.sim import reta_km
-    from test_v2_policy import instance
+
     inp = instance(4)
     idle = {d.did: (d.lat, d.lon) for d in inp.drivers[:10]}
     busy = {d.did: (5.5 * 3600, (d.lat, d.lon)) for d in inp.drivers[10:]}

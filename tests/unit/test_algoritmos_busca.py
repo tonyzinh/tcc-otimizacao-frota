@@ -1,13 +1,14 @@
 """5.4/5.5/5.8: busca no simulador sobre pseudodias históricos."""
+
 import random
 from datetime import date
+
+from test_v2_policy import instance
 
 from tcc_frota.algoritmos.base import PlanContext, Scenario
 from tcc_frota.algoritmos.busca_local import BuscaLocalLNS
 from tcc_frota.algoritmos.cenarios import Evaluator, split
 from tcc_frota.v2.sim import SimParams, SimRequest, reta_km
-
-from test_v2_policy import instance
 
 SIM = SimParams(4.5, 16.0, 1.3, 180.0)
 
@@ -20,15 +21,27 @@ def scenarios(inp, n=4, per_day=30, seed=0):
         reqs = []
         for i in range(per_day):
             z, (lat, lon) = rng.choice(zones)
-            reqs.append(SimRequest(i, rng.uniform(4 * 3600, 8 * 3600), lat + rng.uniform(-.005, .005),
-                                   lon + rng.uniform(-.005, .005), lat, lon + .02, 900.0, None, False, 5, z))
+            reqs.append(
+                SimRequest(
+                    i,
+                    rng.uniform(4 * 3600, 8 * 3600),
+                    lat + rng.uniform(-0.005, 0.005),
+                    lon + rng.uniform(-0.005, 0.005),
+                    lat,
+                    lon + 0.02,
+                    900.0,
+                    None,
+                    False,
+                    5,
+                    z,
+                )
+            )
         out.append(Scenario(date(2026, 3, 9 - k), tuple(sorted(reqs, key=lambda r: r.t))))
     return tuple(out)
 
 
 def ctx(inp, seed=0, scen=(), regime="B"):
-    return PlanContext(inp, date(2026, 3, 16), (4, 11), regime, SIM,
-                       "fim_do_dia" if regime == "B" else "inicio_turno", scen, seed)
+    return PlanContext(inp, date(2026, 3, 16), (4, 11), regime, SIM, "fim_do_dia" if regime == "B" else "inicio_turno", scen, seed)
 
 
 def test_split_is_disjoint_and_recent_first():
@@ -78,6 +91,7 @@ def test_evaluator_floor_penalty():
 def test_annealing_and_pso_deterministic_and_within_hop():
     from tcc_frota.algoritmos.pso import EnxameParticulas
     from tcc_frota.algoritmos.recozimento import RecozimentoSimulado
+
     inp = instance(6)
     sc = scenarios(inp, seed=3)
     for make in (lambda: RecozimentoSimulado(0.02, 0.98, 40, 4.0), lambda: EnxameParticulas(0.8, 0.5, 5, 4, 4.0)):
@@ -90,7 +104,9 @@ def test_annealing_and_pso_deterministic_and_within_hop():
 
 def test_annealing_accepts_worse_only_with_positive_temperature():
     import random as _r
+
     from tcc_frota.algoritmos.recozimento import RecozimentoSimulado
+
     hot, cold = RecozimentoSimulado(1e3, 1.0, 1, 4.0), RecozimentoSimulado(0.0, 0.5, 1, 4.0)
     rng = _r.Random(0)
     assert hot.accept(0.01, 0, rng) and not cold.accept(0.01, 0, rng) and cold.accept(-0.01, 0, rng)

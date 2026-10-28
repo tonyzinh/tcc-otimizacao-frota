@@ -1,4 +1,5 @@
 """Fase 3 da v2 (oráculo e escada de ruído). Exige TCC_REAL_DATA_AUTHORIZED=YES (processamento local, só agregados)."""
+
 import argparse
 import json
 import os
@@ -12,6 +13,7 @@ if __name__ == "__main__":
     if os.environ.get("TCC_REAL_DATA_AUTHORIZED") != "YES":
         sys.exit("defina TCC_REAL_DATA_AUTHORIZED=YES (processamento local autorizado)")
     from tcc_frota.v3 import fase3
+
     ap = argparse.ArgumentParser()
     ap.add_argument("--raw", type=Path, default=ROOT / "data/raw")
     ap.add_argument("--out", type=Path, default=ROOT / "reports/tcc_v2")

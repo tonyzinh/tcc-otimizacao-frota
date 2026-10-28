@@ -6,7 +6,6 @@ import pytest
 from tcc_frota.availability.forecast import HistoricalCandidateBaseline
 from tcc_frota.availability.timeline import OperationalState, TimelineSegment
 
-
 TZ = ZoneInfo("America/Sao_Paulo")
 
 
@@ -33,6 +32,8 @@ def test_future_segments_and_unknown_do_not_create_training_labels():
     cutoff = datetime(2026, 10, 13, 20, tzinfo=TZ)
     target = datetime(2026, 10, 14, 9, tzinfo=TZ)
     with pytest.raises(ValueError):
-        HistoricalCandidateBaseline(cutoff, [segment(target, target + timedelta(hours=1), OperationalState.ONLINE_SEM_OCUPACAO_IDENTIFICADA)])
+        HistoricalCandidateBaseline(
+            cutoff, [segment(target, target + timedelta(hours=1), OperationalState.ONLINE_SEM_OCUPACAO_IDENTIFICADA)]
+        )
     unknown = segment(target - timedelta(days=7), target - timedelta(days=7) + timedelta(hours=1), OperationalState.DESCONHECIDO)
     assert HistoricalCandidateBaseline(cutoff, [unknown]).predict("v1", target).candidate_probability is None

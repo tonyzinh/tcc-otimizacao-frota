@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime
 
 import pytest
 
@@ -6,8 +6,7 @@ from tcc_frota.demand.forecast import forecast_hour
 from tcc_frota.models import Position, Request
 from tcc_frota.spatial.grid import fit_grid
 
-
-UTC = timezone.utc
+UTC = UTC
 A = Position("a", -20.30, -40.30)
 B = Position("b", -20.31, -40.29)
 

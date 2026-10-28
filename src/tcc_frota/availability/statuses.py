@@ -1,14 +1,14 @@
 """Logs de status: mapeamento explícito, sem inferir disponibilidade a partir de Online."""
+
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from collections.abc import Iterable, Mapping
 from datetime import datetime
-from typing import Iterable, Mapping
 
 from tcc_frota.availability.diagnostics import missing_value, timestamp
 from tcc_frota.availability.timeline import EvidenceInterval, OperationalState
 from tcc_frota.models import aware
-
 
 _STATUS = {
     "Online": OperationalState.ONLINE_SEM_OCUPACAO_IDENTIFICADA,

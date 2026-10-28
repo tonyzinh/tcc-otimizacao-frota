@@ -1,10 +1,11 @@
 """Reconstrução conservadora de APP_SOLICITACAO_HIST."""
+
 from __future__ import annotations
 
 from collections import defaultdict
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Iterable, Mapping
 
 from tcc_frota.models import aware
 
@@ -98,12 +99,14 @@ def reconstruct_history(
         latest = max(group, key=lambda item: (item[2], item[0]))
         if sum(item[2] == latest[2] for item in group) > 1:
             ties += 1
+
         def realized_key(item: tuple[int, Mapping[str, object], datetime]) -> tuple[datetime, datetime, int]:
             try:
                 realized = parse_time(item[1].get("DT_INICIO_REALIZADA"))
             except ValueError:
                 realized = None
             return (realized or datetime.min.replace(tzinfo=item[2].tzinfo), item[2], item[0])
+
         alternate = max(group, key=realized_key)
         if latest[0] != alternate[0]:
             disagreements += 1
@@ -128,6 +131,18 @@ def reconstruct_history(
         except ValueError:
             excluded["invalid_spatial_or_distance"] += 1
             lat = lon = pickup = trip = None
-        results.append(Reconstructed(request_id, created, str(row.get("TX_STATUS") or ""), latest[2], str(row.get("CD_VEICULO")) if row.get("CD_VEICULO") else None, lat, lon, pickup, trip))
+        results.append(
+            Reconstructed(
+                request_id,
+                created,
+                str(row.get("TX_STATUS") or ""),
+                latest[2],
+                str(row.get("CD_VEICULO")) if row.get("CD_VEICULO") else None,
+                lat,
+                lon,
+                pickup,
+                trip,
+            )
+        )
     audit = ReconstructionAudit(total, len(results), dict(excluded), disagreements, ties)
     return results, audit

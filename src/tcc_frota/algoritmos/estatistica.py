@@ -3,6 +3,7 @@
 O bootstrap de Bonferroni usa a mesma semente e a mesma sequência de reamostragens de `v2.stats.bootstrap`
 (o IC 95% sai idêntico); só muda o quantil (1 − 0,05/m).
 """
+
 from __future__ import annotations
 
 import random
@@ -62,12 +63,17 @@ def analyse(days: list[dict], m: int) -> dict:
     lo, hi = bootstrap_ci(days, s_served_ratio, level)
     out["corridas_atendidas_var_pct_ic_bonf_inf"], out["corridas_atendidas_var_pct_ic_bonf_sup"] = 100 * lo, 100 * hi
     out["nivel_bonferroni"] = level
-    red = [d["p"]["empty_km"] / d["p"]["served"] < d["b"]["empty_km"] / d["b"]["served"] - 1e-12
-           for d in days if d["p"]["served"] and d["b"]["served"]]
+    red = [
+        d["p"]["empty_km"] / d["p"]["served"] < d["b"]["empty_km"] / d["b"]["served"] - 1e-12
+        for d in days
+        if d["p"]["served"] and d["b"]["served"]
+    ]
     out["dias_com_reducao"] = sum(red)
     out["prop_dias_com_reducao"] = sum(red) / len(red) if red else float("nan")
-    tot = {k: sum(d["p"][k] for d in days) for k in ("served", "pickup_km", "reposition_km", "empty_km", "moves_executed",
-                                                    "plan_seconds", "km_planejado")}
+    tot = {
+        k: sum(d["p"][k] for d in days)
+        for k in ("served", "pickup_km", "reposition_km", "empty_km", "moves_executed", "plan_seconds", "km_planejado")
+    }
     base = {k: sum(d["b"][k] for d in days) for k in ("served", "pickup_km", "empty_km")}
     out["km_busca_por_corrida"] = tot["pickup_km"] / tot["served"]
     out["km_repos_por_corrida"] = tot["reposition_km"] / tot["served"]
@@ -90,11 +96,24 @@ def criteria(by_month: dict[str, dict], by_month_a: dict[str, dict], holm_p: dic
     c1_raw = all(by_month[m]["km_vazio_por_corrida_var_pct_ic_sup"] < 0 for m in months)
     c1_conf = c1_raw and all(holm_p[m] < 0.05 and by_month[m]["km_vazio_por_corrida_var_pct_ic_bonf_sup"] < 0 for m in months)
     c2 = all(by_month[m]["corridas_atendidas_var_pct_ic_inf"] >= -1.0 for m in months)
-    c3 = c1_raw   # medido no simulador por construção
-    c4 = (all(by_month[m]["prop_dias_com_reducao"] >= 0.5 for m in months)
-          and all(by_month_a.get(m, {}).get("km_vazio_por_corrida_var_pct", float("inf")) <= 0 for m in months))
+    c3 = c1_raw  # medido no simulador por construção
+    c4 = all(by_month[m]["prop_dias_com_reducao"] >= 0.5 for m in months) and all(
+        by_month_a.get(m, {}).get("km_vazio_por_corrida_var_pct", float("inf")) <= 0 for m in months
+    )
     c5 = all(by_month[m]["tempo_plano_medio_s"] <= 900 and by_month[m]["tempo_plano_max_s"] <= 3600 for m in months)
-    verdict = ("superior (confirmado)" if c1_conf and c2 and c3 and c4 and c5
-               else "indício, não confirmado" if c1_raw and c2 and c3 and c4 and c5 else "não passa")
-    return {"c1_km_vazio_menor": c1_raw, "c1_confirmado_holm": c1_conf, "c2_nao_inferior_atendimento": c2,
-            "c3_reducao_no_simulador": c3, "c4_consistencia": c4, "c5_tempo": c5, "veredito": verdict}
+    verdict = (
+        "superior (confirmado)"
+        if c1_conf and c2 and c3 and c4 and c5
+        else "indício, não confirmado"
+        if c1_raw and c2 and c3 and c4 and c5
+        else "não passa"
+    )
+    return {
+        "c1_km_vazio_menor": c1_raw,
+        "c1_confirmado_holm": c1_conf,
+        "c2_nao_inferior_atendimento": c2,
+        "c3_reducao_no_simulador": c3,
+        "c4_consistencia": c4,
+        "c5_tempo": c5,
+        "veredito": verdict,
+    }

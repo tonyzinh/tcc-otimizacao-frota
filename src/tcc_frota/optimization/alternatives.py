@@ -4,12 +4,13 @@ Todas recebem as mesmas entradas do corte D+1 e devolvem um `Plan`, para passare
 materialização e pelo mesmo simulador. Nenhuma é política da empresa; limites e capacidades são
 parâmetros experimentais (RN019).
 """
+
 from __future__ import annotations
 
 import random
+from collections.abc import Sequence
 from datetime import datetime
 from math import exp, isfinite
-from typing import Sequence
 
 from tcc_frota.distance import HaversineDistance, PositionDistance, between_km
 from tcc_frota.models import Position, Recommendation, Request, Vehicle, aware
@@ -20,7 +21,8 @@ from tcc_frota.simulation.engine import SimulationConfig, simulate
 def _eligible(vehicles: Sequence[Vehicle], start_at: datetime) -> dict[str, Vehicle]:
     aware(start_at)
     return {
-        v.vehicle_id: v for v in vehicles
+        v.vehicle_id: v
+        for v in vehicles
         if v.active and v.driver_ready and v.position is not None and v.available_from <= start_at < v.available_until
     }
 
@@ -43,8 +45,13 @@ def target_slots(expected_by_zone: dict[str, float], capacity_per_vehicle: float
 
 
 def _plan_from_moves(
-    moves: dict[str, Position], eligible: dict[str, Vehicle], zones: dict[str, Position],
-    expected: dict[str, float], start_at: datetime, capacity: float, max_pickup_km: float,
+    moves: dict[str, Position],
+    eligible: dict[str, Vehicle],
+    zones: dict[str, Position],
+    expected: dict[str, float],
+    start_at: datetime,
+    capacity: float,
+    max_pickup_km: float,
     estimator: PositionDistance,
 ) -> Plan:
     """Avalia um conjunto de movimentos pelo mesmo proxy do guloso, para relatório comparável."""
@@ -64,8 +71,14 @@ def _slot_list(slots: dict[str, int]) -> list[str]:
 
 
 def proportional_plan(
-    vehicles: list[Vehicle], zones: dict[str, Position], expected_by_zone: dict[str, float], start_at: datetime,
-    *, capacity_per_vehicle: float, max_reposition_km: float, max_pickup_km: float = 15.0,
+    vehicles: list[Vehicle],
+    zones: dict[str, Position],
+    expected_by_zone: dict[str, float],
+    start_at: datetime,
+    *,
+    capacity_per_vehicle: float,
+    max_reposition_km: float,
+    max_pickup_km: float = 15.0,
     estimator: PositionDistance | None = None,
 ) -> Plan:
     """Regra simples: vagas proporcionais à demanda, preenchidas pelo par veículo–vaga mais próximo."""
@@ -73,8 +86,7 @@ def proportional_plan(
     eligible = _eligible(vehicles, start_at)
     slots = _slot_list(target_slots(expected_by_zone, capacity_per_vehicle, len(eligible)))
     pairs = sorted(
-        (between_km(estimator, v.position, zones[zone]), vid, index)
-        for vid, v in eligible.items() for index, zone in enumerate(slots)
+        (between_km(estimator, v.position, zones[zone]), vid, index) for vid, v in eligible.items() for index, zone in enumerate(slots)
     )
     used_vehicles: set[str] = set()
     used_slots: set[int] = set()
@@ -86,8 +98,7 @@ def proportional_plan(
         used_slots.add(index)
         if distance > 1e-9:
             moves[vid] = zones[slots[index]]
-    return _plan_from_moves(moves, eligible, zones, expected_by_zone, start_at, capacity_per_vehicle,
-                            max_pickup_km, estimator)
+    return _plan_from_moves(moves, eligible, zones, expected_by_zone, start_at, capacity_per_vehicle, max_pickup_km, estimator)
 
 
 def hungarian(cost: list[list[float]]) -> list[int]:
@@ -136,8 +147,14 @@ def hungarian(cost: list[list[float]]) -> list[int]:
 
 
 def assignment_plan(
-    vehicles: list[Vehicle], zones: dict[str, Position], expected_by_zone: dict[str, float], start_at: datetime,
-    *, capacity_per_vehicle: float, max_reposition_km: float, max_pickup_km: float = 15.0,
+    vehicles: list[Vehicle],
+    zones: dict[str, Position],
+    expected_by_zone: dict[str, float],
+    start_at: datetime,
+    *,
+    capacity_per_vehicle: float,
+    max_reposition_km: float,
+    max_pickup_km: float = 15.0,
     estimator: PositionDistance | None = None,
 ) -> Plan:
     """Método exato para a mesma meta de vagas: preenche o máximo de vagas com a menor soma de km.
@@ -150,8 +167,7 @@ def assignment_plan(
     ids = sorted(eligible)
     slots = _slot_list(target_slots(expected_by_zone, capacity_per_vehicle, len(ids)))
     if not ids or not slots:
-        return _plan_from_moves({}, eligible, zones, expected_by_zone, start_at, capacity_per_vehicle,
-                                max_pickup_km, estimator)
+        return _plan_from_moves({}, eligible, zones, expected_by_zone, start_at, capacity_per_vehicle, max_pickup_km, estimator)
     penalty = max_reposition_km + 1.0
     forbidden = penalty * (len(ids) + 1)
     cost = []
@@ -168,14 +184,23 @@ def assignment_plan(
             target = zones[slots[column]]
             if between_km(estimator, eligible[ids[row]].position, target) > 1e-9:
                 moves[ids[row]] = target
-    return _plan_from_moves(moves, eligible, zones, expected_by_zone, start_at, capacity_per_vehicle,
-                            max_pickup_km, estimator)
+    return _plan_from_moves(moves, eligible, zones, expected_by_zone, start_at, capacity_per_vehicle, max_pickup_km, estimator)
 
 
 def local_search_plan(
-    vehicles: list[Vehicle], zones: dict[str, Position], expected_by_zone: dict[str, float], start_at: datetime,
-    *, initial: Plan, capacity_per_vehicle: float, max_reposition_km: float, max_pickup_km: float = 15.0,
-    min_coverage: float = 0.0, iterations: int = 1500, seed: int = 0, estimator: PositionDistance | None = None,
+    vehicles: list[Vehicle],
+    zones: dict[str, Position],
+    expected_by_zone: dict[str, float],
+    start_at: datetime,
+    *,
+    initial: Plan,
+    capacity_per_vehicle: float,
+    max_reposition_km: float,
+    max_pickup_km: float = 15.0,
+    min_coverage: float = 0.0,
+    iterations: int = 1500,
+    seed: int = 0,
+    estimator: PositionDistance | None = None,
 ) -> Plan:
     """Metaheurística (simulated annealing) sobre o mesmo objetivo do guloso, partindo do guloso.
 
@@ -225,14 +250,21 @@ def local_search_plan(
         temperature *= cooling
     if best_value >= value({r.vehicle_id: r.destination for r in initial.recommendations}) - 1e-9:
         return initial
-    return _plan_from_moves(best, eligible, zones, expected_by_zone, start_at, capacity_per_vehicle,
-                            max_pickup_km, estimator)
+    return _plan_from_moves(best, eligible, zones, expected_by_zone, start_at, capacity_per_vehicle, max_pickup_km, estimator)
 
 
 def simulated_greedy_plan(
-    vehicles: list[Vehicle], zones: dict[str, Position], expected_by_zone: dict[str, float], start_at: datetime,
-    *, scenarios: Sequence[Sequence[Request]], sim_config: SimulationConfig, max_reposition_km: float,
-    candidate_zones: int = 8, max_moves: int = 10, estimator: PositionDistance | None = None,
+    vehicles: list[Vehicle],
+    zones: dict[str, Position],
+    expected_by_zone: dict[str, float],
+    start_at: datetime,
+    *,
+    scenarios: Sequence[Sequence[Request]],
+    sim_config: SimulationConfig,
+    max_reposition_km: float,
+    candidate_zones: int = 8,
+    max_moves: int = 10,
+    estimator: PositionDistance | None = None,
 ) -> Plan:
     """Guloso cujo objetivo é o KM vazio **simulado** em dias históricos de treino.
 
@@ -250,8 +282,7 @@ def simulated_greedy_plan(
     def evaluate(recs: tuple[Recommendation, ...]) -> tuple[float, float, float]:
         km = pickup = served = total = 0.0
         for requests in scenarios:
-            result = simulate("cenario_treino", list(requests), fleet, sim_config, recommendations=recs,
-                              estimator=estimator)
+            result = simulate("cenario_treino", list(requests), fleet, sim_config, recommendations=recs, estimator=estimator)
             km += result.km_dead_estimated
             pickup += result.pickup_km
             served += len(result.served_ids)
@@ -285,6 +316,12 @@ def simulated_greedy_plan(
         chosen += (rec,)
         moved.add(rec.vehicle_id)
     _, final_pickup, final_cov = evaluate(chosen)
-    return Plan(chosen, final_pickup, sum(r.distance_km for r in chosen), final_cov, base_pickup, base_cov,
-                objective="mean simulated estimated dead km over training days; coverage not below baseline")
-
+    return Plan(
+        chosen,
+        final_pickup,
+        sum(r.distance_km for r in chosen),
+        final_cov,
+        base_pickup,
+        base_cov,
+        objective="mean simulated estimated dead km over training days; coverage not below baseline",
+    )

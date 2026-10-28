@@ -6,6 +6,7 @@ conferida em cada par (RN028). Os planejadores recebem só o `PlanContext` do co
 estocásticos rodam com cada semente; os determinísticos rodam uma vez (o simulador não tem
 aleatoriedade, então as sementes não mudariam nada).
 """
+
 from __future__ import annotations
 
 import importlib
@@ -16,7 +17,7 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
-from tcc_frota.algoritmos.base import Planner, PlanContext, PlannerSpec, Scenario, latlon
+from tcc_frota.algoritmos.base import PlanContext, Planner, PlannerSpec, Scenario, latlon
 from tcc_frota.v2 import experiment as ex
 from tcc_frota.v2 import forecast as fc
 from tcc_frota.v2.fleet import end_of_day
@@ -105,29 +106,49 @@ def build_scenarios(study, period: str, target: date, window: tuple[int, int], f
     return tuple(out)
 
 
-def persistent_deficit_zones(study, target: date, window: tuple[int, int], fconfig: fc.ForecastConfig,
-                             share: float = 0.5) -> set[str]:
+def persistent_deficit_zones(study, target: date, window: tuple[int, int], fconfig: fc.ForecastConfig, share: float = 0.5) -> set[str]:
     """Zonas com ao menos um pedido não atendido na janela em ≥ `share` dos dias de treino (antes do corte)."""
     days = fc.training_dates(target, study.history, fconfig)
     count: dict[str, int] = {}
     for d in days:
-        zones = {r["h3_r7_origem"] for r in study.requests_by_date.get(d, [])
-                 if not r["fl_aceito"] and r["h3_r7_origem"] and window[0] <= r["hora_local"] < window[1]}
+        zones = {
+            r["h3_r7_origem"]
+            for r in study.requests_by_date.get(d, [])
+            if not r["fl_aceito"] and r["h3_r7_origem"] and window[0] <= r["hora_local"] < window[1]
+        }
         for z in zones:
             count[z] = count.get(z, 0) + 1
     return {z for z, n in count.items() if days and n >= share * len(days)}
 
 
 def _metrics(res, world_drivers: int) -> dict:
-    return {"n_requests": res.n_requests, "served": res.served, "pickup_km": res.pickup_km,
-            "reposition_km": res.reposition_km, "empty_km": res.empty_km, "wait_sum": sum(res.wait_s),
-            "moves_planned": res.moves_planned, "moves_executed": res.moves_executed,
-            "motoristas_mundo": world_drivers, "signature": res.signature}
+    return {
+        "n_requests": res.n_requests,
+        "served": res.served,
+        "pickup_km": res.pickup_km,
+        "reposition_km": res.reposition_km,
+        "empty_km": res.empty_km,
+        "wait_sum": sum(res.wait_s),
+        "moves_planned": res.moves_planned,
+        "moves_executed": res.moves_executed,
+        "motoristas_mundo": world_drivers,
+        "signature": res.signature,
+    }
 
 
-def evaluate_day(study, period: str, target: date, window_key: str, regime: str, sim: SimParams,
-                 specs: list[PlannerSpec], model: str, fconfig: fc.ForecastConfig = fc.ForecastConfig(),
-                 seeds: tuple[int, ...] = SEEDS, include_baseline: bool = True) -> list[dict]:
+def evaluate_day(
+    study,
+    period: str,
+    target: date,
+    window_key: str,
+    regime: str,
+    sim: SimParams,
+    specs: list[PlannerSpec],
+    model: str,
+    fconfig: fc.ForecastConfig = fc.ForecastConfig(),
+    seeds: tuple[int, ...] = SEEDS,
+    include_baseline: bool = True,
+) -> list[dict]:
     """Baseline e cada configuração em um dia; uma linha por (configuração, semente efetiva)."""
     window = ex.WINDOWS[window_key]
     move_mode = ex.EXECUTION[regime]
@@ -137,9 +158,19 @@ def evaluate_day(study, period: str, target: date, window_key: str, regime: str,
     key = {"periodo": period, "data": target.isoformat(), "janela": window_key, "regime": regime}
     rows = []
     if include_baseline:
-        rows.append({**key, "familia": "nenhum", "cenario": "sem_reposicionamento", "parametros": "{}",
-                     "semente": "", **_metrics(base, len(drivers)), "km_planejado": 0.0, "plan_seconds": 0.0,
-                     "info": "{}"})
+        rows.append(
+            {
+                **key,
+                "familia": "nenhum",
+                "cenario": "sem_reposicionamento",
+                "parametros": "{}",
+                "semente": "",
+                **_metrics(base, len(drivers)),
+                "km_planejado": 0.0,
+                "plan_seconds": 0.0,
+                "info": "{}",
+            }
+        )
     if not specs:
         return rows
     inputs, diag = study.plan_inputs(target, window, regime, drivers, sim.road_factor, model, fconfig)
@@ -152,22 +183,29 @@ def evaluate_day(study, period: str, target: date, window_key: str, regime: str,
         extras = {}
         if getattr(planner, "needs_deficit_zones", False):
             extras["zonas_deficit_persistente"] = persistent_deficit_zones(study, target, window, fconfig)
-        for seed in (seeds if planner.stochastic else seeds[:1]):
+        for seed in seeds if planner.stochastic else seeds[:1]:
             ctx = PlanContext(inputs, target, window, regime, sim, move_mode, scenarios or (), seed, extras)
             start = time.perf_counter()
             moves = planner.plan(ctx)
             elapsed = time.perf_counter() - start
             if any(km > planner.max_km + 1e-6 for _, _, km in moves.values()):
                 raise AssertionError(f"{spec.name}: movimento além do salto máximo")
-            res = simulate(reqs, drivers, sim, w, latlon(moves), max_move_km=planner.max_km,
-                           move_mode=move_mode, move_origins=origins)
+            res = simulate(reqs, drivers, sim, w, latlon(moves), max_move_km=planner.max_km, move_mode=move_mode, move_origins=origins)
             if res.signature != base.signature:
                 raise AssertionError("cenários com entradas diferentes (RN028)")
-            rows.append({**key, "familia": spec.family, "cenario": spec.name,
-                         "parametros": json.dumps(spec.params, sort_keys=True),
-                         "semente": seed if planner.stochastic else "", **_metrics(res, len(drivers)),
-                         "km_planejado": sum(km for _, _, km in moves.values()), "plan_seconds": elapsed,
-                         "info": json.dumps({**planner.info, "frota_plano": diag.get("previstos")}, default=str)})
+            rows.append(
+                {
+                    **key,
+                    "familia": spec.family,
+                    "cenario": spec.name,
+                    "parametros": json.dumps(spec.params, sort_keys=True),
+                    "semente": seed if planner.stochastic else "",
+                    **_metrics(res, len(drivers)),
+                    "km_planejado": sum(km for _, _, km in moves.values()),
+                    "plan_seconds": elapsed,
+                    "info": json.dumps({**planner.info, "frota_plano": diag.get("previstos")}, default=str),
+                }
+            )
     return rows
 
 
@@ -191,8 +229,7 @@ def _evaluator(args):
 
 def _task(args) -> list[dict]:
     period, day, window_key, regime, sim, specs, model, seeds, include_baseline = args[:9]
-    return _evaluator(args)(_STUDY, period, day, window_key, regime, sim, specs, model, seeds=seeds,
-                            include_baseline=include_baseline)
+    return _evaluator(args)(_STUDY, period, day, window_key, regime, sim, specs, model, seeds=seeds, include_baseline=include_baseline)
 
 
 def run_tasks(tasks: list[tuple], raw: Path = Path("data/raw"), workers: int = 1, study=None, echo=print) -> list[dict]:

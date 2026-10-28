@@ -3,6 +3,7 @@
 Saída individual (pedido a pedido, dias) fica em `<out>/<run_id>/`, ignorado pelo Git; apenas
 agregados sem dados individuais são copiados para `reports/tcc_final/` quando `--publish`.
 """
+
 from __future__ import annotations
 
 import csv
@@ -12,7 +13,7 @@ import subprocess
 import time
 from collections import Counter, defaultdict
 from dataclasses import asdict, replace
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime
 from pathlib import Path
 from statistics import mean, median
 
@@ -61,8 +62,7 @@ def outcome_table(silver) -> list[dict]:
     out = []
     for status in sorted({k[1] for k in counts}):
         t = rules.treatment(status)
-        row = {"status": status, "grupo_desfecho": t.grupo, "conta_como_demanda": t.demanda, "aceito": t.aceito,
-               "tratamento": t.descricao}
+        row = {"status": status, "grupo_desfecho": t.grupo, "conta_como_demanda": t.demanda, "aceito": t.aceito, "tratamento": t.descricao}
         for tag in ("historico56", "mar2026", "historico56_set", "set2026"):
             row[f"{tag}_imediatas"] = counts[(tag, status, True)]
             row[f"{tag}_agendadas"] = counts[(tag, status, False)]
@@ -99,8 +99,7 @@ def hour_band_analysis(gold, months: dict[str, tuple[date, date]]) -> list[dict]
         for band in HOUR_BANDS:
             acc, non = groups[(band, True)], groups[(band, False)]
             total = len(acc) + len(non)
-            row = {"periodo": label, "faixa": band, "pedidos": total,
-                   "nao_aceitos_pct": 100 * len(non) / total if total else float("nan")}
+            row = {"periodo": label, "faixa": band, "pedidos": total, "nao_aceitos_pct": 100 * len(non) / total if total else float("nan")}
             for name, values in (("aceitos", acc), ("nao_aceitos", non)):
                 known = [v for v in values if v is not None]
                 row[f"{name}_dist_livre_mediana_km"] = median(known) if known else float("nan")
@@ -121,8 +120,15 @@ def demand_by_hour(gold, months) -> list[dict]:
                 c[r["hora_local"]] += 1
                 a[r["hora_local"]] += r["fl_aceito"]
         for h in range(24):
-            out.append({"periodo": label, "hora": h, "pedidos_por_dia": c[h] / max(1, len(days)),
-                        "aceitos_por_dia": a[h] / max(1, len(days)), "aceite_pct": 100 * a[h] / c[h] if c[h] else float("nan")})
+            out.append(
+                {
+                    "periodo": label,
+                    "hora": h,
+                    "pedidos_por_dia": c[h] / max(1, len(days)),
+                    "aceitos_por_dia": a[h] / max(1, len(days)),
+                    "aceite_pct": 100 * a[h] / c[h] if c[h] else float("nan"),
+                }
+            )
     return out
 
 
@@ -172,15 +178,26 @@ def forecast_evaluation(study, echo) -> tuple[list[dict], list[dict], str]:
                         continue
                     e = fc.errors(pred, t, study.history, range(*window))
                     stage = "calibracao" if t in ex.PERIODS[period].calibration else "teste"
-                    rows.append({"modelo": model, "config": "padrao_56d_sem_carnaval", "periodo": period, "janela": wkey,
-                                 "data": t.isoformat(), "etapa": stage, **e})
+                    rows.append(
+                        {
+                            "modelo": model,
+                            "config": "padrao_56d_sem_carnaval",
+                            "periodo": period,
+                            "janela": wkey,
+                            "data": t.isoformat(),
+                            "etapa": stage,
+                            **e,
+                        }
+                    )
+
     # escolha: só calibração de março, janela principal, WAPE por zona-hora
     def wape(model, stage, period="mar2026", window=ex.MAIN_WINDOW):
         sel = [r for r in rows if r["modelo"] == model and r["etapa"] == stage and r["periodo"] == period and r["janela"] == window]
         return mean(r["wape_zona_hora"] for r in sel) if sel else float("inf")
+
     scores = {m: wape(m, "calibracao") for m in fc.MODELS}
     best = min(scores.values())
-    order = ["media_dia_semana", "naive_sazonal", "poisson"]   # do mais simples ao mais complexo
+    order = ["media_dia_semana", "naive_sazonal", "poisson"]  # do mais simples ao mais complexo
     chosen = next(m for m in order if scores[m] <= best * (1 + ex.FORECAST_MARGIN))
     echo(f"previsão: WAPE calibração {scores}; escolhido {chosen}")
     summary = []
@@ -188,21 +205,34 @@ def forecast_evaluation(study, echo) -> tuple[list[dict], list[dict], str]:
         for period in days:
             for wkey in ex.WINDOWS:
                 for stage in ("calibracao", "teste"):
-                    sel = [r for r in rows if r["modelo"] == model and r["periodo"] == period and r["janela"] == wkey and r["etapa"] == stage]
+                    sel = [
+                        r for r in rows if r["modelo"] == model and r["periodo"] == period and r["janela"] == wkey and r["etapa"] == stage
+                    ]
                     if not sel:
                         continue
                     obs = sum(r["observado_janela"] for r in sel)
-                    summary.append({"modelo": model, "periodo": period, "janela": wkey, "etapa": stage, "dias": len(sel),
-                                    "wape_zona_hora_medio": mean(r["wape_zona_hora"] for r in sel),
-                                    "mae_zona_hora_medio": mean(r["mae_zona_hora"] for r in sel),
-                                    "desvio_poisson_medio": mean(r["desvio_poisson_medio"] for r in sel),
-                                    "wape_total_janela": sum(r["erro_abs_total_janela"] for r in sel) / obs if obs else float("nan"),
-                                    "observado_medio_dia": obs / len(sel),
-                                    "previsto_medio_dia": sum(r["previsto_janela"] for r in sel) / len(sel),
-                                    "escolhido": model == chosen})
+                    summary.append(
+                        {
+                            "modelo": model,
+                            "periodo": period,
+                            "janela": wkey,
+                            "etapa": stage,
+                            "dias": len(sel),
+                            "wape_zona_hora_medio": mean(r["wape_zona_hora"] for r in sel),
+                            "mae_zona_hora_medio": mean(r["mae_zona_hora"] for r in sel),
+                            "desvio_poisson_medio": mean(r["desvio_poisson_medio"] for r in sel),
+                            "wape_total_janela": sum(r["erro_abs_total_janela"] for r in sel) / obs if obs else float("nan"),
+                            "observado_medio_dia": obs / len(sel),
+                            "previsto_medio_dia": sum(r["previsto_janela"] for r in sel) / len(sel),
+                            "escolhido": model == chosen,
+                        }
+                    )
     # sensibilidade da janela de treino e do Carnaval para o modelo escolhido
-    variants = {"28d": fc.ForecastConfig(lookback_days=28), "84d_limitado_ao_disponivel": fc.ForecastConfig(lookback_days=84),
-                "56d_com_carnaval": fc.ForecastConfig(excluded_dates=())}
+    variants = {
+        "28d": fc.ForecastConfig(lookback_days=28),
+        "84d_limitado_ao_disponivel": fc.ForecastConfig(lookback_days=84),
+        "56d_com_carnaval": fc.ForecastConfig(excluded_dates=()),
+    }
     for name, cfg in variants.items():
         for period, targets in days.items():
             sel = []
@@ -214,13 +244,22 @@ def forecast_evaluation(study, echo) -> tuple[list[dict], list[dict], str]:
                     sel.append(fc.errors(pred, t, study.history, range(*ex.WINDOWS[ex.MAIN_WINDOW])))
             if sel:
                 obs = sum(e["observado_janela"] for e in sel)
-                summary.append({"modelo": chosen, "periodo": period, "janela": ex.MAIN_WINDOW, "etapa": f"teste_{name}",
-                                "dias": len(sel), "wape_zona_hora_medio": mean(e["wape_zona_hora"] for e in sel),
-                                "mae_zona_hora_medio": mean(e["mae_zona_hora"] for e in sel),
-                                "desvio_poisson_medio": mean(e["desvio_poisson_medio"] for e in sel),
-                                "wape_total_janela": sum(e["erro_abs_total_janela"] for e in sel) / obs if obs else float("nan"),
-                                "observado_medio_dia": obs / len(sel),
-                                "previsto_medio_dia": sum(e["previsto_janela"] for e in sel) / len(sel), "escolhido": False})
+                summary.append(
+                    {
+                        "modelo": chosen,
+                        "periodo": period,
+                        "janela": ex.MAIN_WINDOW,
+                        "etapa": f"teste_{name}",
+                        "dias": len(sel),
+                        "wape_zona_hora_medio": mean(e["wape_zona_hora"] for e in sel),
+                        "mae_zona_hora_medio": mean(e["mae_zona_hora"] for e in sel),
+                        "desvio_poisson_medio": mean(e["desvio_poisson_medio"] for e in sel),
+                        "wape_total_janela": sum(e["erro_abs_total_janela"] for e in sel) / obs if obs else float("nan"),
+                        "observado_medio_dia": obs / len(sel),
+                        "previsto_medio_dia": sum(e["previsto_janela"] for e in sel) / len(sel),
+                        "escolhido": False,
+                    }
+                )
     return rows, summary, chosen
 
 
@@ -244,10 +283,18 @@ def select_policies(study, sim, model, echo) -> tuple[dict, list[dict]]:
     for name, algorithm, params in specs:
         days = ex.pair_days(rows, name)
         score, dr, dk = ex.efficiency(days)
-        table.append({"cenario": name, "algoritmo": algorithm, **params, "delta_corridas": dr, "delta_km_vazio": dk,
-                      "corridas_por_km_extra": score if score < 1e8 else float("inf"),
-                      "movimentos_executados": sum(d["p"]["moves_executed"] for d in days),
-                      "movimentos_planejados": sum(d["p"]["moves_planned"] for d in days)})
+        table.append(
+            {
+                "cenario": name,
+                "algoritmo": algorithm,
+                **params,
+                "delta_corridas": dr,
+                "delta_km_vazio": dk,
+                "corridas_por_km_extra": score if score < 1e8 else float("inf"),
+                "movimentos_executados": sum(d["p"]["moves_executed"] for d in days),
+                "movimentos_planejados": sum(d["p"]["moves_planned"] for d in days),
+            }
+        )
     # guloso: (ρ, dmax) com maior eficiência média sobre a grade de α
     best_g = None
     for rho in ex.RHO_GRID:
@@ -257,20 +304,33 @@ def select_policies(study, sim, model, echo) -> tuple[dict, list[dict]]:
             key = (mean(vals), -rho, -dmax)
             if best_g is None or key > best_g[0]:
                 best_g = (key, {"rho_km": rho, "max_km": dmax})
+
     def best_of(alg):
         sel = [t for t in table if t["algoritmo"] == alg]
-        return max(sel, key=lambda t: ((min(t["corridas_por_km_extra"], 1e3) if t["delta_corridas"] > 0 else min(0.0, t["delta_corridas"])),
-                                       -t.get("max_km", 0)))
+        return max(
+            sel,
+            key=lambda t: (
+                (min(t["corridas_por_km_extra"], 1e3) if t["delta_corridas"] > 0 else min(0.0, t["delta_corridas"])),
+                -t.get("max_km", 0),
+            ),
+        )
+
     bt, bp = best_of("regra_limiar"), best_of("proporcional")
-    selection = {"guloso_marginal": best_g[1],
-                 "regra_limiar": {"theta": bt["theta"], "rho_km": bt["rho_km"], "max_km": bt["max_km"]},
-                 "proporcional": {"max_km": bp["max_km"]}}
+    selection = {
+        "guloso_marginal": best_g[1],
+        "regra_limiar": {"theta": bt["theta"], "rho_km": bt["rho_km"], "max_km": bt["max_km"]},
+        "proporcional": {"max_km": bp["max_km"]},
+    }
     for t in table:
         t["selecionado"] = (
-            (t["algoritmo"] == "guloso_marginal" and t["rho_km"] == selection["guloso_marginal"]["rho_km"]
-             and t["max_km"] == selection["guloso_marginal"]["max_km"])
+            (
+                t["algoritmo"] == "guloso_marginal"
+                and t["rho_km"] == selection["guloso_marginal"]["rho_km"]
+                and t["max_km"] == selection["guloso_marginal"]["max_km"]
+            )
             or (t["algoritmo"] == "regra_limiar" and t["theta"] == bt["theta"] and t["max_km"] == bt["max_km"])
-            or (t["algoritmo"] == "proporcional" and t["max_km"] == bp["max_km"]))
+            or (t["algoritmo"] == "proporcional" and t["max_km"] == bp["max_km"])
+        )
     echo(f"seleção (calibração de março): {selection}")
     return selection, table
 
@@ -279,7 +339,7 @@ def select_policies(study, sim, model, echo) -> tuple[dict, list[dict]]:
 def final_run(raw: Path, out: Path, *, publish: Path | None = None, echo=print) -> dict:
     rules_salt = rules.load_salt()
     started = time.time()
-    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    run_id = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     run_dir = out / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
     batches = prepare_raw(raw, echo=echo)
@@ -301,8 +361,17 @@ def final_run(raw: Path, out: Path, *, publish: Path | None = None, echo=print) 
     forecast_rows, forecast_summary, model = forecast_evaluation(study, echo)
     tables["tab07_erros_previsao"] = forecast_summary
     tables["tab18_previsto_observado_diario"] = [
-        {"modelo": r["modelo"], "periodo": r["periodo"], "janela": r["janela"], "data": r["data"], "etapa": r["etapa"],
-         "observado": r["observado_janela"], "previsto": r["previsto_janela"]} for r in forecast_rows]
+        {
+            "modelo": r["modelo"],
+            "periodo": r["periodo"],
+            "janela": r["janela"],
+            "data": r["data"],
+            "etapa": r["etapa"],
+            "observado": r["observado_janela"],
+            "previsto": r["previsto_janela"],
+        }
+        for r in forecast_rows
+    ]
     zone_rows: dict[tuple[str, str], Counter] = defaultdict(Counter)
     for row in gold.demanda_zona_hora:
         for label, (first, last) in months.items():
@@ -331,10 +400,18 @@ def final_run(raw: Path, out: Path, *, publish: Path | None = None, echo=print) 
                     served += r.served
                     n += r.n_requests
                     waits += r.wait_s
-                fit.append({"periodo": name, "etapa": stage, "janela": wkey, "pedidos": n,
-                            "atendimento_sim_pct": 100 * served / max(1, n), "aceite_obs_pct": 100 * obs["taxa_aceite"],
-                            "tempo_ate_passageiro_mediano_sim_s": median(waits) if waits else float("nan"),
-                            "busca_mediana_obs_s": obs["busca_mediana_s"]})
+                fit.append(
+                    {
+                        "periodo": name,
+                        "etapa": stage,
+                        "janela": wkey,
+                        "pedidos": n,
+                        "atendimento_sim_pct": 100 * served / max(1, n),
+                        "aceite_obs_pct": 100 * obs["taxa_aceite"],
+                        "tempo_ate_passageiro_mediano_sim_s": median(waits) if waits else float("nan"),
+                        "busca_mediana_obs_s": obs["busca_mediana_s"],
+                    }
+                )
     tables["tab09_ajuste_baseline"] = fit
 
     selection, selection_table = select_policies(study, sims[ex.SELECTION_PERIOD], model, echo)
@@ -357,13 +434,22 @@ def final_run(raw: Path, out: Path, *, publish: Path | None = None, echo=print) 
                     if not days:
                         continue
                     diag = [d["p"].get("diag_frota", {}) for d in days]
-                    row = {"periodo": name, "janela": wkey, "regime": regime, "cenario": scen, "algoritmo": alg,
-                           "parametros": json.dumps(params), **compare(days, BOOTSTRAP_REPS, SEED),
-                           "tempo_plano_medio_s": mean(d["p"]["plan_seconds"] for d in days),
-                           "precisao_escala_pct": 100 * sum(x.get("acertos", 0) for x in diag) / max(1, sum(x.get("previstos", 0) for x in diag)),
-                           "revocacao_escala_pct": 100 * sum(x.get("acertos", 0) for x in diag) / max(1, sum(x.get("reais", 0) for x in diag)),
-                           "ganho_planejado_corridas": sum(d["p"]["planned_gain"] for d in days),
-                           "km_planejado": sum(d["p"]["planned_km"] for d in days)}
+                    row = {
+                        "periodo": name,
+                        "janela": wkey,
+                        "regime": regime,
+                        "cenario": scen,
+                        "algoritmo": alg,
+                        "parametros": json.dumps(params),
+                        **compare(days, BOOTSTRAP_REPS, SEED),
+                        "tempo_plano_medio_s": mean(d["p"]["plan_seconds"] for d in days),
+                        "precisao_escala_pct": 100
+                        * sum(x.get("acertos", 0) for x in diag)
+                        / max(1, sum(x.get("previstos", 0) for x in diag)),
+                        "revocacao_escala_pct": 100 * sum(x.get("acertos", 0) for x in diag) / max(1, sum(x.get("reais", 0) for x in diag)),
+                        "ganho_planejado_corridas": sum(d["p"]["planned_gain"] for d in days),
+                        "km_planejado": sum(d["p"]["planned_km"] for d in days),
+                    }
                     main.append(row)
     tables["tab11_principal"] = main
 
@@ -379,10 +465,19 @@ def final_run(raw: Path, out: Path, *, publish: Path | None = None, echo=print) 
                 n = sum(d["b"]["requests_by_hour"].get(h, 0) for d in days)
                 kb = sum(d["b"]["pickup_by_hour"].get(h, 0.0) for d in days)
                 kp = sum(d["p"]["pickup_by_hour"].get(h, 0.0) for d in days)
-                by_hour.append({"periodo": name, "cenario": scen, "hora": h, "pedidos": n, "atendidas_base": b,
-                                "atendidas_prop": p, "corridas_extras": p - b,
-                                "km_busca_por_corrida_base": kb / b if b else float("nan"),
-                                "km_busca_por_corrida_prop": kp / p if p else float("nan")})
+                by_hour.append(
+                    {
+                        "periodo": name,
+                        "cenario": scen,
+                        "hora": h,
+                        "pedidos": n,
+                        "atendidas_base": b,
+                        "atendidas_prop": p,
+                        "corridas_extras": p - b,
+                        "km_busca_por_corrida_base": kb / b if b else float("nan"),
+                        "km_busca_por_corrida_prop": kp / p if p else float("nan"),
+                    }
+                )
     tables["tab12_por_faixa_horaria"] = by_hour
 
     # sensibilidades (uma variável por vez): março, teste, 04-11, regime B, guloso intermediário
@@ -400,8 +495,14 @@ def final_run(raw: Path, out: Path, *, publish: Path | None = None, echo=print) 
         ("paciencia_x0.5", {"sim": replace(base_sim, patience_s=base_sim.patience_s * 0.5)}),
         ("paciencia_x2", {"sim": replace(base_sim, patience_s=base_sim.patience_s * 2)}),
         ("cancelamento_pos_aceite", {"sim": replace(base_sim, post_accept_cancel=True)}),
-        ("limite_distancia_3km", {"spec": [(inter, "guloso_marginal", {"alpha": ex.NAMED_ALPHA["intermediaria"], "rho_km": g["rho_km"], "max_km": 3.0})]}),
-        ("limite_distancia_10km", {"spec": [(inter, "guloso_marginal", {"alpha": ex.NAMED_ALPHA["intermediaria"], "rho_km": g["rho_km"], "max_km": 10.0})]}),
+        (
+            "limite_distancia_3km",
+            {"spec": [(inter, "guloso_marginal", {"alpha": ex.NAMED_ALPHA["intermediaria"], "rho_km": g["rho_km"], "max_km": 3.0})]},
+        ),
+        (
+            "limite_distancia_10km",
+            {"spec": [(inter, "guloso_marginal", {"alpha": ex.NAMED_ALPHA["intermediaria"], "rho_km": g["rho_km"], "max_km": 10.0})]},
+        ),
         ("treino_28d", {"fconfig": fc.ForecastConfig(lookback_days=28)}),
         ("treino_84d_limitado", {"fconfig": fc.ForecastConfig(lookback_days=84)}),
         ("treino_com_carnaval", {"fconfig": fc.ForecastConfig(excluded_dates=())}),
@@ -415,9 +516,19 @@ def final_run(raw: Path, out: Path, *, publish: Path | None = None, echo=print) 
     for label, v in [("referencia", {})] + variants:
         rows = []
         for day in period.test:
-            rows += ex.run_day(study, period.name, day, ex.MAIN_WINDOW, v.get("regime", ex.MAIN_REGIME), v.get("sim", base_sim),
-                               v.get("spec", inter_spec), v.get("model", model), v.get("fconfig", fc.ForecastConfig()),
-                               move_mode=v.get("move_mode"), position_cut_hour=v.get("position_cut_hour"))
+            rows += ex.run_day(
+                study,
+                period.name,
+                day,
+                ex.MAIN_WINDOW,
+                v.get("regime", ex.MAIN_REGIME),
+                v.get("sim", base_sim),
+                v.get("spec", inter_spec),
+                v.get("model", model),
+                v.get("fconfig", fc.ForecastConfig()),
+                move_mode=v.get("move_mode"),
+                position_cut_hour=v.get("position_cut_hour"),
+            )
         days = ex.pair_days(rows, inter)
         sens.append({"variacao": label, **compare(days, BOOTSTRAP_REPS, SEED)})
     tables["tab13_sensibilidade"] = sens
@@ -428,48 +539,103 @@ def final_run(raw: Path, out: Path, *, publish: Path | None = None, echo=print) 
         if r["janela"] != ex.MAIN_WINDOW:
             continue
         e = r["km_vazio_incremental_por_corrida_extra"]
-        breakeven.append({k: r[k] for k in ("periodo", "regime", "cenario")} | {
-            "corridas_extras_por_dia": r["corridas_extras_por_dia"],
-            "km_vazio_incremental_por_corrida_extra": e,
-            "ic_inf": r["km_vazio_incremental_por_corrida_extra_ic_inf"],
-            "ic_sup": r["km_vazio_incremental_por_corrida_extra_ic_sup"],
-            "regra": "vantajoso se margem por corrida extra > e x custo marginal por km (valores a fornecer)"})
+        breakeven.append(
+            {k: r[k] for k in ("periodo", "regime", "cenario")}
+            | {
+                "corridas_extras_por_dia": r["corridas_extras_por_dia"],
+                "km_vazio_incremental_por_corrida_extra": e,
+                "ic_inf": r["km_vazio_incremental_por_corrida_extra_ic_inf"],
+                "ic_sup": r["km_vazio_incremental_por_corrida_extra_ic_sup"],
+                "regra": "vantajoso se margem por corrida extra > e x custo marginal por km (valores a fornecer)",
+            }
+        )
     tables["tab14_ponto_equilibrio"] = breakeven
 
     ladder = [r for r in main if r["janela"] == ex.MAIN_WINDOW and r["cenario"] in ("proporcional", inter, "regra_limiar")]
-    tables["tab15_escada_informacao"] = [{k: r[k] for k in (
-        "periodo", "regime", "cenario", "taxa_execucao_pct", "precisao_escala_pct", "revocacao_escala_pct",
-        "corridas_atendidas_var_pct", "corridas_atendidas_var_pct_ic_inf", "corridas_atendidas_var_pct_ic_sup",
-        "km_vazio_por_corrida_var_pct", "km_vazio_por_corrida_var_pct_ic_inf", "km_vazio_por_corrida_var_pct_ic_sup")}
-        for r in ladder]
+    tables["tab15_escada_informacao"] = [
+        {
+            k: r[k]
+            for k in (
+                "periodo",
+                "regime",
+                "cenario",
+                "taxa_execucao_pct",
+                "precisao_escala_pct",
+                "revocacao_escala_pct",
+                "corridas_atendidas_var_pct",
+                "corridas_atendidas_var_pct_ic_inf",
+                "corridas_atendidas_var_pct_ic_sup",
+                "km_vazio_por_corrida_var_pct",
+                "km_vazio_por_corrida_var_pct_ic_inf",
+                "km_vazio_por_corrida_var_pct_ic_sup",
+            )
+        }
+        for r in ladder
+    ]
 
     pareto = [r for r in main if r["algoritmo"] in ("guloso_marginal", "proporcional", "regra_limiar") and r["janela"] == ex.MAIN_WINDOW]
-    tables["tab16_fronteira_pareto"] = [{k: r[k] for k in (
-        "periodo", "regime", "cenario", "parametros", "corridas_atendidas_var_pct", "corridas_atendidas_var_pct_ic_inf",
-        "corridas_atendidas_var_pct_ic_sup", "km_vazio_por_corrida_var_pct", "km_vazio_por_corrida_var_pct_ic_inf",
-        "km_vazio_por_corrida_var_pct_ic_sup", "km_reposicionamento_por_dia", "km_vazio_incremental_por_corrida_extra")}
-        for r in pareto]
+    tables["tab16_fronteira_pareto"] = [
+        {
+            k: r[k]
+            for k in (
+                "periodo",
+                "regime",
+                "cenario",
+                "parametros",
+                "corridas_atendidas_var_pct",
+                "corridas_atendidas_var_pct_ic_inf",
+                "corridas_atendidas_var_pct_ic_sup",
+                "km_vazio_por_corrida_var_pct",
+                "km_vazio_por_corrida_var_pct_ic_inf",
+                "km_vazio_por_corrida_var_pct_ic_sup",
+                "km_reposicionamento_por_dia",
+                "km_vazio_incremental_por_corrida_extra",
+            )
+        }
+        for r in pareto
+    ]
 
     for name, rows in tables.items():
         write_csv(run_dir / f"{name}.csv", rows)
-    write_csv(run_dir / "individual" / "dias_cenarios.csv",
-              [{k: (json.dumps(v) if isinstance(v, (dict, list)) else v) for k, v in r.items()} for r in daily])
+    write_csv(
+        run_dir / "individual" / "dias_cenarios.csv",
+        [{k: (json.dumps(v) if isinstance(v, (dict, list)) else v) for k, v in r.items()} for r in daily],
+    )
     write_csv(run_dir / "individual" / "previsao_por_dia.csv", forecast_rows)
 
     result = {
-        "run_id": run_id, "gerado_em": datetime.now(timezone.utc).isoformat(), "duracao_s": round(time.time() - started, 1),
-        "versao_codigo": code_version(), "semente_bootstrap": SEED, "reamostragens": BOOTSTRAP_REPS,
+        "run_id": run_id,
+        "gerado_em": datetime.now(UTC).isoformat(),
+        "duracao_s": round(time.time() - started, 1),
+        "versao_codigo": code_version(),
+        "semente_bootstrap": SEED,
+        "reamostragens": BOOTSTRAP_REPS,
         "hashes_entrada_sha256": hashes,
-        "contagens_ingeridas": dict(silver.ingested), "filtros_universo": dict(gold.filtros),
+        "contagens_ingeridas": dict(silver.ingested),
+        "filtros_universo": dict(gold.filtros),
         "configuracao": {
-            "periodos": {k: {"calibracao": [d.isoformat() for d in p.calibration], "teste": [d.isoformat() for d in p.test]}
-                         for k, p in ex.PERIODS.items()},
-            "janelas": ex.WINDOWS, "janela_principal": ex.MAIN_WINDOW, "regime_principal": ex.MAIN_REGIME,
-            "grades": {"raio": ex.RADIUS_GRID, "paciencia": ex.PATIENCE_GRID, "alpha": ex.ALPHA_GRID, "rho": ex.RHO_GRID,
-                       "dmax": ex.DMAX_GRID, "theta": ex.THETA_GRID, "dmax_limiar": ex.THRESHOLD_DMAX,
-                       "dmax_proporcional": ex.PROP_DMAX},
-            "alpha_nomeados": ex.NAMED_ALPHA, "modelo_previsao": model, "previsao": asdict(fc.ForecastConfig()),
-            "parametros_medidos": measured, "simulador": {k: asdict(v) for k, v in sims.items()},
+            "periodos": {
+                k: {"calibracao": [d.isoformat() for d in p.calibration], "teste": [d.isoformat() for d in p.test]}
+                for k, p in ex.PERIODS.items()
+            },
+            "janelas": ex.WINDOWS,
+            "janela_principal": ex.MAIN_WINDOW,
+            "regime_principal": ex.MAIN_REGIME,
+            "grades": {
+                "raio": ex.RADIUS_GRID,
+                "paciencia": ex.PATIENCE_GRID,
+                "alpha": ex.ALPHA_GRID,
+                "rho": ex.RHO_GRID,
+                "dmax": ex.DMAX_GRID,
+                "theta": ex.THETA_GRID,
+                "dmax_limiar": ex.THRESHOLD_DMAX,
+                "dmax_proporcional": ex.PROP_DMAX,
+            },
+            "alpha_nomeados": ex.NAMED_ALPHA,
+            "modelo_previsao": model,
+            "previsao": asdict(fc.ForecastConfig()),
+            "parametros_medidos": measured,
+            "simulador": {k: asdict(v) for k, v in sims.items()},
             "selecao": selection,
         },
         "tabelas": {k: f"{k}.csv" for k in tables},
@@ -481,7 +647,7 @@ def final_run(raw: Path, out: Path, *, publish: Path | None = None, echo=print) 
         from tcc_frota.v2.figures import make_figures
 
         result["figuras"] = make_figures(run_dir, run_dir / "figuras")
-    except ImportError as exc:   # matplotlib/h3 são extras opcionais
+    except ImportError as exc:  # matplotlib/h3 são extras opcionais
         result["figuras"] = f"não geradas: {exc}"
     (run_dir / "result.json").write_text(json.dumps(result, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
     if publish is not None:

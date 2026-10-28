@@ -11,6 +11,7 @@ feito às 20h de D com um de três regimes:
   com a empresa). Variante de sensibilidade: posição às 20h.
 - C (oráculo): posições e horários reais de D+1. Viola o corte; serve só para diagnóstico.
 """
+
 from __future__ import annotations
 
 import bisect
@@ -35,7 +36,7 @@ class PlannedDriver:
     did: str
     lat: float
     lon: float
-    start_h: float   # hora prevista de início (horas desde a meia-noite de D+1)
+    start_h: float  # hora prevista de início (horas desde a meia-noite de D+1)
     end_h: float
 
 
@@ -110,13 +111,13 @@ def rides_from_silver(solicitacoes: list[dict]) -> list[dict]:
         lon = r["lon_destino_real"] if r["lon_destino_real"] is not None else r["lon_destino"]
         if r["status"] != "CorridaEncerrada" or lat is None:
             lat, lon = r["lat_origem"], r["lon_origem"]
-        out.append({"codigo": r["codigo"], "did": r["motorista_pseud"], "start": start, "end": end,
-                    "lat": lat, "lon": lon})
+        out.append({"codigo": r["codigo"], "did": r["motorista_pseud"], "start": start, "end": end, "lat": lat, "lon": lon})
     return out
 
 
-def build_world(index: FleetIndex, requests_day: list[dict], target: date, window: tuple[int, int],
-                trip_seconds_fallback, tail_h: int = 3) -> tuple[list[SimRequest], list[SimDriver]]:
+def build_world(
+    index: FleetIndex, requests_day: list[dict], target: date, window: tuple[int, int], trip_seconds_fallback, tail_h: int = 3
+) -> tuple[list[SimRequest], list[SimDriver]]:
     """Pedidos do universo na janela e motoristas reais de D+1 com sessões e compromissos."""
     w0, w1 = window[0] * 3600.0, window[1] * 3600.0
     horizon = w1 + tail_h * 3600
@@ -128,9 +129,21 @@ def build_world(index: FleetIndex, requests_day: list[dict], target: date, windo
             continue
         in_window.add(r["codigo"])
         trip = r["dur_viagem_obs_s"] or trip_seconds_fallback(r)
-        reqs.append(SimRequest(r["codigo"], t, r["lat_origem"], r["lon_origem"], r["lat_destino"], r["lon_destino"],
-                               trip, r["s_espera_ate_desistir"], r["fl_cancelada_pos_aceite"], r["hora_local"],
-                               r["h3_r7_origem"] or ""))
+        reqs.append(
+            SimRequest(
+                r["codigo"],
+                t,
+                r["lat_origem"],
+                r["lon_origem"],
+                r["lat_destino"],
+                r["lon_destino"],
+                trip,
+                r["s_espera_ate_desistir"],
+                r["fl_cancelada_pos_aceite"],
+                r["hora_local"],
+                r["h3_r7_origem"] or "",
+            )
+        )
     sessions: dict[str, list] = defaultdict(list)
     for s in index.sessions.get(target, []):
         start, end = seconds(s["ts_inicio"], target), seconds(s["ts_fim"], target)
@@ -168,9 +181,15 @@ def end_of_day(target: date) -> datetime:
     return datetime.combine(target, time(0), TZ) - timedelta(microseconds=1)
 
 
-def planned_fleet(regime: str, index: FleetIndex, target: date, window: tuple[int, int],
-                  world: list[SimDriver], min_presence: float = 0.5,
-                  position_cut_hour: int | None = None) -> tuple[list[PlannedDriver], dict]:
+def planned_fleet(
+    regime: str,
+    index: FleetIndex,
+    target: date,
+    window: tuple[int, int],
+    world: list[SimDriver],
+    min_presence: float = 0.5,
+    position_cut_hour: int | None = None,
+) -> tuple[list[PlannedDriver], dict]:
     """Frota que o planejador enxerga no corte, por regime, e diagnóstico de precisão/revocação.
 
     Posição: A usa o corte de 20h; B usa o fim de D (ou `position_cut_hour`, se dado)."""
@@ -197,8 +216,7 @@ def planned_fleet(regime: str, index: FleetIndex, target: date, window: tuple[in
             start, _, lat, lon = first
             end = max(e for _, e, _, _ in d.sessions)
             out.append(PlannedDriver(d.did, lat, lon, max(start, w0) / 3600, min(end, w1) / 3600))
-        return out, {"previstos": len(out), "reais": len(actual), "acertos": len(out), "sem_posicao": 0,
-                     "dias_comparaveis": len(days)}
+        return out, {"previstos": len(out), "reais": len(actual), "acertos": len(out), "sem_posicao": 0, "dias_comparaveis": len(days)}
     else:
         raise ValueError(regime)
     out, missing = [], 0
@@ -210,5 +228,4 @@ def planned_fleet(regime: str, index: FleetIndex, target: date, window: tuple[in
         start, end = typical.get(did, (w0 / 3600, w1 / 3600))
         out.append(PlannedDriver(did, p[0], p[1], start, end))
     hits = len({d.did for d in out} & actual)
-    return out, {"previstos": len(out), "reais": len(actual), "acertos": hits, "sem_posicao": missing,
-                 "dias_comparaveis": len(days)}
+    return out, {"previstos": len(out), "reais": len(actual), "acertos": hits, "sem_posicao": missing, "dias_comparaveis": len(days)}

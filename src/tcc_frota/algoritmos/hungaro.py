@@ -11,6 +11,7 @@ Matriz de custo motorista i × coluna j, com N colunas "livre" (custo 0, não me
 as soluções com o máximo de vagas, minimiza o km dos movimentos. Diferença para 5.1: o custo é medido do
 motorista (não do centróide da zona dele) até a vaga e a escolha de quem se move é ótima, não gulosa.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -63,6 +64,11 @@ class HungaroPosicoesEspera(Planner):
             d, z = drivers[i], slots[j]
             if zone_of[d.did] != z and km[i, j] > 1e-9:
                 moves[d.did] = (inp.zones[z][0], inp.zones[z][1], float(km[i, j]))
-        self.info = {"status": "otimo", "vagas": len(slots), "vagas_preenchidas": filled, "movimentos": len(moves),
-                     "objetivo_km": sum(m[2] for m in moves.values())}
+        self.info = {
+            "status": "otimo",
+            "vagas": len(slots),
+            "vagas_preenchidas": filled,
+            "movimentos": len(moves),
+            "objetivo_km": sum(m[2] for m in moves.values()),
+        }
         return moves

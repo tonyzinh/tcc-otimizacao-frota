@@ -4,6 +4,7 @@ Lê `resultados/finalistas_<mes>_dias.csv`, agrega as sementes por dia, recalcul
 total por corrida e das corridas (regime B) com bootstrap pareado de dias em NumPy (gerador diferente
 do usado na bateria) e confere B + R = total linha a linha. Uso: python scripts/checagem_independente.py [pasta]
 """
+
 from __future__ import annotations
 
 import csv
@@ -31,7 +32,7 @@ def load(path: Path):
 
 def main() -> int:
     rng = np.random.default_rng(987654321)
-    folder = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("resultados")   # ex.: resultados/seletivo
+    folder = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("resultados")  # ex.: resultados/seletivo
     for month in ("marco", "setembro"):
         path = folder / f"finalistas_{month}_dias.csv"
         if not path.exists():
@@ -50,8 +51,10 @@ def main() -> int:
             sv_point, sv_boot = served(p, b), served(p[idx], b[idx])
             lo, hi = np.percentile(km_boot, [2.5, 97.5])
             slo, shi = np.percentile(sv_boot, [2.5, 97.5])
-            print(f"  {c:<28} km vazio/corrida {100 * km_point:+7.2f}% [{100 * lo:+.2f}; {100 * hi:+.2f}]   "
-                  f"corridas {100 * sv_point:+6.2f}% [{100 * slo:+.2f}; {100 * shi:+.2f}]")
+            print(
+                f"  {c:<28} km vazio/corrida {100 * km_point:+7.2f}% [{100 * lo:+.2f}; {100 * hi:+.2f}]   "
+                f"corridas {100 * sv_point:+6.2f}% [{100 * slo:+.2f}; {100 * shi:+.2f}]"
+            )
     return 0
 
 

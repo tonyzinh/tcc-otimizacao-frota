@@ -6,6 +6,7 @@ corrida. Corridas extras = atendidas no cenário e não no baseline do mesmo dia
 perdidas = atendidas só no baseline. Antes de usar o rastro, confere corridas e KM de busca de cada dia contra
 os CSV diários existentes. Só agregados saem do módulo.
 """
+
 from __future__ import annotations
 
 import bisect
@@ -40,15 +41,25 @@ def day_rides(study, period: str, target, sim, spec: PlannerSpec, model: str, se
     scen = build_scenarios(study, period, target, window, fc.ForecastConfig()) if getattr(planner, "needs_scenarios", False) else ()
     moves = planner.plan(PlanContext(inputs, target, window, regime, sim, ex.EXECUTION[regime], scen, seed))
     tp: list = []
-    res = simulate(reqs, drivers, sim, w, latlon(moves), max_move_km=planner.max_km, move_mode=ex.EXECUTION[regime],
-                   move_origins=origins, trace=tp)
+    res = simulate(
+        reqs, drivers, sim, w, latlon(moves), max_move_km=planner.max_km, move_mode=ex.EXECUTION[regime], move_origins=origins, trace=tp
+    )
     pb, pp = _pickups(tb), _pickups(tp)
     assert len(pb) == base.served and abs(sum(pb.values()) - base.pickup_km) < 1e-6
     assert len(pp) == res.served and abs(sum(pp.values()) - res.pickup_km) < 1e-6
-    return {"data": target.isoformat(), "semente": seed if planner.stochastic else "", "cenario": spec.name,
-            "served_base": base.served, "pickup_base": base.pickup_km, "served": res.served, "pickup": res.pickup_km,
-            "extras": [pp[r] for r in pp.keys() - pb.keys()], "comuns": [pp[r] for r in pp.keys() & pb.keys()],
-            "perdidas_base": [pb[r] for r in pb.keys() - pp.keys()], "baseline": list(pb.values())}
+    return {
+        "data": target.isoformat(),
+        "semente": seed if planner.stochastic else "",
+        "cenario": spec.name,
+        "served_base": base.served,
+        "pickup_base": base.pickup_km,
+        "served": res.served,
+        "pickup": res.pickup_km,
+        "extras": [pp[r] for r in pp.keys() - pb.keys()],
+        "comuns": [pp[r] for r in pp.keys() & pb.keys()],
+        "perdidas_base": [pb[r] for r in pb.keys() - pp.keys()],
+        "baseline": list(pb.values()),
+    }
 
 
 def summary(values: list[float]) -> dict:
@@ -69,10 +80,17 @@ def real_pickup(study, days) -> dict:
     for h in study.silver.historico:
         hist.setdefault(h["codigo"], h)
     accepted = [r for d in days for r in study.requests_by_date.get(d, []) if r["fl_aceito"] and 4 <= r["hora_local"] < 11]
-    vals = [hist[r["codigo"]]["dist_motorista_m"] / 1000 for r in accepted
-            if r["codigo"] in hist and hist[r["codigo"]]["dist_motorista_m"] not in (None, "")]
-    return {"aceitas": len(accepted), "com_pickup_realizado": len(vals),
-            "cobertura_pct": 100 * len(vals) / len(accepted) if accepted else float("nan"), "valores": vals}
+    vals = [
+        hist[r["codigo"]]["dist_motorista_m"] / 1000
+        for r in accepted
+        if r["codigo"] in hist and hist[r["codigo"]]["dist_motorista_m"] not in (None, "")
+    ]
+    return {
+        "aceitas": len(accepted),
+        "com_pickup_realizado": len(vals),
+        "cobertura_pct": 100 * len(vals) / len(accepted) if accepted else float("nan"),
+        "valores": vals,
+    }
 
 
 def unserved_by_distance(study, days) -> list[dict]:
@@ -101,6 +119,13 @@ def unserved_by_distance(study, days) -> list[dict]:
             a[0] += 1
             a[1] += not r["fl_aceito"]
     order = [f"[{a:g},{b:g})" if b != float("inf") else f">={a:g}" for a, b in DIST_BANDS] + ["sem_livre_na_foto", "sem_foto_ate_10min"]
-    return [{"faixa_distancia_km": b, "pedidos": acc[b][0], "nao_aceitos": acc[b][1],
-             "nao_aceite_pct": 100 * acc[b][1] / acc[b][0] if acc[b][0] else float("nan"),
-             "participacao_pct": 100 * acc[b][0] / total if total else float("nan")} for b in order]
+    return [
+        {
+            "faixa_distancia_km": b,
+            "pedidos": acc[b][0],
+            "nao_aceitos": acc[b][1],
+            "nao_aceite_pct": 100 * acc[b][1] / acc[b][0] if acc[b][0] else float("nan"),
+            "participacao_pct": 100 * acc[b][0] / total if total else float("nan"),
+        }
+        for b in order
+    ]

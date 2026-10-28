@@ -5,11 +5,12 @@ previsão e dos parâmetros dos algoritmos **somente** nos dias de calibração 
 nos dias de teste de março e de setembro com parâmetros congelados; (4) sensibilidades, uma variável
 por vez. Tudo o que é testado é guardado nas linhas diárias e reportado.
 """
+
 from __future__ import annotations
 
 import time as _time
 from collections import defaultdict
-from dataclasses import asdict, dataclass, replace
+from dataclasses import dataclass
 from datetime import date, timedelta
 from statistics import median
 
@@ -51,7 +52,7 @@ DMAX_GRID = (3.0, 6.0, 10.0)
 THETA_GRID = (0.05, 0.1, 0.2, 0.5)
 THRESHOLD_DMAX = (3.0, 6.0)
 PROP_DMAX = (3.0, 6.0, 12.0)
-FORECAST_MARGIN = 0.05   # modelo mais simples que não perca por mais de 5% no WAPE
+FORECAST_MARGIN = 0.05  # modelo mais simples que não perca por mais de 5% no WAPE
 
 
 class Study:
@@ -81,8 +82,11 @@ class Study:
         reqs = [r for d in dates for r in self.requests_by_date.get(d, []) if window[0] <= r["hora_local"] < window[1]]
         accepted = [r for r in reqs if r["fl_aceito"]]
         search = [r["s_registro_ate_chegada"] for r in reqs if r["grupo_desfecho"] == "atendida" and r["s_registro_ate_chegada"]]
-        return {"pedidos": len(reqs), "taxa_aceite": len(accepted) / max(1, len(reqs)),
-                "busca_mediana_s": median(search) if search else float("nan")}
+        return {
+            "pedidos": len(reqs),
+            "taxa_aceite": len(accepted) / max(1, len(reqs)),
+            "busca_mediana_s": median(search) if search else float("nan"),
+        }
 
     def measured_parameters(self, dates: tuple[date, ...]) -> dict[str, float]:
         """Fator rua/reta, velocidade de busca e modelo de duração, só com os dias dados."""
@@ -108,10 +112,15 @@ class Study:
                 reta = _km(p[0], p[1], r["lat_origem"], r["lon_origem"])
                 if reta >= 0.5:
                     pick_factor.append(h["dist_motorista_m"] / 1000 / reta)
-        return {"fator_rua_reta_busca": median(pick_factor), "n_fator_busca": len(pick_factor),
-                "velocidade_busca_kmh": median(pick_speed), "n_velocidade": len(pick_speed),
-                "fator_rua_reta_viagem": median(trip_factor), "velocidade_viagem_kmh": median(trip_speed),
-                "n_viagem": len(trip_factor)}
+        return {
+            "fator_rua_reta_busca": median(pick_factor),
+            "n_fator_busca": len(pick_factor),
+            "velocidade_busca_kmh": median(pick_speed),
+            "n_velocidade": len(pick_speed),
+            "fator_rua_reta_viagem": median(trip_factor),
+            "velocidade_viagem_kmh": median(trip_speed),
+            "n_viagem": len(trip_factor),
+        }
 
     # ---------- mundo e entradas do plano ----------
     def world(self, period: str, target: date, window: tuple[int, int]):
@@ -128,13 +137,21 @@ class Study:
     def kappa(self, target: date, window: tuple[int, int]) -> float:
         cut_day = target - timedelta(days=1)
         days = [d for d in self.fleet.dates if cut_day - timedelta(days=28) < d <= cut_day]
-        rides = sum(r["fl_aceito"] for d in days for r in self.requests_by_date.get(d, [])
-                    if window[0] <= r["hora_local"] < window[1])
+        rides = sum(r["fl_aceito"] for d in days for r in self.requests_by_date.get(d, []) if window[0] <= r["hora_local"] < window[1])
         hours = sum(self.driver_hours.get((d, h), 0.0) for d in days for h in range(*window))
         return rides / hours if hours > 0 else 0.5
 
-    def plan_inputs(self, target: date, window: tuple[int, int], regime: str, world_drivers, road_factor: float,
-                    model: str, fconfig: fc.ForecastConfig, position_cut_hour: int | None = None) -> tuple[PlanInputs, dict]:
+    def plan_inputs(
+        self,
+        target: date,
+        window: tuple[int, int],
+        regime: str,
+        world_drivers,
+        road_factor: float,
+        model: str,
+        fconfig: fc.ForecastConfig,
+        position_cut_hour: int | None = None,
+    ) -> tuple[PlanInputs, dict]:
         hours = tuple(range(*window))
         demand = fc.predict(model, target, self.history, range(*window), fconfig)
         train = fc.training_dates(target, self.history, fconfig)
@@ -146,22 +163,31 @@ class Study:
                 acc[1] += b
                 acc[2] += n
         zones = {z: (a / n, b / n) for z, (a, b, n) in sums.items() if n > 0}
-        drivers, diag = planned_fleet(regime, self.fleet, target, window, world_drivers,
-                                      position_cut_hour=position_cut_hour)
+        drivers, diag = planned_fleet(regime, self.fleet, target, window, world_drivers, position_cut_hour=position_cut_hour)
         diag["kappa"] = self.kappa(target, window)
         diag["demanda_prevista"] = sum(demand.values())
         return PlanInputs(tuple(drivers), zones, demand, hours, diag["kappa"], road_factor), diag
 
 
 def metrics(res, plan=None, plan_seconds: float = 0.0) -> dict:
-    return {"n_requests": res.n_requests, "served": res.served, "pickup_km": res.pickup_km,
-            "reposition_km": res.reposition_km, "empty_km": res.empty_km, "wait_sum": sum(res.wait_s),
-            "wait_median": median(res.wait_s) if res.wait_s else float("nan"),
-            "moves_planned": res.moves_planned, "moves_executed": res.moves_executed,
-            "planned_gain": plan.expected_gain if plan else 0.0, "planned_km": plan.planned_km if plan else 0.0,
-            "plan_seconds": plan_seconds, "signature": res.signature,
-            "served_by_hour": dict(res.served_by_hour), "requests_by_hour": dict(res.requests_by_hour),
-            "pickup_by_hour": dict(res.pickup_km_by_hour)}
+    return {
+        "n_requests": res.n_requests,
+        "served": res.served,
+        "pickup_km": res.pickup_km,
+        "reposition_km": res.reposition_km,
+        "empty_km": res.empty_km,
+        "wait_sum": sum(res.wait_s),
+        "wait_median": median(res.wait_s) if res.wait_s else float("nan"),
+        "moves_planned": res.moves_planned,
+        "moves_executed": res.moves_executed,
+        "planned_gain": plan.expected_gain if plan else 0.0,
+        "planned_km": plan.planned_km if plan else 0.0,
+        "plan_seconds": plan_seconds,
+        "signature": res.signature,
+        "served_by_hour": dict(res.served_by_hour),
+        "requests_by_hour": dict(res.requests_by_hour),
+        "pickup_by_hour": dict(res.pickup_km_by_hour),
+    }
 
 
 def policy_specs(selection: dict) -> list[tuple[str, str, dict]]:
@@ -169,8 +195,7 @@ def policy_specs(selection: dict) -> list[tuple[str, str, dict]]:
     g = selection["guloso_marginal"]
     specs = [("proporcional", "proporcional", {"max_km": selection["proporcional"]["max_km"]})]
     for alpha in ALPHA_GRID:
-        specs.append((f"guloso_marginal_a{alpha:g}", "guloso_marginal",
-                      {"alpha": alpha, "rho_km": g["rho_km"], "max_km": g["max_km"]}))
+        specs.append((f"guloso_marginal_a{alpha:g}", "guloso_marginal", {"alpha": alpha, "rho_km": g["rho_km"], "max_km": g["max_km"]}))
     t = selection["regra_limiar"]
     specs.append(("regra_limiar", "regra_limiar", t))
     return specs
@@ -189,16 +214,37 @@ def make_plan(algorithm: str, inputs: PlanInputs, params: dict):
 EXECUTION = {"A": "inicio_turno", "B": "fim_do_dia", "C": "fim_do_dia"}
 
 
-def run_day(study: Study, period: str, target: date, window_key: str, regime: str, sim: SimParams,
-            specs: list[tuple[str, str, dict]], model: str, fconfig: fc.ForecastConfig, *,
-            move_mode: str | None = None, position_cut_hour: int | None = None) -> list[dict]:
+def run_day(
+    study: Study,
+    period: str,
+    target: date,
+    window_key: str,
+    regime: str,
+    sim: SimParams,
+    specs: list[tuple[str, str, dict]],
+    model: str,
+    fconfig: fc.ForecastConfig,
+    *,
+    move_mode: str | None = None,
+    position_cut_hour: int | None = None,
+) -> list[dict]:
     window = WINDOWS[window_key]
     move_mode = move_mode or EXECUTION[regime]
     reqs, drivers = study.world(period, target, window)
     w = (window[0] * 3600.0, window[1] * 3600.0)
     base = simulate(reqs, drivers, sim, w)
-    rows = [{"periodo": period, "data": target.isoformat(), "janela": window_key, "regime": regime,
-             "cenario": "sem_reposicionamento", "algoritmo": "nenhum", "parametros": {}, **metrics(base)}]
+    rows = [
+        {
+            "periodo": period,
+            "data": target.isoformat(),
+            "janela": window_key,
+            "regime": regime,
+            "cenario": "sem_reposicionamento",
+            "algoritmo": "nenhum",
+            "parametros": {},
+            **metrics(base),
+        }
+    ]
     if not specs:
         return rows
     inputs, diag = study.plan_inputs(target, window, regime, drivers, sim.road_factor, model, fconfig, position_cut_hour)
@@ -208,13 +254,22 @@ def run_day(study: Study, period: str, target: date, window_key: str, regime: st
         start = _time.perf_counter()
         plan = make_plan(algorithm, inputs, params)
         elapsed = _time.perf_counter() - start
-        res = simulate(reqs, drivers, sim, w, plan.moves, max_move_km=params["max_km"], move_mode=move_mode,
-                       move_origins=origins)
+        res = simulate(reqs, drivers, sim, w, plan.moves, max_move_km=params["max_km"], move_mode=move_mode, move_origins=origins)
         if res.signature != base.signature:
             raise AssertionError("cenários com entradas diferentes (RN028)")
-        rows.append({"periodo": period, "data": target.isoformat(), "janela": window_key, "regime": regime,
-                     "cenario": name, "algoritmo": algorithm, "parametros": params, "diag_frota": diag,
-                     **metrics(res, plan, elapsed)})
+        rows.append(
+            {
+                "periodo": period,
+                "data": target.isoformat(),
+                "janela": window_key,
+                "regime": regime,
+                "cenario": name,
+                "algoritmo": algorithm,
+                "parametros": params,
+                "diag_frota": diag,
+                **metrics(res, plan, elapsed),
+            }
+        )
     return rows
 
 
@@ -242,14 +297,24 @@ def calibrate_simulator(study: Study, period: Period, measured: dict, echo=print
             rate = served / max(1, n)
             med = median(waits) if waits else float("nan")
             loss = ((rate - obs["taxa_aceite"]) / obs["taxa_aceite"]) ** 2 + ((med - obs["busca_mediana_s"]) / obs["busca_mediana_s"]) ** 2
-            grid.append({"periodo": period.name, "raio_km": radius, "paciencia_s": patience,
-                         "taxa_atendimento_sim": rate, "taxa_aceite_obs": obs["taxa_aceite"],
-                         "tempo_ate_passageiro_mediano_sim_s": med, "busca_mediana_obs_s": obs["busca_mediana_s"],
-                         "perda": loss})
+            grid.append(
+                {
+                    "periodo": period.name,
+                    "raio_km": radius,
+                    "paciencia_s": patience,
+                    "taxa_atendimento_sim": rate,
+                    "taxa_aceite_obs": obs["taxa_aceite"],
+                    "tempo_ate_passageiro_mediano_sim_s": med,
+                    "busca_mediana_obs_s": obs["busca_mediana_s"],
+                    "perda": loss,
+                }
+            )
     best = min(grid, key=lambda g: (g["perda"], g["raio_km"], g["paciencia_s"]))
     best["escolhido"] = True
-    echo(f"[{period.name}] simulador calibrado: raio {best['raio_km']} km, paciência {best['paciencia_s']} s, "
-         f"atendimento {best['taxa_atendimento_sim']:.3f} vs {obs['taxa_aceite']:.3f}")
+    echo(
+        f"[{period.name}] simulador calibrado: raio {best['raio_km']} km, paciência {best['paciencia_s']} s, "
+        f"atendimento {best['taxa_atendimento_sim']:.3f} vs {obs['taxa_aceite']:.3f}"
+    )
     sim = SimParams(best["raio_km"], measured["velocidade_busca_kmh"], measured["fator_rua_reta_busca"], best["paciencia_s"])
     return sim, grid
 

@@ -4,6 +4,7 @@ Cada braço = (realocação de início de dia do plano, ou nenhuma) + (política
 mesma política Bk, o mesmo mundo, a mesma fila e os mesmos números aleatórios (sorteios por hash de semente, ID e dia).
 O plano é calculado uma vez por (dia, algoritmo, semente) e independe de ρ, conformidade e Bk (o planejador não conhece o baseline).
 """
+
 from __future__ import annotations
 
 import json
@@ -12,7 +13,7 @@ import time
 import zlib
 from datetime import date
 
-from tcc_frota.algoritmos.base import PlanContext, PlannerSpec, Scenario, latlon
+from tcc_frota.algoritmos.base import PlanContext, PlannerSpec, latlon
 from tcc_frota.algoritmos.bateria import SEEDS, build_planner, build_scenarios, persistent_deficit_zones
 from tcc_frota.v2 import experiment as ex
 from tcc_frota.v2 import forecast as fc
@@ -25,7 +26,7 @@ RHOS = (0.25, 0.5, 0.75, 1.0)
 CONFS = (0.5, 0.75, 1.0)
 BASELINES = ("B0", "B1", "B2", "B3", "B4")
 CRN_SEED = 20261028
-REACTIVE = ReactiveConfig(tick_s=300.0, lookback_s=900.0, max_km=3.0)   # parâmetros declarados (pré-registro D10)
+REACTIVE = ReactiveConfig(tick_s=300.0, lookback_s=900.0, max_km=3.0)  # parâmetros declarados (pré-registro D10)
 REGIME, WINDOW = "B", "04-11"
 
 
@@ -68,11 +69,27 @@ def policy_args(name: str, tracks: dict) -> dict:
 
 
 def _row(key: dict, scen: str, family: str, params, res, seed, km_plan, secs, n_drivers: int) -> dict:
-    return {**key, "familia": family, "cenario": scen, "parametros": json.dumps(params, sort_keys=True), "semente": seed,
-            "n_requests": res.n_requests, "served": res.served, "pickup_km": res.pickup_km, "reposition_km": res.reposition_km,
-            "drift_km": res.drift_km, "empty_km": res.empty_km_v1, "empty_km_sim": res.empty_km_sim, "overnight_km": res.overnight_km,
-            "wait_sum": sum(res.wait_s), "moves_planned": res.moves_planned, "moves_executed": res.moves_executed,
-            "motoristas_mundo": n_drivers, "km_planejado": km_plan, "plan_seconds": secs}
+    return {
+        **key,
+        "familia": family,
+        "cenario": scen,
+        "parametros": json.dumps(params, sort_keys=True),
+        "semente": seed,
+        "n_requests": res.n_requests,
+        "served": res.served,
+        "pickup_km": res.pickup_km,
+        "reposition_km": res.reposition_km,
+        "drift_km": res.drift_km,
+        "empty_km": res.empty_km_v1,
+        "empty_km_sim": res.empty_km_sim,
+        "overnight_km": res.overnight_km,
+        "wait_sum": sum(res.wait_s),
+        "moves_planned": res.moves_planned,
+        "moves_executed": res.moves_executed,
+        "motoristas_mundo": n_drivers,
+        "km_planejado": km_plan,
+        "plan_seconds": secs,
+    }
 
 
 def placebo_moves(inputs, moves: dict, hop_km: float, seed_key: str) -> dict:
@@ -91,9 +108,21 @@ def placebo_moves(inputs, moves: dict, hop_km: float, seed_key: str) -> dict:
     return out
 
 
-def evaluate_day4(study, period: str, target: date, sim: SimParams, specs: list[PlannerSpec], model: str, *,
-                  world: str = "origem", seeds: tuple[int, ...] = SEEDS, rhos=RHOS, confs=CONFS, baselines=BASELINES,
-                  placebo: bool = True) -> list[dict]:
+def evaluate_day4(
+    study,
+    period: str,
+    target: date,
+    sim: SimParams,
+    specs: list[PlannerSpec],
+    model: str,
+    *,
+    world: str = "origem",
+    seeds: tuple[int, ...] = SEEDS,
+    rhos=RHOS,
+    confs=CONFS,
+    baselines=BASELINES,
+    placebo: bool = True,
+) -> list[dict]:
     """`world`: "origem" (m2 primária: os dois braços começam na última posição de D) ou "login" (mundo da v1; traz também a
     contabilização "pagar nos dois", `empty_km_sim`). m1 sempre corrigido. O placebo roda só em ρ = 1 e conformidade = 1."""
     window = ex.WINDOWS[WINDOW]
@@ -111,14 +140,16 @@ def evaluate_day4(study, period: str, target: date, sim: SimParams, specs: list[
         raise ValueError(world)
     inputs, diag = study.plan_inputs(target, window, REGIME, drivers, sim.road_factor, model, fc.ForecastConfig())
 
-    plans = []   # (spec, planner, seed, moves, secs, rótulo)
+    plans = []  # (spec, planner, seed, moves, secs, rótulo)
     for spec in specs:
         planner = build_planner(spec)
-        scenarios = build_scenarios(study, period, target, window, fc.ForecastConfig()) if getattr(planner, "needs_scenarios", False) else ()
+        scenarios = (
+            build_scenarios(study, period, target, window, fc.ForecastConfig()) if getattr(planner, "needs_scenarios", False) else ()
+        )
         extras = {}
         if getattr(planner, "needs_deficit_zones", False):
             extras["zonas_deficit_persistente"] = persistent_deficit_zones(study, target, window, fc.ForecastConfig())
-        for seed in (seeds if planner.stochastic else seeds[:1]):
+        for seed in seeds if planner.stochastic else seeds[:1]:
             ctx = PlanContext(inputs, target, window, REGIME, sim, move_mode, scenarios, seed, extras)
             t0 = time.perf_counter()
             moves = planner.plan(ctx)
@@ -138,16 +169,41 @@ def evaluate_day4(study, period: str, target: date, sim: SimParams, specs: list[
             pol = policy_args(bk, tracks)
             par = f"{world}|{bk}|rho{rho:g}"
             base = simulate3(reqs, drivers, sim, w, unrecoverable=unrec, **pol, **common)
-            rows.append(_row({**base_key, "grupo": "base", "par": par}, "sem_reposicionamento", "nenhum", {}, base, "", 0.0, 0.0, len(drivers)))
+            rows.append(
+                _row({**base_key, "grupo": "base", "par": par}, "sem_reposicionamento", "nenhum", {}, base, "", 0.0, 0.0, len(drivers))
+            )
             for conf in confs:
                 for spec, planner, seed, moves, secs, label in plans:
                     if label.startswith("placebo_") and not (rho == 1.0 and conf == 1.0):
                         continue
                     kept = {did: m for did, m in moves.items() if complies(did, target, conf)}
                     res = simulate3(reqs, drivers, sim, w, kept, max_move_km=planner.max_km, unrecoverable=unrec, **pol, **common)
-                    rows.append(_row({**base_key, "grupo": f"{par}|c{conf:g}", "par": par}, label, spec.family, spec.params, res,
-                                      seed if planner.stochastic else "", 0.0, secs, len(drivers)))
-            if bk != "B4" and rho == 1.0:      # B4 como candidato (sem plano) contra a política Bk
+                    rows.append(
+                        _row(
+                            {**base_key, "grupo": f"{par}|c{conf:g}", "par": par},
+                            label,
+                            spec.family,
+                            spec.params,
+                            res,
+                            seed if planner.stochastic else "",
+                            0.0,
+                            secs,
+                            len(drivers),
+                        )
+                    )
+            if bk != "B4" and rho == 1.0:  # B4 como candidato (sem plano) contra a política Bk
                 cand = simulate3(reqs, drivers, sim, w, unrecoverable=unrec, reactive=REACTIVE, **common)
-                rows.append(_row({**base_key, "grupo": f"{par}|candidato", "par": par}, "B4_reativo_candidato", "reativo", {}, cand, "", 0.0, 0.0, len(drivers)))
+                rows.append(
+                    _row(
+                        {**base_key, "grupo": f"{par}|candidato", "par": par},
+                        "B4_reativo_candidato",
+                        "reativo",
+                        {},
+                        cand,
+                        "",
+                        0.0,
+                        0.0,
+                        len(drivers),
+                    )
+                )
     return rows

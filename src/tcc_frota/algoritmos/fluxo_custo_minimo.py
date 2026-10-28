@@ -15,6 +15,7 @@ inteira. Com P = 1.000 km, todo déficit alcançável é preenchido. Cada unidad
 movimento do motorista da zona u mais próximo do centróide de v cujo deslocamento real respeita H.
 Resolve com `scipy.optimize.linprog` (sem dependência nova).
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -48,14 +49,24 @@ def solve_transport(inputs: PlanInputs, sup: dict[str, int], dem: dict[str, int]
         a_eq[iv[v], k] = 1
     for k, v in enumerate(dv):
         a_eq[k, n_f + k] = 1
-    res = linprog(cost, A_ub=a_ub.tocsr(), b_ub=[sup[u] for u in su], A_eq=a_eq.tocsr(), b_eq=[dem[v] for v in dv],
-                  bounds=(0, None), method="highs-ds")
+    res = linprog(
+        cost,
+        A_ub=a_ub.tocsr(),
+        b_ub=[sup[u] for u in su],
+        A_eq=a_eq.tocsr(),
+        b_eq=[dem[v] for v in dv],
+        bounds=(0, None),
+        method="highs-ds",
+    )
     if res.status != 0:
         return {}, {"status": f"falha_{res.status}", "objetivo_km": float("nan"), "deficit_nao_preenchido": sum(dem.values())}
     flows = {(u, v): int(round(x)) for (u, v, _), x in zip(arcs, res.x[:n_f]) if x > 0.5}
     unmet = float(res.x[n_f:].sum())
-    return flows, {"status": "otimo", "objetivo_km": float(sum(c * res.x[k] for k, (_, _, c) in enumerate(arcs))),
-                   "deficit_nao_preenchido": unmet}
+    return flows, {
+        "status": "otimo",
+        "objetivo_km": float(sum(c * res.x[k] for k, (_, _, c) in enumerate(arcs))),
+        "deficit_nao_preenchido": unmet,
+    }
 
 
 def flows_to_moves(inputs: PlanInputs, flows: dict[tuple[str, str], int], hop: float, min_km: float = 0.0) -> Moves:
@@ -67,8 +78,7 @@ def flows_to_moves(inputs: PlanInputs, flows: dict[tuple[str, str], int], hop: f
     moves: Moves = {}
     for (u, v), k in sorted(flows.items(), key=lambda kv: kv[0]):
         c = inputs.zones[v]
-        cands = sorted(((reta_km(d.lat, d.lon, *c) * inputs.road_factor, d.did) for d in by_zone.get(u, ())
-                        if d.did not in used))
+        cands = sorted((reta_km(d.lat, d.lon, *c) * inputs.road_factor, d.did) for d in by_zone.get(u, ()) if d.did not in used)
         for km, did in cands:
             if k <= 0:
                 break
@@ -104,8 +114,14 @@ class FluxoCustoMinimo(Planner):
         sup, dem = surplus_deficit(have, target)
         flows, info = solve_transport(inp, sup, dem, self.max_km)
         moves = flows_to_moves(inp, flows, self.max_km)
-        self.info = {**info, "alvo_total": sum(target.values()), "excedente": sum(sup.values()),
-                     "deficit": sum(dem.values()), "fluxo": sum(flows.values()), "movimentos": len(moves)}
+        self.info = {
+            **info,
+            "alvo_total": sum(target.values()),
+            "excedente": sum(sup.values()),
+            "deficit": sum(dem.values()),
+            "fluxo": sum(flows.values()),
+            "movimentos": len(moves),
+        }
         return moves
 
 

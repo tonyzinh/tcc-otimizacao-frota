@@ -3,6 +3,7 @@
 Nada aqui altera a v1. Com `demand_mode="previsto"` o resultado reproduz a bateria (regime B). Os modos "oraculo" e
 "mistura" usam a demanda real de D+1 e, portanto, **violam o corte D+1**: servem de limite superior, nunca de D+1 estrito.
 """
+
 from __future__ import annotations
 
 import json
@@ -12,7 +13,7 @@ from dataclasses import replace
 from datetime import date
 
 from tcc_frota.algoritmos.base import PlanContext, PlannerSpec, Scenario, latlon
-from tcc_frota.algoritmos.bateria import SEEDS, build_planner, load_frozen, persistent_deficit_zones, build_scenarios
+from tcc_frota.algoritmos.bateria import SEEDS, build_planner, build_scenarios, load_frozen, persistent_deficit_zones
 from tcc_frota.algoritmos.protocolo import load_finalists
 from tcc_frota.v2 import experiment as ex
 from tcc_frota.v2 import forecast as fc
@@ -21,8 +22,18 @@ from tcc_frota.v2.sim import SimParams
 from tcc_frota.v3.sim import simulate3
 
 REGIME = "B"
-ORACLE_ALGORITHMS = ("proporcional", "guloso_a0.02", "guloso_a0.1", "guloso_a0.5", "regra_limiar",
-                     "fluxo_custo_minimo", "hungaro", "busca_local", "recozimento", "pso")
+ORACLE_ALGORITHMS = (
+    "proporcional",
+    "guloso_a0.02",
+    "guloso_a0.1",
+    "guloso_a0.5",
+    "regra_limiar",
+    "fluxo_custo_minimo",
+    "hungaro",
+    "busca_local",
+    "recozimento",
+    "pso",
+)
 DEMAND_DRIVEN = ("proporcional", "guloso_a0.02", "guloso_a0.1", "guloso_a0.5", "regra_limiar", "fluxo_custo_minimo", "hungaro")
 
 
@@ -82,16 +93,46 @@ def mixing_weight(target_wape: float, err_g_in: float, y_total: float, outside: 
 
 # ---------------------------------------------------------------- um dia
 def _row(key: dict, spec_name: str, family: str, params, res, seed, km_plan: float, secs: float, info: dict, n_drivers: int) -> dict:
-    return {**key, "familia": family, "cenario": spec_name, "parametros": json.dumps(params, sort_keys=True), "semente": seed,
-            "n_requests": res.n_requests, "served": res.served, "pickup_km": res.pickup_km, "reposition_km": res.reposition_km,
-            "empty_km": res.empty_km, "empty_km_sim": res.empty_km_sim, "overnight_km": res.overnight_km,
-            "wait_sum": sum(res.wait_s), "moves_planned": res.moves_planned, "moves_executed": res.moves_executed,
-            "motoristas_mundo": n_drivers, "km_planejado": km_plan, "plan_seconds": secs, "info": json.dumps(info, default=str)}
+    return {
+        **key,
+        "familia": family,
+        "cenario": spec_name,
+        "parametros": json.dumps(params, sort_keys=True),
+        "semente": seed,
+        "n_requests": res.n_requests,
+        "served": res.served,
+        "pickup_km": res.pickup_km,
+        "reposition_km": res.reposition_km,
+        "empty_km": res.empty_km,
+        "empty_km_sim": res.empty_km_sim,
+        "overnight_km": res.overnight_km,
+        "wait_sum": sum(res.wait_s),
+        "moves_planned": res.moves_planned,
+        "moves_executed": res.moves_executed,
+        "motoristas_mundo": n_drivers,
+        "km_planejado": km_plan,
+        "plan_seconds": secs,
+        "info": json.dumps(info, default=str),
+    }
 
 
-def evaluate_day3(study, period: str, target: date, window_key: str, sim: SimParams, specs: list[PlannerSpec], model: str, *,
-                  demand_mode: str = "previsto", mix_w: float | None = None, label: str = "", seeds: tuple[int, ...] = SEEDS,
-                  include_baseline: bool = True, fix_m1: bool = True, fix_m2: bool = True) -> list[dict]:
+def evaluate_day3(
+    study,
+    period: str,
+    target: date,
+    window_key: str,
+    sim: SimParams,
+    specs: list[PlannerSpec],
+    model: str,
+    *,
+    demand_mode: str = "previsto",
+    mix_w: float | None = None,
+    label: str = "",
+    seeds: tuple[int, ...] = SEEDS,
+    include_baseline: bool = True,
+    fix_m1: bool = True,
+    fix_m2: bool = True,
+) -> list[dict]:
     """Baseline e planos em um dia (regime B). `demand_mode`: previsto | oraculo | mistura (usa `mix_w`)."""
     window = ex.WINDOWS[window_key]
     move_mode = ex.EXECUTION[REGIME]
@@ -119,12 +160,15 @@ def evaluate_day3(study, period: str, target: date, window_key: str, sim: SimPar
         planner = build_planner(spec)
         scenarios = ()
         if getattr(planner, "needs_scenarios", False):
-            scenarios = ((Scenario(target, tuple(reqs)),) if demand_mode == "oraculo"
-                         else build_scenarios(study, period, target, window, fc.ForecastConfig()))
+            scenarios = (
+                (Scenario(target, tuple(reqs)),)
+                if demand_mode == "oraculo"
+                else build_scenarios(study, period, target, window, fc.ForecastConfig())
+            )
         extras = {}
         if getattr(planner, "needs_deficit_zones", False):
             extras["zonas_deficit_persistente"] = persistent_deficit_zones(study, target, window, fc.ForecastConfig())
-        for seed in (seeds if planner.stochastic else seeds[:1]):
+        for seed in seeds if planner.stochastic else seeds[:1]:
             ctx = PlanContext(inputs, target, window, REGIME, sim, move_mode, scenarios, seed, extras)
             t0 = time.perf_counter()
             moves = planner.plan(ctx)
@@ -134,6 +178,18 @@ def evaluate_day3(study, period: str, target: date, window_key: str, sim: SimPar
             res = simulate3(reqs, drivers, sim, w, latlon(moves), max_move_km=planner.max_km, **sim_kw)
             if res.signature != base.signature:
                 raise AssertionError("cenários com entradas diferentes (RN028)")
-            rows.append(_row(key, spec.name, spec.family, spec.params, res, seed if planner.stochastic else "",
-                             sum(km for _, _, km in moves.values()), secs, {**planner.info, **diag_row}, len(drivers)))
+            rows.append(
+                _row(
+                    key,
+                    spec.name,
+                    spec.family,
+                    spec.params,
+                    res,
+                    seed if planner.stochastic else "",
+                    sum(km for _, _, km in moves.values()),
+                    secs,
+                    {**planner.info, **diag_row},
+                    len(drivers),
+                )
+            )
     return rows

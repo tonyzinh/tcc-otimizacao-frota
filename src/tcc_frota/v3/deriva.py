@@ -4,6 +4,7 @@ Um veículo livre tem um estado de deriva que dá a posição e o KM percorrido 
 nada é simulado até o veículo ser despachado, reposicionado, comprometido ou encerrar a sessão). O veículo continua despachável
 na posição interpolada. O KM de deriva entra no KM vazio dos dois braços (pré-registro §8, Fase 4).
 """
+
 from __future__ import annotations
 
 import math
@@ -23,6 +24,7 @@ def _lerp(p: LatLon, q: LatLon, f: float) -> LatLon:
 @dataclass
 class GoTo:
     """Segue em linha reta até `target` na velocidade efetiva e para; km por rua = reta × fator."""
+
     t0: float
     p0: LatLon
     target: LatLon
@@ -40,6 +42,7 @@ class GoTo:
 @dataclass
 class Cruise:
     """Passeio aleatório: pontos uniformes num quadrado de lado `side_km` centrado em `anchor`, percorridos em sequência."""
+
     t0: float
     p0: LatLon
     anchor: LatLon
@@ -47,7 +50,7 @@ class Cruise:
     speed_kmh: float
     road_factor: float
     seed: int
-    _legs: list = field(default_factory=list)      # (t_fim, p_fim, km_acumulado)
+    _legs: list = field(default_factory=list)  # (t_fim, p_fim, km_acumulado)
     _rng: random.Random | None = None
 
     def _extend(self, t: float) -> None:
@@ -81,6 +84,7 @@ class Observed:
 
     `pieces`: (ta, tb, dlat, dlon, km) por par de fotos consecutivas ambas livres; km = reta × fator. A resolução temporal
     subestima o movimento real (limitação declarada)."""
+
     t0: float
     p0: LatLon
     pieces: tuple
@@ -107,6 +111,7 @@ class DriftPolicy:
 
 class ReturnHome(DriftPolicy):
     """B1: ao ficar livre, volta à posição de início da sessão (no braço do plano, o alvo reposicionado)."""
+
     name = "B1_retorno_origem"
 
     def start(self, did, t, pos, anchor, speed_kmh, road_factor):
@@ -115,6 +120,7 @@ class ReturnHome(DriftPolicy):
 
 class LocalCruise(DriftPolicy):
     """B3: passeio aleatório numa vizinhança fixa (padrão 2×2 km) em torno da posição de início da sessão."""
+
     name = "B3_cruzeiro_local"
 
     def __init__(self, side_km: float = 2.0, seed: int = 20261028):
@@ -127,6 +133,7 @@ class LocalCruise(DriftPolicy):
 
 class ObservedTracks(DriftPolicy):
     """B2: movimento observado dos livres (`tracks[did]` = peças de `observed_pieces`)."""
+
     name = "B2_movimento_observado"
 
     def __init__(self, tracks: dict[str, tuple]):
@@ -137,8 +144,9 @@ class ObservedTracks(DriftPolicy):
         return Observed(t, pos, pieces) if pieces else None
 
 
-def observed_pieces(snaps: list[tuple[float, float, float, int]], road_factor: float, max_gap_s: float = 720.0,
-                    max_speed_kmh: float = 80.0) -> tuple:
+def observed_pieces(
+    snaps: list[tuple[float, float, float, int]], road_factor: float, max_gap_s: float = 720.0, max_speed_kmh: float = 80.0
+) -> tuple:
     """Peças de movimento livre a partir de fotos ordenadas `(t, lat, lon, estado)`; estado 1 = ONLINE (livre).
 
     Descarta pares com intervalo > `max_gap_s` ou velocidade reta implausível (> `max_speed_kmh`, salto de GPS)."""
@@ -157,6 +165,7 @@ def observed_pieces(snaps: list[tuple[float, float, float, int]], road_factor: f
 class ReactiveConfig:
     """B4: a cada `tick_s`, livres são alocados (alocação ótima por distância) às origens de pedidos não atendidos nos últimos
     `lookback_s`, desde que a distância em linha reta seja <= `max_km`. Só usa o passado (pedidos já perdidos)."""
+
     tick_s: float = 300.0
     lookback_s: float = 900.0
     max_km: float = 3.0

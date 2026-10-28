@@ -12,6 +12,7 @@ Objetivo (menor é melhor), com piso de atendimento δ = 1% contra o plano vazio
 Os pseudodias são divididos em busca (metade mais recente) e aceitação (os demais); o planejador
 escolhe, na aceitação, entre plano inicial, melhor plano da busca e plano vazio.
 """
+
 from __future__ import annotations
 
 import random
@@ -25,7 +26,7 @@ FLOOR = 0.99
 PENALTY = 10.0
 OPS = (("remover", 0.3), ("trocar", 0.2), ("reconstruir", 0.3), ("acrescentar", 0.2))
 
-ZonePlan = dict[str, str]   # motorista -> zona de destino
+ZonePlan = dict[str, str]  # motorista -> zona de destino
 
 
 def split(scenarios: tuple[Scenario, ...]) -> tuple[tuple[Scenario, ...], tuple[Scenario, ...]]:
@@ -52,8 +53,16 @@ class Evaluator:
             moves = {did: zones[z] for did, z in plan.items()}
             served = empty = repo = 0.0
             for s in self.scenarios:
-                res = simulate(list(s.requests), self.drivers, self.ctx.sim, self.ctx.window_s, moves,
-                               max_move_km=self.hop, move_mode=self.ctx.move_mode, move_origins=self.origins)
+                res = simulate(
+                    list(s.requests),
+                    self.drivers,
+                    self.ctx.sim,
+                    self.ctx.window_s,
+                    moves,
+                    max_move_km=self.hop,
+                    move_mode=self.ctx.move_mode,
+                    move_origins=self.origins,
+                )
                 served += res.served
                 empty += res.empty_km
                 repo += res.reposition_km

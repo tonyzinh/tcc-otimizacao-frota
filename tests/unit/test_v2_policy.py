@@ -1,4 +1,5 @@
 """Algoritmos v2 (Fase 5): propriedades do guloso de valor marginal, da regra de limiar e do proporcional."""
+
 import random
 
 from tcc_frota.v2.fleet import PlannedDriver
@@ -8,11 +9,13 @@ from tcc_frota.v2.sim import reta_km
 
 def instance(seed: int, n_drivers: int = 25, n_zones: int = 12) -> PlanInputs:
     rng = random.Random(seed)
-    zones = {f"z{k}": (-20.30 + rng.uniform(-.08, .08), -40.30 + rng.uniform(-.08, .08)) for k in range(n_zones)}
+    zones = {f"z{k}": (-20.30 + rng.uniform(-0.08, 0.08), -40.30 + rng.uniform(-0.08, 0.08)) for k in range(n_zones)}
     hours = (4, 5, 6, 7)
     demand = {(h, z): rng.choice([0, 0, 0.5, 2, 5]) for h in hours for z in zones}
-    drivers = tuple(PlannedDriver(f"d{k}", -20.30 + rng.uniform(-.1, .1), -40.30 + rng.uniform(-.1, .1),
-                                  rng.uniform(4, 6), rng.uniform(7, 8)) for k in range(n_drivers))
+    drivers = tuple(
+        PlannedDriver(f"d{k}", -20.30 + rng.uniform(-0.1, 0.1), -40.30 + rng.uniform(-0.1, 0.1), rng.uniform(4, 6), rng.uniform(7, 8))
+        for k in range(n_drivers)
+    )
     return PlanInputs(drivers, zones, demand, hours, kappa=0.8, road_factor=1.4)
 
 
@@ -49,9 +52,11 @@ def test_no_move_beyond_distance_limit_and_each_driver_moves_once():
     for seed in range(10):
         inp = instance(seed)
         by = {d.did: d for d in inp.drivers}
-        for plan in (marginal_greedy(inp, alpha=0.01, rho_km=1.5, max_km=3.0),
-                     threshold_rule(inp, theta=0.01, rho_km=1.5, max_km=3.0),
-                     proportional(inp, max_km=3.0)):
+        for plan in (
+            marginal_greedy(inp, alpha=0.01, rho_km=1.5, max_km=3.0),
+            threshold_rule(inp, theta=0.01, rho_km=1.5, max_km=3.0),
+            proportional(inp, max_km=3.0),
+        ):
             for did, (lat, lon) in plan.moves.items():
                 assert reta_km(by[did].lat, by[did].lon, lat, lon) * inp.road_factor <= 3.0 + 1e-9
 

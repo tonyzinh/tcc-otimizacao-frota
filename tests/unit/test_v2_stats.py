@@ -1,20 +1,39 @@
 """Estatística pareada por dia (Fase 6)."""
+
 import pytest
 
 from tcc_frota.v2 import stats
 
 
 def day(bs, ps, bk, pk, br=0.0, pr=0.0):
-    return {"b": {"served": bs, "pickup_km": bk, "reposition_km": br, "empty_km": bk + br, "wait_sum": 600.0 * bs,
-                  "n_requests": 100, "moves_planned": 0, "moves_executed": 0},
-            "p": {"served": ps, "pickup_km": pk, "reposition_km": pr, "empty_km": pk + pr, "wait_sum": 540.0 * ps,
-                  "n_requests": 100, "moves_planned": 4, "moves_executed": 2}}
+    return {
+        "b": {
+            "served": bs,
+            "pickup_km": bk,
+            "reposition_km": br,
+            "empty_km": bk + br,
+            "wait_sum": 600.0 * bs,
+            "n_requests": 100,
+            "moves_planned": 0,
+            "moves_executed": 0,
+        },
+        "p": {
+            "served": ps,
+            "pickup_km": pk,
+            "reposition_km": pr,
+            "empty_km": pk + pr,
+            "wait_sum": 540.0 * ps,
+            "n_requests": 100,
+            "moves_planned": 4,
+            "moves_executed": 2,
+        },
+    }
 
 
 def test_sign_flip_exact_and_symmetric():
     assert stats.sign_flip_pvalue([1.0] * 6) == pytest.approx(2 / 64)
     assert stats.sign_flip_pvalue([1.0, -1.0, 1.0, -1.0]) == 1.0
-    assert stats.sign_flip_pvalue([]) != stats.sign_flip_pvalue([])   # nan
+    assert stats.sign_flip_pvalue([]) != stats.sign_flip_pvalue([])  # nan
 
 
 def test_compare_reports_primary_indicators_with_ci():

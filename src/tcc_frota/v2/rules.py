@@ -3,6 +3,7 @@
 Cada regra aqui tem equivalente nos notebooks `nb_slv_*_v2`. Mudanças devem ser feitas nos dois
 lugares e cobertas por `tests/unit/test_v2_rules.py`.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -35,22 +36,18 @@ class StatusTreatment:
 STATUS_TREATMENT: dict[str, StatusTreatment] = {
     "CorridaEncerrada": StatusTreatment("atendida", True, True, "corrida concluída"),
     "CorridaCanceladaSolicitantePosAceite": StatusTreatment(
-        "cancelada_pos_aceite_solicitante", True, True, "motorista aceitou; solicitante cancelou depois"),
+        "cancelada_pos_aceite_solicitante", True, True, "motorista aceitou; solicitante cancelou depois"
+    ),
     "CorridaCanceladaMotoristaPosAceite": StatusTreatment(
-        "cancelada_pos_aceite_motorista", True, True, "motorista aceitou e cancelou depois"),
+        "cancelada_pos_aceite_motorista", True, True, "motorista aceitou e cancelou depois"
+    ),
     "NaoAtendida": StatusTreatment("nao_atendida", True, False, "nenhum motorista aceitou"),
-    "LimiteEsperaAtingido": StatusTreatment("nao_atendida_limite_espera", True, False,
-                                            "tempo limite de espera atingido sem aceite"),
-    "CorridaCanceladaSolicitante": StatusTreatment("cancelada_solicitante_pre_aceite", True, False,
-                                                   "solicitante desistiu antes do aceite"),
-    "PagamentoRejeitado": StatusTreatment("nao_demanda_pagamento", False, False,
-                                          "pagamento rejeitado; não chega ao despacho"),
-    "CorridaCanceladaOperador": StatusTreatment("nao_demanda_operador", False, False,
-                                                "cancelada pela operação"),
-    "Retracamento": StatusTreatment("nao_demanda_retracamento", False, False,
-                                    "retraçamento; semântica não homologada"),
-    "CorridaCanceladaAgendamento": StatusTreatment("nao_demanda_agendamento_cancelado", False, False,
-                                                   "agendamento cancelado"),
+    "LimiteEsperaAtingido": StatusTreatment("nao_atendida_limite_espera", True, False, "tempo limite de espera atingido sem aceite"),
+    "CorridaCanceladaSolicitante": StatusTreatment("cancelada_solicitante_pre_aceite", True, False, "solicitante desistiu antes do aceite"),
+    "PagamentoRejeitado": StatusTreatment("nao_demanda_pagamento", False, False, "pagamento rejeitado; não chega ao despacho"),
+    "CorridaCanceladaOperador": StatusTreatment("nao_demanda_operador", False, False, "cancelada pela operação"),
+    "Retracamento": StatusTreatment("nao_demanda_retracamento", False, False, "retraçamento; semântica não homologada"),
+    "CorridaCanceladaAgendamento": StatusTreatment("nao_demanda_agendamento_cancelado", False, False, "agendamento cancelado"),
     "CorridaIniciada": StatusTreatment("transitorio_sem_desfecho", False, False, "estado não final no extrato"),
     "CondutorACaminho": StatusTreatment("transitorio_sem_desfecho", False, False, "estado não final no extrato"),
     "CondutorChegou": StatusTreatment("transitorio_sem_desfecho", False, False, "estado não final no extrato"),
@@ -90,8 +87,7 @@ def coordinate(value: object) -> float | None:
 
 
 def in_box(lat: float | None, lon: float | None) -> bool:
-    return (lat is not None and lon is not None and BOX_LAT[0] <= lat <= BOX_LAT[1]
-            and BOX_LON[0] <= lon <= BOX_LON[1])
+    return lat is not None and lon is not None and BOX_LAT[0] <= lat <= BOX_LAT[1] and BOX_LON[0] <= lon <= BOX_LON[1]
 
 
 def round3(value: float | None) -> float | None:

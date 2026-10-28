@@ -37,9 +37,7 @@ def test_empty_fleet_does_not_claim_reduction():
 
 def test_multiple_synthetic_periods_have_independent_d1_cutoffs():
     result = run_periods(seed=123, periods=3)
-    assert [period["date"] for period in result["periods"]] == [
-        "2026-10-15", "2026-10-16", "2026-10-17"
-    ]
+    assert [period["date"] for period in result["periods"]] == ["2026-10-15", "2026-10-16", "2026-10-17"]
     assert all(period["comparable_inputs"] for period in result["periods"])
     assert result == run_periods(seed=123, periods=3)
     assert result["baseline_served_total"] == result["proposed_served_total"] == 30

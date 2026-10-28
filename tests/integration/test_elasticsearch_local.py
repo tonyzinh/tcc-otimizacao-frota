@@ -11,8 +11,12 @@ from tcc_frota.ingestion.es_analytics import SUMMARY_COUNTS, build_analytics
 def month(root, dataset, name, rows, *, status="completed", declared=None):
     directory = root / dataset / name
     directory.mkdir(parents=True)
-    (directory / "manifest.json").write_text(json.dumps({"status": status, "dataset": dataset,
-        "month": name, "region": 1, "documents": len(rows) if declared is None else declared}), encoding="utf-8")
+    (directory / "manifest.json").write_text(
+        json.dumps(
+            {"status": status, "dataset": dataset, "month": name, "region": 1, "documents": len(rows) if declared is None else declared}
+        ),
+        encoding="utf-8",
+    )
     (directory / "dados.jsonl").write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
     (directory / "pagina_0001.json").write_text(json.dumps(rows), encoding="utf-8")
     return directory
@@ -23,7 +27,10 @@ def test_manifest_jsonl_and_incomplete_month(tmp_path):
     good = month(root, "solicitacoes", "2025-10", [{"codigo": 1}])
     month(root, "ofertas", "2025-10", [{"codigo": "x"}], status="running")
     assert validate_manifest(good / "manifest.json", "solicitacoes", "2025-10") == (True, "complete", 1)
-    assert next(row for row in discover(root) if row["dataset"] == "ofertas" and row["month"] == "2025-10")["status"] == "manifest_not_complete"
+    assert (
+        next(row for row in discover(root) if row["dataset"] == "ofertas" and row["month"] == "2025-10")["status"]
+        == "manifest_not_complete"
+    )
     assert list(iter_jsonl(good / "dados.jsonl")) == [(1, {"codigo": 1})]
     (good / "dados.jsonl").write_text("[]\n", encoding="utf-8")
     with pytest.raises(ValueError, match="não é objeto"):
@@ -47,17 +54,18 @@ def test_local_layers_dedup_temporal_only_and_no_invented_fleet(tmp_path, monkey
     monkeypatch.setenv("TCC_REAL_DATA_AUTHORIZED", "YES")
     root = tmp_path / "raw"
     event = {"dT_REGISTRO": "2026-01-05T08:00:00-03:00", "tX_STATUS": "Criada"}
-    request = {"codigo": 7, "dT_REGISTRO": "2026-01-07T12:00:00-03:00",
-               "tX_STATUS": "Encerrada", "logStatus": [event]}
-    month(root, "solicitacoes", "2026-01", [request, {**request, "tX_STATUS": "Outro"},
-        {"codigo": 8, "logStatus": []}])
+    request = {"codigo": 7, "dT_REGISTRO": "2026-01-07T12:00:00-03:00", "tX_STATUS": "Encerrada", "logStatus": [event]}
+    month(root, "solicitacoes", "2026-01", [request, {**request, "tX_STATUS": "Outro"}, {"codigo": 8, "logStatus": []}])
     month(root, "solicitacoes", "2026-02", [{**request, "dT_REGISTRO": "2026-02-01T10:00:00-03:00"}])
-    summary = {"dataHora": "2026-01-05T08:00:00-03:00", "codigoRegiao": 1,
-               **{field: 1 for field in SUMMARY_COUNTS}}
+    summary = {"dataHora": "2026-01-05T08:00:00-03:00", "codigoRegiao": 1, **dict.fromkeys(SUMMARY_COUNTS, 1)}
     month(root, "sumarios", "2026-01", [summary])
-    offer = {"dataHora": "2026-01-05T10:30:00-03:00", "ofertaList": [
-        {"status": "Online", "latitude": -20.3, "longitude": -40.3,
-         "dataPosicaoGPS": "2026-01-05T08:00:00-03:00"}, {"status": "mystery"}]}
+    offer = {
+        "dataHora": "2026-01-05T10:30:00-03:00",
+        "ofertaList": [
+            {"status": "Online", "latitude": -20.3, "longitude": -40.3, "dataPosicaoGPS": "2026-01-05T08:00:00-03:00"},
+            {"status": "mystery"},
+        ],
+    }
     month(root, "ofertas", "2026-01", [offer])
     month(root, "ofertas", "2026-02", [{"dataHora": "2026-02-01T12:00:00-03:00"}], status="running")
     report = process_local(root, tmp_path / "runs")
@@ -71,6 +79,7 @@ def test_local_layers_dedup_temporal_only_and_no_invented_fleet(tmp_path, monkey
     assert result["audit"]["offer_position_over_120_min"] == 1
     assert result["eligible_fleet_status"] == "blocked_unverified"
     import pyarrow.parquet as pq
+
     gold = pq.read_table(run / "gold" / "demand_hourly.parquet").to_pylist()
     assert len(gold) == 1 and gold[0]["request_count"] == 1 and gold[0]["hour"] == 8
     assert gold[0]["spatial_status"] == "origin_unavailable"

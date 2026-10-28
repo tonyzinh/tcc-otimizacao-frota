@@ -1,4 +1,5 @@
 """Bloco 1: WAPE por faixa a partir dos erros por hora e previsões sem dados do dia D nem de D+1."""
+
 from datetime import date, timedelta
 
 from tcc_frota.analise import demanda as dm
@@ -22,7 +23,7 @@ def test_models_ignore_target_and_cut_day():
     target = date(2026, 3, 20)
     days = [target - timedelta(days=k) for k in range(0, 70)]
     base = history(days)
-    spiked = history(days, lambda d, h: 999 if d >= target - timedelta(days=1) else 2)   # D e D+1 alterados
+    spiked = history(days, lambda d, h: 999 if d >= target - timedelta(days=1) else 2)  # D e D+1 alterados
     cfg = fc.ForecastConfig(excluded_dates=())
     for f in (dm.m0, dm.m1):
         assert f(target, base, cfg) == f(target, spiked, cfg)

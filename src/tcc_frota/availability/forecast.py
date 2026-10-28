@@ -1,14 +1,14 @@
 """Baseline D+1 da condição de candidato, separado de disponibilidade real."""
+
 from __future__ import annotations
 
 from collections import defaultdict
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Iterable
 
 from tcc_frota.availability.timeline import OperationalState, TimelineSegment
 from tcc_frota.models import aware
-
 
 _NEGATIVE = {
     OperationalState.EM_CORRIDA,
@@ -67,8 +67,18 @@ class HistoricalCandidateBaseline:
         positive, negative = self.hours.get((vehicle_id, target.weekday(), target.hour), [0.0, 0.0])
         observed = positive + negative
         candidate = positive / observed if observed >= min_observed_hours and positive > 0 else None
-        reason = "taxa histórica de Online sem ocupação identificada; não é disponibilidade confirmada" if candidate is not None else "evidência positiva/negativa insuficiente na mesma faixa semanal"
+        reason = (
+            "taxa histórica de Online sem ocupação identificada; não é disponibilidade confirmada"
+            if candidate is not None
+            else "evidência positiva/negativa insuficiente na mesma faixa semanal"
+        )
         return CandidateForecast(
-            vehicle_id, target, candidate, None, round(positive, 3), round(negative, 3), reason,
+            vehicle_id,
+            target,
+            candidate,
+            None,
+            round(positive, 3),
+            round(negative, 3),
+            reason,
             confidence_level="PROXY_NAO_CALIBRADO" if candidate is not None else "SEM_EVIDENCIA_SUFICIENTE",
         )

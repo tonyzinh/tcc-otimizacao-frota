@@ -28,6 +28,7 @@ reais de D+1 não o altera (teste).
 
 Variantes de previsão espacial (sensibilidade 4.4, só calibração): `blocos3h`, `h3r6`, `deficit`.
 """
+
 from __future__ import annotations
 
 import random
@@ -40,8 +41,13 @@ from tcc_frota.v2.policy import PlanInputs, _Coverage, home_zone
 from tcc_frota.v2.sim import reta_km, simulate
 
 RHO_KM = 2.5
-REASONS = ("permaneceu_sem_candidato", "permaneceu_sem_economia", "permaneceu_sem_ganho_atendimento",
-           "permaneceu_reprovado_validacao", "movido")
+REASONS = (
+    "permaneceu_sem_candidato",
+    "permaneceu_sem_economia",
+    "permaneceu_sem_ganho_atendimento",
+    "permaneceu_reprovado_validacao",
+    "movido",
+)
 BLOCKS = ((4, 7), (7, 10), (10, 11))
 
 
@@ -165,8 +171,9 @@ class GulosoSeletivo(Planner):
             key = (frozenset(plan.items()), group, j)
             if key not in cache:
                 moves = {did: inp.zones[z] for did, z in plan.items()}
-                res = simulate(reqs, drivers, ctx.sim, ctx.window_s, moves, max_move_km=self.max_km,
-                               move_mode=ctx.move_mode, move_origins=origins)
+                res = simulate(
+                    reqs, drivers, ctx.sim, ctx.window_s, moves, max_move_km=self.max_km, move_mode=ctx.move_mode, move_origins=origins
+                )
                 cache[key] = (res.served, res.pickup_km, res.reposition_km)
                 sims += 1
             return cache[key]
@@ -227,14 +234,21 @@ class GulosoSeletivo(Planner):
             cur[did] = z
             plan[did] = z
         moves = {did: (inp.zones[z][0], inp.zones[z][1], km[(did, z)]) for did, z in plan.items()}
-        self.info = {"status": "ok", "iteracoes": iterations, "pares_avaliados": evaluated, "simulacoes": sims,
-                     "cenarios_selecao": len(sel), "cenarios_validacao": len(val), "dias_disjuntos": disjoint,
-                     **self._count(reasons)}
+        self.info = {
+            "status": "ok",
+            "iteracoes": iterations,
+            "pares_avaliados": evaluated,
+            "simulacoes": sims,
+            "cenarios_selecao": len(sel),
+            "cenarios_validacao": len(val),
+            "dias_disjuntos": disjoint,
+            **self._count(reasons),
+        }
         return moves
 
     @staticmethod
     def _count(reasons: dict[str, int]) -> dict[str, int]:
-        out = {r: 0 for r in REASONS}
+        out = dict.fromkeys(REASONS, 0)
         for v in reasons.values():
             out[REASONS[v]] += 1
         return out

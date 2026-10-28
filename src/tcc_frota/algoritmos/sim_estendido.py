@@ -13,6 +13,7 @@ Cópia de `tcc_frota.v2.sim.simulate` (sem o rastro de visualização) com três
 Com os valores padrão, o resultado é idêntico ao do simulador da v2 (teste
 `tests/unit/test_algoritmos_sim_estendido.py`). O simulador da v2 não foi alterado.
 """
+
 from __future__ import annotations
 
 import heapq
@@ -23,12 +24,23 @@ from scipy.optimize import linear_sum_assignment
 from tcc_frota.v2.sim import SimDriver, SimParams, SimRequest, SimResult, _merge, reta_km, signature
 
 
-def simulate_ext(requests: list[SimRequest], drivers: list[SimDriver], params: SimParams,
-                 window: tuple[float, float], moves: dict[str, tuple[float, float]] | None = None,
-                 tail_s: float = 3 * 3600, max_move_km: float = float("inf"), move_mode: str = "inicio_turno",
-                 move_origins: dict[str, tuple[float, float]] | None = None, *, dispatch: str = "proximo",
-                 batch_s: float = 60.0, dispatch_radius_km: float | None = None, epochs: tuple[float, ...] = (),
-                 epoch_planner=None) -> SimResult:
+def simulate_ext(
+    requests: list[SimRequest],
+    drivers: list[SimDriver],
+    params: SimParams,
+    window: tuple[float, float],
+    moves: dict[str, tuple[float, float]] | None = None,
+    tail_s: float = 3 * 3600,
+    max_move_km: float = float("inf"),
+    move_mode: str = "inicio_turno",
+    move_origins: dict[str, tuple[float, float]] | None = None,
+    *,
+    dispatch: str = "proximo",
+    batch_s: float = 60.0,
+    dispatch_radius_km: float | None = None,
+    epochs: tuple[float, ...] = (),
+    epoch_planner=None,
+) -> SimResult:
     if move_mode not in ("inicio_turno", "fim_do_dia") or dispatch not in ("proximo", "lote"):
         raise ValueError("modo inválido")
     radius = params.radius_km if dispatch_radius_km is None else dispatch_radius_km
@@ -141,7 +153,7 @@ def simulate_ext(requests: list[SimRequest], drivers: list[SimDriver], params: S
         km = reta_km(pos[did][0], pos[did][1], lat, lon) * params.road_factor
         end = t + 3600 * km / params.speed_kmh
         if km <= 1e-9 or km > max_move_km + 1e-9 or commit_blocks(did, t, end):
-            res.move_outcomes[did] = ("already_there" if km <= 1e-9 else "limit" if km > max_move_km + 1e-9 else "busy")
+            res.move_outcomes[did] = "already_there" if km <= 1e-9 else "limit" if km > max_move_km + 1e-9 else "busy"
             return False
         res.move_outcomes[did] = "executed"
         res.move_origins_used[did] = pos[did]
@@ -184,10 +196,10 @@ def simulate_ext(requests: list[SimRequest], drivers: list[SimDriver], params: S
             push(t + batch_s, 6, "batch", None)
 
     def run_epoch(t: float) -> None:
-        idle = {did: pos[did] for did in online if online[did] and busy_until[did] is None and pos[did] is not None
-                and did not in pending_move}
-        busy = {did: (busy_until[did], busy_target.get(did, pos[did])) for did in online
-                if online[did] and busy_until[did] is not None}
+        idle = {
+            did: pos[did] for did in online if online[did] and busy_until[did] is None and pos[did] is not None and did not in pending_move
+        }
+        busy = {did: (busy_until[did], busy_target.get(did, pos[did])) for did in online if online[did] and busy_until[did] is not None}
         plan = epoch_planner(t, idle, busy) if epoch_planner else {}
         for did, target in sorted(plan.items()):
             if did not in idle:

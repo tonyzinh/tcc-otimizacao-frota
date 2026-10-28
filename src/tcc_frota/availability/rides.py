@@ -1,9 +1,10 @@
 """Corridas encerradas geram evidência de ocupação, nunca de tempo livre."""
+
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from collections.abc import Iterable, Mapping
 from datetime import datetime
-from typing import Iterable, Mapping
 
 from tcc_frota.availability.diagnostics import missing_value, timestamp
 from tcc_frota.availability.timeline import EvidenceInterval, OperationalState

@@ -11,6 +11,7 @@ fronteira com menor KM vazio por corrida entre os que têm corridas ≥ 0,99 × 
 semente usa o seu finalista (`NSGA2Finalista`) e as métricas do dia são a média das sementes.
 Implementação própria (pymoo não está instalado; ver auditoria).
 """
+
 from __future__ import annotations
 
 import json
@@ -27,8 +28,13 @@ ETA_C, ETA_M, P_C = 15.0, 20.0, 0.9
 
 def decode(x: list[float]) -> dict:
     teto = int(x[3])
-    return {"peso": round(x[0], 4), "share": round(x[1], 4), "max_km": round(x[2], 4),
-            "teto": None if teto >= 6 else teto, "km_min": round(x[4], 4)}
+    return {
+        "peso": round(x[0], 4),
+        "share": round(x[1], 4),
+        "max_km": round(x[2], 4),
+        "teto": None if teto >= 6 else teto,
+        "km_min": round(x[4], 4),
+    }
 
 
 # ------------------------------------------------------------------ NSGA-II genérico (minimização)
@@ -63,7 +69,7 @@ def nondominated_sort(objs: list[tuple]) -> list[list[int]]:
 
 
 def crowding(objs: list[tuple], front: list[int]) -> dict[int, float]:
-    dist = {i: 0.0 for i in front}
+    dist = dict.fromkeys(front, 0.0)
     for m in range(len(objs[front[0]])):
         order = sorted(front, key=lambda i: objs[i][m])
         lo, hi = objs[order[0]][m], objs[order[-1]][m]
@@ -136,7 +142,7 @@ def nsga2(evaluate, rng: random.Random, pop_size: int = POP, generations: int = 
                 newo += [allo[i] for i in f]
             else:
                 cd = crowding(allo, f)
-                for i in sorted(f, key=lambda i: -cd[i])[:pop_size - len(new)]:
+                for i in sorted(f, key=lambda i: -cd[i])[: pop_size - len(new)]:
                     new.append(allx[i])
                     newo.append(allo[i])
                 break
@@ -181,8 +187,16 @@ def evaluate_params(days: list[CalibDay], params: dict) -> tuple[tuple[float, fl
     served = empty = repo = 0.0
     for d in days:
         moves = planner.plan(d.ctx)
-        res = simulate(d.reqs, d.drivers, d.ctx.sim, d.ctx.window_s, latlon(moves), max_move_km=planner.max_km,
-                       move_mode=d.ctx.move_mode, move_origins=d.origins)
+        res = simulate(
+            d.reqs,
+            d.drivers,
+            d.ctx.sim,
+            d.ctx.window_s,
+            latlon(moves),
+            max_move_km=planner.max_km,
+            move_mode=d.ctx.move_mode,
+            move_origins=d.origins,
+        )
         served += res.served
         empty += res.empty_km
         repo += res.reposition_km
@@ -198,17 +212,31 @@ def search(study, frozen, seed: int) -> dict:
     front = set(nondominated_sort(objs)[0])
     rows = []
     for k, (x, o, extra) in enumerate(history):
-        rows.append({"semente": seed, "avaliacao": k, "parametros": json.dumps(decode(x), sort_keys=True),
-                     "corridas": extra["corridas"], "km_vazio": extra["km_vazio"], "km_repos": extra["km_repos"],
-                     "km_vazio_por_corrida": extra["km_vazio"] / extra["corridas"],
-                     "corridas_base": base_served, "km_vazio_base": base_empty,
-                     "na_fronteira": k in front, "satisfaz_piso": extra["corridas"] >= 0.99 * base_served - 1e-9})
+        rows.append(
+            {
+                "semente": seed,
+                "avaliacao": k,
+                "parametros": json.dumps(decode(x), sort_keys=True),
+                "corridas": extra["corridas"],
+                "km_vazio": extra["km_vazio"],
+                "km_repos": extra["km_repos"],
+                "km_vazio_por_corrida": extra["km_vazio"] / extra["corridas"],
+                "corridas_base": base_served,
+                "km_vazio_base": base_empty,
+                "na_fronteira": k in front,
+                "satisfaz_piso": extra["corridas"] >= 0.99 * base_served - 1e-9,
+            }
+        )
     feasible = [r for r in rows if r["na_fronteira"] and r["satisfaz_piso"]]
     pool = feasible or [max((r for r in rows if r["na_fronteira"]), key=lambda r: r["corridas"])]
     best = min(pool, key=lambda r: (r["km_vazio_por_corrida"], r["avaliacao"]))
-    return {"semente": seed, "finalista": json.loads(best["parametros"]), "linha_finalista": best,
-            "regra": "fronteira: menor km vazio/corrida com piso" if feasible else "sem ponto viável na fronteira",
-            "avaliacoes": rows}
+    return {
+        "semente": seed,
+        "finalista": json.loads(best["parametros"]),
+        "linha_finalista": best,
+        "regra": "fronteira: menor km vazio/corrida com piso" if feasible else "sem ponto viável na fronteira",
+        "avaliacoes": rows,
+    }
 
 
 class NSGA2Finalista(Planner):
@@ -227,7 +255,7 @@ class NSGA2Finalista(Planner):
 
     def plan(self, ctx: PlanContext) -> Moves:
         inner = FluxoParametrico(**self.finalistas[str(ctx.seed)])
-        self.max_km = inner.max_km          # limite de execução = salto do finalista desta semente
+        self.max_km = inner.max_km  # limite de execução = salto do finalista desta semente
         moves = inner.plan(ctx)
         self.info = {**inner.info, "parametros_semente": self.finalistas[str(ctx.seed)]}
         return moves

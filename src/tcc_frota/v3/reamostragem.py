@@ -3,6 +3,7 @@
 Todas as funções devolvem uma matriz (B, n) de índices de dias. A mesma matriz é reutilizada em todas as linhas
 do mesmo período, o que preserva a dependência entre testes (necessária ao Romano–Wolf) e dá números aleatórios comuns.
 """
+
 from __future__ import annotations
 
 import zlib

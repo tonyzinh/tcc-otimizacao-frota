@@ -1,4 +1,5 @@
 """Fase 1 da v2: executa `tcc_frota.v3.fase1.run` sobre as tabelas diárias derivadas (sem reler data/raw)."""
+
 import argparse
 import json
 import sys
@@ -6,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from tcc_frota.v3 import fase1  # noqa: E402
+from tcc_frota.v3 import fase1
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()

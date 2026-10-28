@@ -1,4 +1,5 @@
 """Estatística pareada por dia (Fase 6): bootstrap de razões e teste de permutação por troca de sinal."""
+
 from __future__ import annotations
 
 import random
@@ -102,10 +103,12 @@ def compare(days: list[dict], reps: int = 2000, seed: int = 20261016) -> dict[st
         out[name + "_ic_inf"] = lo * scale
         out[name + "_ic_sup"] = hi * scale
     out["p_corridas"] = sign_flip_pvalue([d["p"]["served"] - d["b"]["served"] for d in days])
-    out["p_km_vazio_por_corrida"] = sign_flip_pvalue([
-        ratio(d["p"]["empty_km"], d["p"]["served"]) - ratio(d["b"]["empty_km"], d["b"]["served"]) for d in days])
-    out["p_tempo"] = sign_flip_pvalue([
-        ratio(d["p"]["wait_sum"], d["p"]["served"]) - ratio(d["b"]["wait_sum"], d["b"]["served"]) for d in days])
+    out["p_km_vazio_por_corrida"] = sign_flip_pvalue(
+        [ratio(d["p"]["empty_km"], d["p"]["served"]) - ratio(d["b"]["empty_km"], d["b"]["served"]) for d in days]
+    )
+    out["p_tempo"] = sign_flip_pvalue(
+        [ratio(d["p"]["wait_sum"], d["p"]["served"]) - ratio(d["b"]["wait_sum"], d["b"]["served"]) for d in days]
+    )
     for k in ("served", "pickup_km", "reposition_km", "empty_km", "n_requests", "moves_planned", "moves_executed"):
         out[f"soma_base_{k}"] = sum(d["b"][k] for d in days)
         out[f"soma_prop_{k}"] = sum(d["p"][k] for d in days)

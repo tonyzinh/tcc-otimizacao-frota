@@ -8,6 +8,7 @@ a partir da hora em que ficam livres, mas não são movidos. A demanda da hora c
 trecho restante do horizonte. Usa informação de D+1 em tempo real (estado da frota), por isso não entra
 na tabela principal.
 """
+
 from __future__ import annotations
 
 from math import ceil, floor
@@ -28,9 +29,18 @@ def epoch_times(window: tuple[int, int]) -> tuple[float, ...]:
     return tuple(out)
 
 
-def plan_epoch(t: float, idle: dict[str, tuple[float, float]], busy: dict[str, tuple[float, tuple[float, float]]],
-               base: PlanInputs, window: tuple[int, int], *, horizon_h: float, alpha: float, rho_km: float,
-               max_km: float) -> dict[str, tuple[float, float]]:
+def plan_epoch(
+    t: float,
+    idle: dict[str, tuple[float, float]],
+    busy: dict[str, tuple[float, tuple[float, float]]],
+    base: PlanInputs,
+    window: tuple[int, int],
+    *,
+    horizon_h: float,
+    alpha: float,
+    rho_km: float,
+    max_km: float,
+) -> dict[str, tuple[float, float]]:
     if not idle:
         return {}
     t_end = min(t + horizon_h * 3600.0, window[1] * 3600.0)
@@ -42,8 +52,11 @@ def plan_epoch(t: float, idle: dict[str, tuple[float, float]], busy: dict[str, t
             if overlap > 0:
                 demand[(h, z)] = v * overlap
     drivers = [PlannedDriver(did, p[0], p[1], t / 3600, t_end / 3600) for did, p in sorted(idle.items())]
-    drivers += [PlannedDriver(did, p[0], p[1], min(free_at, t_end) / 3600, t_end / 3600)
-                for did, (free_at, p) in sorted(busy.items()) if p is not None]
+    drivers += [
+        PlannedDriver(did, p[0], p[1], min(free_at, t_end) / 3600, t_end / 3600)
+        for did, (free_at, p) in sorted(busy.items())
+        if p is not None
+    ]
     inp = PlanInputs(tuple(drivers), base.zones, demand, hours, base.kappa, base.road_factor)
     cov = _Coverage(inp)
     home = {d.did: home_zone(d.lat, d.lon, inp.zones, rho_km) for d in drivers}

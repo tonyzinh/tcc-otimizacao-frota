@@ -1,8 +1,9 @@
 """RN016: nunca assumir equivalência direta de IDs entre sistemas."""
+
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Mapping
 
 
 @dataclass(frozen=True)
@@ -24,4 +25,6 @@ def validate_driver_links(
         raise ValueError("mapeamento motorista não é um-para-um")
     if any(j not in journey_ids or s not in status_ids for j, s in verified_mapping.items()):
         raise ValueError("mapeamento contém ID sem evidência nas fontes")
-    return DriverLinkAudit(True, len(verified_mapping), len(journey_ids - verified_mapping.keys()), len(status_ids - set(verified_mapping.values())))
+    return DriverLinkAudit(
+        True, len(verified_mapping), len(journey_ids - verified_mapping.keys()), len(status_ids - set(verified_mapping.values()))
+    )

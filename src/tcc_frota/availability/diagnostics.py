@@ -1,4 +1,5 @@
 """Diagnóstico agregado de fontes operacionais sem imprimir valores pessoais."""
+
 from __future__ import annotations
 
 from collections import Counter
@@ -8,7 +9,6 @@ from zoneinfo import ZoneInfo
 
 from tcc_frota.availability.contracts import SourceContract, locate_source
 from tcc_frota.availability.io import iter_rows, source_schema
-
 
 _MISSING = {"", "null", "none", "nan", "nat", "<na>"}
 
@@ -42,7 +42,13 @@ def diagnose_source(
     columns = set.intersection(*(set(schema) for schema in schemas))
     missing = sorted(set(contract.required) - columns)
     if missing:
-        return {"dataset": contract.name, "status": "SCHEMA_INCOMPLETO", "files": len(paths), "missing_required": missing, "columns": sorted(columns)}
+        return {
+            "dataset": contract.name,
+            "status": "SCHEMA_INCOMPLETO",
+            "files": len(paths),
+            "missing_required": missing,
+            "columns": sorted(columns),
+        }
     selected = tuple(sorted(set(contract.required) | (set(contract.time_columns) & columns) | ({contract.key} if contract.key else set())))
     non_null: Counter[str] = Counter()
     invalid_time: Counter[str] = Counter()
@@ -82,7 +88,9 @@ def diagnose_source(
                     continue
                 minimum[name] = min(minimum.get(name, parsed), parsed)
                 maximum[name] = max(maximum.get(name, parsed), parsed)
-                if name == primary_time and ((period_start and parsed.date() < period_start) or (period_end and parsed.date() > period_end)):
+                if name == primary_time and (
+                    (period_start and parsed.date() < period_start) or (period_end and parsed.date() > period_end)
+                ):
                     outside_period += 1
     return {
         "dataset": contract.name,

@@ -1,13 +1,12 @@
 """Backtest do proxy de candidatura; não mede disponibilidade confirmada."""
+
 from __future__ import annotations
 
 from collections import defaultdict
-from datetime import timedelta
-from typing import Iterable
+from collections.abc import Iterable
 
 from tcc_frota.availability.forecast import CandidateForecast
 from tcc_frota.availability.timeline import OperationalState, TimelineSegment
-
 
 _NEGATIVE = {
     OperationalState.EM_CORRIDA,

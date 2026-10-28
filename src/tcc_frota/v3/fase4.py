@@ -1,4 +1,5 @@
 """Fase 4: baselines realistas B0–B4, recuperabilidade ρ e conformidade (local, só agregados; pré-registro D3, D10, D11)."""
+
 from __future__ import annotations
 
 import time
@@ -15,11 +16,13 @@ _STUDY = None
 def _init(raw: str) -> None:
     global _STUDY
     from tcc_frota.algoritmos.bateria import build_study
+
     _STUDY = build_study(Path(raw))
 
 
 def _task(args) -> list[dict]:
     from tcc_frota.algoritmos.bateria import load_frozen
+
     world, period, day = args
     frozen = load_frozen()
     specs = av.phase3_specs()
@@ -30,6 +33,7 @@ def _task(args) -> list[dict]:
 
 def run(raw: Path, out: Path, runs: Path, workers: int = 3, reps: int = 10000, echo=print) -> dict:
     from multiprocessing import get_context
+
     from tcc_frota.v2 import experiment as ex
 
     tasks = [(w, p, d) for w in ("origem", "login") for p, per in ex.PERIODS.items() for d in per.test]
@@ -98,10 +102,13 @@ def finish(rows: list[dict], out: Path, reps: int = 10000, echo=print) -> dict:
             res = analise.analyze(analise.build_pairs(synth, field, None, "par"), reps, f"plano_vs_placebo_{tag}")
             write_csv(out / f"fase4_plano_vs_placebo_{tag}_linhas.csv", res["linhas"])
             write_csv(out / f"fase4_plano_vs_placebo_{tag}_nb.csv", res["nb"])
-            summary[f"plano_vs_placebo_{tag}"] = {d: sum(1 for x in res["linhas"] if x["decisao"] == d) for d in ("reducao", "aumento", "inconclusivo")}
+            summary[f"plano_vs_placebo_{tag}"] = {
+                d: sum(1 for x in res["linhas"] if x["decisao"] == d) for d in ("reducao", "aumento", "inconclusivo")
+            }
         # B4 como candidato (sem plano) contra cada política Bk; ρ = 1
-        cand = [r for r in days if r["mundo"] == world and r["par"].endswith("rho1")
-                and r["cenario"] in (analise.BASE, "B4_reativo_candidato")]
+        cand = [
+            r for r in days if r["mundo"] == world and r["par"].endswith("rho1") and r["cenario"] in (analise.BASE, "B4_reativo_candidato")
+        ]
         res = analise.analyze(analise.build_pairs(cand, fields[0][0], None, "par"), reps, f"F4c_{world}")
         write_csv(out / f"fase4_candidato_B4_{world}_linhas.csv", res["linhas"])
         write_csv(out / f"fase4_candidato_B4_{world}_nb.csv", res["nb"])

@@ -1,4 +1,5 @@
 """Cobertura de chaves entre extratos; coincidência de ID não valida vínculo temporal."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -38,14 +39,16 @@ def relationship_coverage(root: Path) -> list[dict[str, object]]:
         if left is None or right is None:
             results.append({"left": left_name, "right": right_name, "status": "FONTE_AUSENTE"})
             continue
-        results.append({
-            "left": left_name,
-            "right": right_name,
-            "left_distinct": len(left),
-            "right_distinct": len(right),
-            "overlap_distinct": len(left & right),
-            "left_only_distinct": len(left - right),
-            "right_only_distinct": len(right - left),
-            "interpretation": "coincidência de chave apenas; validade temporal e semântica não verificadas",
-        })
+        results.append(
+            {
+                "left": left_name,
+                "right": right_name,
+                "left_distinct": len(left),
+                "right_distinct": len(right),
+                "overlap_distinct": len(left & right),
+                "left_only_distinct": len(left - right),
+                "right_only_distinct": len(right - left),
+                "interpretation": "coincidência de chave apenas; validade temporal e semântica não verificadas",
+            }
+        )
     return results

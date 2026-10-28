@@ -3,17 +3,18 @@
 Pré-registro: `docs/ORCAMENTO_CONFIGURACOES.md` §5. Reaproveita a agregação, a regra de escolha, o registro
 e a estatística da bateria (`protocolo.py`, `estatistica.py`). Saídas agregadas em `resultados/seletivo/`.
 """
+
 from __future__ import annotations
 
 import json
 import subprocess
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
+from tcc_frota.algoritmos import protocolo as pr
 from tcc_frota.algoritmos.base import PlannerSpec
 from tcc_frota.algoritmos.bateria import SEEDS, load_frozen, run_tasks
-from tcc_frota.algoritmos import protocolo as pr
 from tcc_frota.v2 import experiment as ex
 
 OUT = pr.RESULTS / "seletivo"
@@ -23,9 +24,14 @@ C1 = PlannerSpec("guloso_marginal", "C1_guloso_marginal_a0.2", {"alpha": 0.2, "r
 
 
 def grid() -> list[PlannerSpec]:
-    return [PlannerSpec("guloso_seletivo", f"C2|H{h:g}|K{k}|tau{t:g}",
-                        {"max_km": h, "k": k, "tau": t, "lam": 0.0, "m": 30, "previsao": "padrao"})
-            for h in (2.0, 3.0, 4.0) for k in (8, 16) for t in (1.0, 2.0)]
+    return [
+        PlannerSpec(
+            "guloso_seletivo", f"C2|H{h:g}|K{k}|tau{t:g}", {"max_km": h, "k": k, "tau": t, "lam": 0.0, "m": 30, "previsao": "padrao"}
+        )
+        for h in (2.0, 3.0, 4.0)
+        for k in (8, 16)
+        for t in (1.0, 2.0)
+    ]
 
 
 def variants(finalist: dict) -> list[PlannerSpec]:
@@ -35,8 +41,11 @@ def variants(finalist: dict) -> list[PlannerSpec]:
 def _calibrate(specs: list[PlannerSpec], name: str, workers: int, raw: Path, echo) -> tuple[list[dict], dict]:
     frozen = load_frozen()
     sim = frozen.sims[pr.CALIB_PERIOD]
-    tasks = [(pr.CALIB_PERIOD, day, pr.CALIB_WINDOW, pr.CALIB_REGIME, sim, [s], frozen.model, SEEDS, k == 0)
-             for day in ex.PERIODS[pr.CALIB_PERIOD].calibration for k, s in enumerate(specs)]
+    tasks = [
+        (pr.CALIB_PERIOD, day, pr.CALIB_WINDOW, pr.CALIB_REGIME, sim, [s], frozen.model, SEEDS, k == 0)
+        for day in ex.PERIODS[pr.CALIB_PERIOD].calibration
+        for k, s in enumerate(specs)
+    ]
     echo(f"[{name}] {len(specs)} configurações × {len(ex.PERIODS[pr.CALIB_PERIOD].calibration)} dias")
     rows = run_tasks(tasks, raw, workers, echo=echo)
     pr.write_rows(RUNS / f"calibracao_{name}.csv", rows)
@@ -48,9 +57,11 @@ def _calibrate(specs: list[PlannerSpec], name: str, workers: int, raw: Path, ech
 
 def _show(summary, chosen, echo):
     for s in sorted(summary, key=lambda s: s["km_vazio_por_corrida"]):
-        echo(f"  {s['cenario']:<28} corridas {s['var_corridas_pct']:+6.2f}%  km vazio/corrida "
-             f"{s['var_km_vazio_por_corrida_pct']:+6.2f}%  mov {s['movimentos_executados']:.1f}  "
-             f"t {s['tempo_plano_medio_s']:.1f}s{'  <- escolhido' if s['cenario'] == chosen else ''}")
+        echo(
+            f"  {s['cenario']:<28} corridas {s['var_corridas_pct']:+6.2f}%  km vazio/corrida "
+            f"{s['var_km_vazio_por_corrida_pct']:+6.2f}%  mov {s['movimentos_executados']:.1f}  "
+            f"t {s['tempo_plano_medio_s']:.1f}s{'  <- escolhido' if s['cenario'] == chosen else ''}"
+        )
 
 
 def calibrate(workers: int = 10, raw: Path = Path("data/raw"), echo=print, register: bool = True, name: str = "guloso_seletivo") -> dict:
@@ -60,8 +71,9 @@ def calibrate(workers: int = 10, raw: Path = Path("data/raw"), echo=print, regis
     if register:
         pr.append_registry(summary, best["cenario"], "calibracao", ",".join(map(str, SEEDS)))
         OUT.mkdir(parents=True, exist_ok=True)
-        (OUT / "calibracao_C2.json").write_text(json.dumps({"codigo": pr.git_head(), "finalista": best, "grade": summary},
-                                                          ensure_ascii=False, indent=2), encoding="utf-8")
+        (OUT / "calibracao_C2.json").write_text(
+            json.dumps({"codigo": pr.git_head(), "finalista": best, "grade": summary}, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
     return best
 
 
@@ -72,17 +84,23 @@ def calibrate_variants(workers: int = 10, raw: Path = Path("data/raw"), echo=pri
     best = min(viable, key=lambda s: s["km_vazio_por_corrida"]) if viable else None
     _show(summary, best["cenario"] if best else "", echo)
     pr.append_registry(summary, best["cenario"] if best else "", "calibracao_variantes_4.4", ",".join(map(str, SEEDS)))
-    (OUT / "calibracao_C3.json").write_text(json.dumps({"codigo": pr.git_head(), "c2": c2, "escolhida": best, "grade": summary},
-                                                      ensure_ascii=False, indent=2), encoding="utf-8")
+    (OUT / "calibracao_C3.json").write_text(
+        json.dumps({"codigo": pr.git_head(), "c2": c2, "escolhida": best, "grade": summary}, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
     return {"escolhida": best["cenario"] if best else None}
 
 
 def freeze() -> dict:
     c2 = json.loads((OUT / "calibracao_C2.json").read_text(encoding="utf-8"))["finalista"]
-    c3 = json.loads((OUT / "calibracao_C3.json").read_text(encoding="utf-8"))["escolhida"] if (OUT / "calibracao_C3.json").exists() else None
-    fin = {"C2": {"cenario": c2["cenario"], "parametros": json.loads(c2["parametros"]), "regra": c2["regra"]},
-           "C3": ({"cenario": c3["cenario"], "parametros": json.loads(c3["parametros"])} if c3 else None),
-           "congelado_em": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "codigo": pr.git_head()}
+    c3 = (
+        json.loads((OUT / "calibracao_C3.json").read_text(encoding="utf-8"))["escolhida"] if (OUT / "calibracao_C3.json").exists() else None
+    )
+    fin = {
+        "C2": {"cenario": c2["cenario"], "parametros": json.loads(c2["parametros"]), "regra": c2["regra"]},
+        "C3": ({"cenario": c3["cenario"], "parametros": json.loads(c3["parametros"])} if c3 else None),
+        "congelado_em": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "codigo": pr.git_head(),
+    }
     FINALISTS.write_text(json.dumps(fin, ensure_ascii=False, indent=2), encoding="utf-8")
     return fin
 
@@ -102,8 +120,12 @@ def run_test(period: str, workers: int = 10, raw: Path = Path("data/raw"), echo=
         raise SystemExit("resultados/seletivo/finalistas.json precisa estar commitado antes do teste")
     frozen = load_frozen()
     specs = test_specs()
-    tasks = [(period, day, pr.CALIB_WINDOW, regime, frozen.sims[period], [s], frozen.model, SEEDS, k == 0)
-             for day in ex.PERIODS[period].test for regime in pr.TEST_REGIMES for k, s in enumerate(specs)]
+    tasks = [
+        (period, day, pr.CALIB_WINDOW, regime, frozen.sims[period], [s], frozen.model, SEEDS, k == 0)
+        for day in ex.PERIODS[period].test
+        for regime in pr.TEST_REGIMES
+        for k, s in enumerate(specs)
+    ]
     echo(f"[seletivo teste {period}] {len(specs)} cenários × {len(ex.PERIODS[period].test)} dias × 2 regimes")
     rows = run_tasks(tasks, raw, workers, echo=echo)
     path = OUT / f"finalistas_{pr.MONTH_LABEL[period]}_dias.csv"
@@ -112,15 +134,18 @@ def run_test(period: str, workers: int = 10, raw: Path = Path("data/raw"), echo=
 
 
 def analyse(period: str) -> list[dict]:
-    from tcc_frota.algoritmos.estatistica import analyse as an, holm
+    from tcc_frota.algoritmos.estatistica import analyse as an
+    from tcc_frota.algoritmos.estatistica import holm
 
     rows = pr.read_rows(OUT / f"finalistas_{pr.MONTH_LABEL[period]}_dias.csv")
     out = []
     for regime in pr.TEST_REGIMES:
         days = pr.per_day([r for r in rows if r["regime"] == regime])
         scen = sorted({c for c, _ in days if c != "sem_reposicionamento"})
-        res = {c: {"periodo": period, "regime": regime, "cenario": c, "m_comparacoes": len(scen),
-                   **an(pr.paired(days, c), len(scen))} for c in scen}
+        res = {
+            c: {"periodo": period, "regime": regime, "cenario": c, "m_comparacoes": len(scen), **an(pr.paired(days, c), len(scen))}
+            for c in scen
+        }
         adj = holm({c: v["p_km_vazio_por_corrida"] for c, v in res.items()})
         for c, v in res.items():
             v["p_km_vazio_por_corrida_holm"] = adj[c]
@@ -149,9 +174,16 @@ def reasons_table() -> list[dict]:
                 a[k] += info.get(k, 0)
         for (p, reg, c), a in sorted(acc.items()):
             tot = sum(a[k] for k in REASONS)
-            out.append({"periodo": p, "regime": reg, "cenario": c, "planos_dia_semente": int(a["planos"]),
-                        **{k: a[k] / a["planos"] for k in REASONS},
-                        **{f"{k}_pct": 100 * a[k] / tot if tot else 0.0 for k in REASONS}})
+            out.append(
+                {
+                    "periodo": p,
+                    "regime": reg,
+                    "cenario": c,
+                    "planos_dia_semente": int(a["planos"]),
+                    **{k: a[k] / a["planos"] for k in REASONS},
+                    **{f"{k}_pct": 100 * a[k] / tot if tot else 0.0 for k in REASONS},
+                }
+            )
     pr.write_rows(OUT / "motivos_decisao.csv", out)
     return out
 
@@ -175,9 +207,16 @@ def pareto() -> Path:
                 continue
             x, y = float(r["km_vazio_por_corrida_var_pct"]), float(r["corridas_atendidas_var_pct"])
             key = r["cenario"][:2]
-            ax.errorbar(x, y, xerr=[[x - float(r["km_vazio_por_corrida_var_pct_ic_inf"])], [float(r["km_vazio_por_corrida_var_pct_ic_sup"]) - x]],
-                        yerr=[[y - float(r["corridas_atendidas_var_pct_ic_inf"])], [float(r["corridas_atendidas_var_pct_ic_sup"]) - y]],
-                        fmt="o", color=colors.get(key, "grey"), label=r["cenario"], capsize=3)
+            ax.errorbar(
+                x,
+                y,
+                xerr=[[x - float(r["km_vazio_por_corrida_var_pct_ic_inf"])], [float(r["km_vazio_por_corrida_var_pct_ic_sup"]) - x]],
+                yerr=[[y - float(r["corridas_atendidas_var_pct_ic_inf"])], [float(r["corridas_atendidas_var_pct_ic_sup"]) - y]],
+                fmt="o",
+                color=colors.get(key, "grey"),
+                label=r["cenario"],
+                capsize=3,
+            )
             rows.append({"periodo": period, "cenario": r["cenario"], "var_corridas_pct": y, "var_km_vazio_por_corrida_pct": x})
         ax.axvline(0, color="grey", lw=0.8, ls="--")
         ax.axhline(-1, color="grey", lw=0.8, ls=":")
@@ -189,8 +228,14 @@ def pareto() -> Path:
     out = OUT / "pareto_C0_C3.png"
     fig.savefig(out, dpi=150)
     plt.close(fig)
-    pr.write_rows(OUT / "pareto_C0_C3.csv", [{"periodo": p, "cenario": "C0_sem_reposicionamento", "var_corridas_pct": 0.0,
-                                               "var_km_vazio_por_corrida_pct": 0.0} for p in pr.MONTH_LABEL] + rows)
+    pr.write_rows(
+        OUT / "pareto_C0_C3.csv",
+        [
+            {"periodo": p, "cenario": "C0_sem_reposicionamento", "var_corridas_pct": 0.0, "var_km_vazio_por_corrida_pct": 0.0}
+            for p in pr.MONTH_LABEL
+        ]
+        + rows,
+    )
     return out
 
 
@@ -203,7 +248,8 @@ def criteria_table() -> list[dict]:
     for period, lab in pr.MONTH_LABEL.items():
         for r in pr.read_rows(OUT / f"finalistas_{lab}.csv"):
             months.setdefault(r["cenario"], {}).setdefault(r["regime"], {})[period] = {
-                k: (num(v) if k not in ("periodo", "regime", "cenario") else v) for k, v in r.items()}
+                k: (num(v) if k not in ("periodo", "regime", "cenario") else v) for k, v in r.items()
+            }
     out = []
     for scen, reg in sorted(months.items()):
         b, a = reg["B"], reg.get("A", {})
@@ -219,16 +265,22 @@ def criteria_table() -> list[dict]:
     pr.write_rows(OUT / "tabela_criterios.csv", out)
     fmt = lambda x: f"{x:+.2f}".replace(".", "{,}")
     yn = lambda x: "sim" if x else "não"
-    lines = [r"% Gerado por tcc_frota.algoritmos.seletivo.criteria_table — não editar à mão.",
-             r"\begin{tabular}{lrrrrcccccc}", r"\hline",
-             r"Cenário & \multicolumn{2}{c}{Corridas (\%)} & \multicolumn{2}{c}{KM vazio/corrida (\%)} & C1 & C2 & C3 & C4 & C5 & Aprovado \\",
-             r" & mar & set & mar & set & & & & & & \\", r"\hline"]
+    lines = [
+        r"% Gerado por tcc_frota.algoritmos.seletivo.criteria_table — não editar à mão.",
+        r"\begin{tabular}{lrrrrcccccc}",
+        r"\hline",
+        r"Cenário & \multicolumn{2}{c}{Corridas (\%)} & \multicolumn{2}{c}{KM vazio/corrida (\%)} & C1 & C2 & C3 & C4 & C5 & Aprovado \\",
+        r" & mar & set & mar & set & & & & & & \\",
+        r"\hline",
+    ]
     for r in out:
         cell = lambda lab, k: f"{fmt(r[f'{lab}_{k}'])} [{fmt(r[f'{lab}_{k}_ic_inf'])}; {fmt(r[f'{lab}_{k}_ic_sup'])}]"
-        lines.append(f"{r['cenario'].replace('_', ' ')} & {cell('marco', 'corridas_atendidas_var_pct')} & {cell('setembro', 'corridas_atendidas_var_pct')} & "
-                     f"{cell('marco', 'km_vazio_por_corrida_var_pct')} & {cell('setembro', 'km_vazio_por_corrida_var_pct')} & "
-                     f"{yn(r['c1_km_vazio_menor'])} & {yn(r['c2_nao_inferior_atendimento'])} & {yn(r['c3_reducao_no_simulador'])} & "
-                     f"{yn(r['c4_consistencia'])} & {yn(r['c5_tempo'])} & {'sim' if r['veredito'].startswith('superior') else 'não'} \\\\")
+        lines.append(
+            f"{r['cenario'].replace('_', ' ')} & {cell('marco', 'corridas_atendidas_var_pct')} & {cell('setembro', 'corridas_atendidas_var_pct')} & "
+            f"{cell('marco', 'km_vazio_por_corrida_var_pct')} & {cell('setembro', 'km_vazio_por_corrida_var_pct')} & "
+            f"{yn(r['c1_km_vazio_menor'])} & {yn(r['c2_nao_inferior_atendimento'])} & {yn(r['c3_reducao_no_simulador'])} & "
+            f"{yn(r['c4_consistencia'])} & {yn(r['c5_tempo'])} & {'sim' if r['veredito'].startswith('superior') else 'não'} \\\\"
+        )
     lines += [r"\hline", r"\end{tabular}"]
     Path("tabelas").mkdir(exist_ok=True)
     Path("tabelas/tab_seletivo_criterios.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")

@@ -1,5 +1,9 @@
 """Guloso seletivo (C2): permanecer é o padrão, aceitação protegida, salto máximo, determinismo e não vazamento."""
+
 from datetime import date, timedelta
+
+from test_algoritmos_busca import scenarios
+from test_v2_policy import instance
 
 from tcc_frota.algoritmos.base import PlanContext
 from tcc_frota.algoritmos.bateria import scenario_days
@@ -7,20 +11,16 @@ from tcc_frota.algoritmos.guloso_seletivo import REASONS, GulosoSeletivo, accept
 from tcc_frota.v2 import forecast as fc
 from tcc_frota.v2.sim import SimParams, reta_km
 
-from test_algoritmos_busca import scenarios
-from test_v2_policy import instance
-
 SIM = SimParams(4.5, 16.0, 1.3, 180.0)
 
 
 def ctx(inp, seed=0, scen=(), regime="B"):
-    return PlanContext(inp, date(2026, 3, 16), (4, 11), regime, SIM,
-                       "fim_do_dia" if regime == "B" else "inicio_turno", scen, seed)
+    return PlanContext(inp, date(2026, 3, 16), (4, 11), regime, SIM, "fim_do_dia" if regime == "B" else "inicio_turno", scen, seed)
 
 
 def test_acceptance_rule_requires_mean_above_tau_se_and_rides():
     assert accept([1.0, 1.1, 0.9, 1.0], [10, 10, 10, 10], [10, 10, 10, 10], 2.0) == (True, True)
-    assert accept([3.0, -2.0, 2.5, -2.0], [10] * 4, [10] * 4, 1.0)[0] is False   # média > 0 mas dentro do ruído
+    assert accept([3.0, -2.0, 2.5, -2.0], [10] * 4, [10] * 4, 1.0)[0] is False  # média > 0 mas dentro do ruído
     assert accept([-0.1, -0.2], [10, 10], [10, 10], 1.0)[0] is False
     assert accept([1.0, 1.0, 1.0], [9, 10, 10], [10, 10, 10], 1.0) == (True, False)
 
@@ -85,5 +85,5 @@ def test_plan_ignores_anything_but_the_context():
     inp = instance(3)
     sc = scenarios(inp, 6, seed=1)
     a = GulosoSeletivo(4.0, 8, 1.0).plan(ctx(inp, 2, sc))
-    _ = scenarios(inp, 3, seed=99)   # pedidos "reais" diferentes de D+1, nunca entregues ao planejador
+    _ = scenarios(inp, 3, seed=99)  # pedidos "reais" diferentes de D+1, nunca entregues ao planejador
     assert a == GulosoSeletivo(4.0, 8, 1.0).plan(ctx(inp, 2, sc))

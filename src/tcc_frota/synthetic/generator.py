@@ -1,10 +1,11 @@
 """Geração sintética sem IDs, placas ou trajetórias da empresa."""
+
 from __future__ import annotations
 
 import csv
 import random
 from dataclasses import dataclass
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
 
 from tcc_frota.models import Position, Request, Vehicle
@@ -48,8 +49,10 @@ def make_synthetic(
                     minute = 5 + index * 11 + rng.randrange(3)
                     origin = zones[zone_id]
                     destination = zones[zone_id if index % 2 == 0 else "centro"]
-                    stamp = datetime.combine(day, time(hour, minute), tzinfo=timezone.utc)
-                    history.append(Request(f"train-{days_before}-{hour}-{zone_id}-{index}", stamp, origin, destination, 10 + rng.randrange(5)))
+                    stamp = datetime.combine(day, time(hour, minute), tzinfo=UTC)
+                    history.append(
+                        Request(f"train-{days_before}-{hour}-{zone_id}-{index}", stamp, origin, destination, 10 + rng.randrange(5))
+                    )
     evaluation: list[Request] = []
     for hour in (8, 9):
         for zone_id, n in (("leste", leste_eval_count), ("centro", 1), ("norte", 1)):
@@ -57,10 +60,10 @@ def make_synthetic(
                 minute = 5 + index * 11 + rng.randrange(3)
                 origin = zones[zone_id]
                 destination = zones[zone_id if index % 2 == 0 else "centro"]
-                stamp = datetime.combine(target_date, time(hour, minute), tzinfo=timezone.utc)
+                stamp = datetime.combine(target_date, time(hour, minute), tzinfo=UTC)
                 evaluation.append(Request(f"test-{hour}-{zone_id}-{index}", stamp, origin, destination, 10 + rng.randrange(5)))
-    start = datetime.combine(target_date, time(7), tzinfo=timezone.utc)
-    end = datetime.combine(target_date + timedelta(days=1), time(0), tzinfo=timezone.utc)
+    start = datetime.combine(target_date, time(7), tzinfo=UTC)
+    end = datetime.combine(target_date + timedelta(days=1), time(0), tzinfo=UTC)
     positions = ("centro",) if initial_distribution == "center" else ("centro", "leste", "norte")
     vehicles = [Vehicle(f"synthetic-{i:03d}", zones[positions[i % len(positions)]], start, end) for i in range(fleet_size)]
     return SyntheticDataset(zones, history, evaluation, vehicles, target_date, seed)
@@ -73,14 +76,52 @@ def export_synthetic(dataset: SyntheticDataset, directory: str | Path) -> tuple[
     vehicle_file = root / "vehicles.csv"
     with request_file.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.writer(handle)
-        writer.writerow(("request_id", "created_at", "origin_zone", "origin_lat", "origin_lon", "destination_zone", "destination_lat", "destination_lon", "trip_minutes", "split", "dataset_kind"))
+        writer.writerow(
+            (
+                "request_id",
+                "created_at",
+                "origin_zone",
+                "origin_lat",
+                "origin_lon",
+                "destination_zone",
+                "destination_lat",
+                "destination_lon",
+                "trip_minutes",
+                "split",
+                "dataset_kind",
+            )
+        )
         for split, requests in (("train", dataset.historical), ("test", dataset.evaluation)):
             for request in requests:
-                writer.writerow((request.request_id, request.created_at.isoformat(), request.origin.zone, request.origin.lat, request.origin.lon, request.destination.zone, request.destination.lat, request.destination.lon, request.trip_minutes, split, "synthetic"))
+                writer.writerow(
+                    (
+                        request.request_id,
+                        request.created_at.isoformat(),
+                        request.origin.zone,
+                        request.origin.lat,
+                        request.origin.lon,
+                        request.destination.zone,
+                        request.destination.lat,
+                        request.destination.lon,
+                        request.trip_minutes,
+                        split,
+                        "synthetic",
+                    )
+                )
     with vehicle_file.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.writer(handle)
         writer.writerow(("vehicle_id", "zone", "lat", "lon", "available_from", "available_until", "dataset_kind"))
         for vehicle in dataset.vehicles:
             assert vehicle.position is not None
-            writer.writerow((vehicle.vehicle_id, vehicle.position.zone, vehicle.position.lat, vehicle.position.lon, vehicle.available_from.isoformat(), vehicle.available_until.isoformat(), "synthetic"))
+            writer.writerow(
+                (
+                    vehicle.vehicle_id,
+                    vehicle.position.zone,
+                    vehicle.position.lat,
+                    vehicle.position.lon,
+                    vehicle.available_from.isoformat(),
+                    vehicle.available_until.isoformat(),
+                    "synthetic",
+                )
+            )
     return request_file, vehicle_file

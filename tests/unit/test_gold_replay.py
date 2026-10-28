@@ -1,20 +1,28 @@
 """Experimento D+1 sobre a Gold com linhas artificiais no mesmo formato do cache."""
+
 from dataclasses import replace
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 import pytest
 
 from tcc_frota.distance import CachedDistance, HaversineDistance, haversine_km
 from tcc_frota.gold.replay import (
-    GoldData, RealExperimentConfig, World, build_world, forecast_zones, materialize,
-    predicted_fleet, run_day, training_days,
+    GoldData,
+    RealExperimentConfig,
+    World,
+    build_world,
+    forecast_zones,
+    materialize,
+    predicted_fleet,
+    run_day,
+    training_days,
 )
 from tcc_frota.models import Commitment, Position, Recommendation, Vehicle
 from tcc_frota.optimization.greedy import Plan
 
 TZ = ZoneInfo("America/Sao_Paulo")
-UTC = timezone.utc
+UTC = UTC
 TARGET = date(2026, 9, 30)  # quarta-feira
 CONFIG = RealExperimentConfig(lookback_days=14, min_presence_rate=0.5)
 TRAIN = [date(2026, 9, 16), date(2026, 9, 23)]
@@ -29,31 +37,56 @@ def ride(ride_id, driver, day, hour, minute=0, *, zone=1, tipo="TempoReal", minu
     lat, lon = Z1 if zone == 1 else Z2
     aceite = local(day, hour, minute)
     return {
-        "id_corrida": ride_id, "id_motorista_pseud": driver, "tipo_solicitacao": tipo,
-        "ts_registro": registro or aceite - timedelta(minutes=1), "ts_aceite": aceite,
-        "ts_chegada": aceite + timedelta(minutes=5), "ts_inicio": aceite + timedelta(minutes=6),
-        "ts_fim": aceite + timedelta(minutes=6 + minutes), "data_local": day,
-        "lat_origem": lat, "lon_origem": lon, "h3_r7_origem": zone,
-        "lat_destino": lat, "lon_destino": lon, "h3_r7_destino": zone,
-        "km_pickup_reta": 1.0, "km_gps_pickup": 1.3, "min_viagem": float(minutes),
+        "id_corrida": ride_id,
+        "id_motorista_pseud": driver,
+        "tipo_solicitacao": tipo,
+        "ts_registro": registro or aceite - timedelta(minutes=1),
+        "ts_aceite": aceite,
+        "ts_chegada": aceite + timedelta(minutes=5),
+        "ts_inicio": aceite + timedelta(minutes=6),
+        "ts_fim": aceite + timedelta(minutes=6 + minutes),
+        "data_local": day,
+        "lat_origem": lat,
+        "lon_origem": lon,
+        "h3_r7_origem": zone,
+        "lat_destino": lat,
+        "lon_destino": lon,
+        "h3_r7_destino": zone,
+        "km_pickup_reta": 1.0,
+        "km_gps_pickup": 1.3,
+        "min_viagem": float(minutes),
     }
 
 
 def presence(driver, day, hour=7, zone_r8=11):
     lat, lon = Z1 if zone_r8 == 11 else Z2
-    return {"id_motorista_pseud": driver, "data_local": day, "hora_local": hour, "fl_disponivel_na_hora": True,
-            "lat_primeira": lat, "lon_primeira": lon, "h3_r8_primeira": zone_r8}
+    return {
+        "id_motorista_pseud": driver,
+        "data_local": day,
+        "hora_local": hour,
+        "fl_disponivel_na_hora": True,
+        "lat_primeira": lat,
+        "lon_primeira": lon,
+        "h3_r8_primeira": zone_r8,
+    }
 
 
 def session(driver, seq, start, end, zone_r8=11, estado="DISPONIVEL"):
     lat, lon = Z1 if zone_r8 == 11 else Z2
-    return {"id_motorista_pseud": driver, "seq_sessao": seq, "estado_sessao": estado, "ts_inicio": start,
-            "ts_fim": end, "lat_inicio": lat, "lon_inicio": lon, "h3_r8_inicio": zone_r8}
+    return {
+        "id_motorista_pseud": driver,
+        "seq_sessao": seq,
+        "estado_sessao": estado,
+        "ts_inicio": start,
+        "ts_fim": end,
+        "lat_inicio": lat,
+        "lon_inicio": lon,
+        "h3_r8_inicio": zone_r8,
+    }
 
 
 def demand(day, hour, zone, qty):
-    return {"data_local": day, "hora_local": hour, "tipo_solicitacao": "TempoReal", "h3_r7": zone,
-            "qtd_corridas_atendidas": qty}
+    return {"data_local": day, "hora_local": hour, "tipo_solicitacao": "TempoReal", "h3_r7": zone, "qtd_corridas_atendidas": qty}
 
 
 def tables(extra_demand=(), extra_presence=(), rides=None, sessions=None):
@@ -64,12 +97,13 @@ def tables(extra_demand=(), extra_presence=(), rides=None, sessions=None):
             {"h3_r8": 22, "h3_r7": 2, "lat_centro_r7": Z2[0], "lon_centro_r7": Z2[1]},
         ],
         "tb_demanda_zona_hora": [demand(d, 8, 2, 3) for d in TRAIN] + list(extra_demand),
-        "tb_frota_sessoes": sessions if sessions is not None else [
+        "tb_frota_sessoes": sessions
+        if sessions is not None
+        else [
             session("a", 1, local(TARGET, 6), local(TARGET, 12)),
             session("b", 1, local(TARGET, 6), local(TARGET, 12), zone_r8=22),
         ],
-        "tb_frota_motorista_hora": [presence(drv, d, h) for d in TRAIN for drv in ("a", "b") for h in (7, 8, 9)]
-        + list(extra_presence),
+        "tb_frota_motorista_hora": [presence(drv, d, h) for d in TRAIN for drv in ("a", "b") for h in (7, 8, 9)] + list(extra_presence),
         "tb_corridas_replay": train_rides + (rides if rides is not None else [ride("r1", "x", TARGET, 8, zone=2)]),
     }
 

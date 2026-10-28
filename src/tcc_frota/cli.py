@@ -1,4 +1,5 @@
 """CLI local; nenhuma subrotina envia dados a serviços externos."""
+
 from __future__ import annotations
 
 import argparse
@@ -6,13 +7,12 @@ import json
 from datetime import date, datetime
 from pathlib import Path
 
+from tcc_frota.demand.forecast import forecast_temporal_counts
 from tcc_frota.experiment import run_synthetic, write_report
-from tcc_frota.ingestion.files import read_rows
-from tcc_frota.ingestion.pipeline import build_local_medallion
 from tcc_frota.ingestion.elasticsearch import discover, process_local
 from tcc_frota.ingestion.es_analytics import build_analytics, build_registration_proxy, profile_request_times
-from tcc_frota.ingestion.files import authorize
-from tcc_frota.demand.forecast import forecast_temporal_counts
+from tcc_frota.ingestion.files import authorize, read_rows
+from tcc_frota.ingestion.pipeline import build_local_medallion
 from tcc_frota.quality.audit import audit_rows
 from tcc_frota.synthetic.generator import export_synthetic, make_synthetic
 
@@ -57,8 +57,9 @@ def main(argv: list[str] | None = None) -> int:
     forecast.add_argument("--cutoff", type=datetime.fromisoformat, required=True)
     forecast.add_argument("--target-date", type=date.fromisoformat, required=True)
     forecast.add_argument("--slot-hours", type=int, default=1)
-    forecast.add_argument("--exploratory-registration-proxy", action="store_true",
-                          help="usa série exploratória de dT_REGISTRO; não é demanda validada")
+    forecast.add_argument(
+        "--exploratory-registration-proxy", action="store_true", help="usa série exploratória de dT_REGISTRO; não é demanda validada"
+    )
     profile = sub.add_parser("es-profile-requests", help="perfil agregado de relógios e status das solicitações")
     profile.add_argument("--run", type=Path, required=True)
     explore = sub.add_parser("es-explore-demand", help="série temporal exploratória de dT_REGISTRO")
@@ -69,13 +70,13 @@ def main(argv: list[str] | None = None) -> int:
     gold_export.add_argument("--v2", action="store_true", help="exporta as tabelas tb_gld_*_v2")
     prepare = sub.add_parser("prepare-raw", help="confere lotes de data/raw contra os manifestos (v2)")
     prepare.add_argument("--raw", type=Path, default=Path("data/raw"))
-    prepare.add_argument("--materialize-to", type=Path, default=None,
-                         help="copia os lotes aceitos para <destino>/<tag>/ sem alterar os originais")
+    prepare.add_argument(
+        "--materialize-to", type=Path, default=None, help="copia os lotes aceitos para <destino>/<tag>/ sem alterar os originais"
+    )
     final = sub.add_parser("final-run", help="v2: dos extratos às tabelas finais do TCC")
     final.add_argument("--raw", type=Path, default=Path("data/raw"))
     final.add_argument("--out", type=Path, default=Path("reports/runs/tcc_final"))
-    final.add_argument("--publish", type=Path, default=None,
-                       help="copia só os agregados (CSV e result.json) para esta pasta versionável")
+    final.add_argument("--publish", type=Path, default=None, help="copia só os agregados (CSV e result.json) para esta pasta versionável")
     fl_export = sub.add_parser("fleetlab-export", help="v2: gera os JSON do FleetLab (uso local, dados pseudonimizados)")
     fl_export.add_argument("--raw", type=Path, default=Path("data/raw"))
     fl_export.add_argument("--result", type=Path, default=Path("reports/tcc_final/result.json"))
@@ -95,12 +96,13 @@ def main(argv: list[str] | None = None) -> int:
     gold_replay.add_argument("--min-presence-rate", type=float, default=0.5)
     gold_replay.add_argument("--max-reposition-km", type=float, default=12.0)
     gold_replay.add_argument("--execution-tolerance-minutes", type=float, default=30.0)
-    gold_replay.add_argument("--algorithm", default="guloso",
-                             choices=("guloso", "proporcional", "atribuicao_otima", "busca_local", "guloso_simulado"))
-    gold_replay.add_argument("--details", action="store_true",
-                             help="grava o detalhe de cada dia (mapa) em days/, ignorado pelo Git")
-    gold_replay.add_argument("--oracle-fleet", action="store_true",
-                             help="diagnóstico com frota real de D+1; viola o corte e não é resultado D+1")
+    gold_replay.add_argument(
+        "--algorithm", default="guloso", choices=("guloso", "proporcional", "atribuicao_otima", "busca_local", "guloso_simulado")
+    )
+    gold_replay.add_argument("--details", action="store_true", help="grava o detalhe de cada dia (mapa) em days/, ignorado pelo Git")
+    gold_replay.add_argument(
+        "--oracle-fleet", action="store_true", help="diagnóstico com frota real de D+1; viola o corte e não é resultado D+1"
+    )
     gold_replay.add_argument("--out", type=Path, default=Path("reports/runs/gold_replay"))
     args = parser.parse_args(argv)
     if args.command == "generate-synthetic":
@@ -108,7 +110,9 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps({"dataset_kind": "synthetic", "files": [str(file) for file in files]}))
     elif args.command == "run-synthetic":
         result = run_synthetic(
-            args.seed, args.fleet_size, args.minimum_coverage,
+            args.seed,
+            args.fleet_size,
+            args.minimum_coverage,
             leste_train_count=args.leste_train_count,
             leste_eval_count=args.leste_eval_count,
             initial_distribution=args.initial_distribution,
@@ -116,7 +120,15 @@ def main(argv: list[str] | None = None) -> int:
             adherence=args.adherence,
         )
         files = write_report(result, args.out)
-        print(json.dumps({"run_id": result["run_id"], "files": [str(file) for file in files], "estimated_km_reduction_percent": result["estimated_km_reduction_percent"]}))
+        print(
+            json.dumps(
+                {
+                    "run_id": result["run_id"],
+                    "files": [str(file) for file in files],
+                    "estimated_km_reduction_percent": result["estimated_km_reduction_percent"],
+                }
+            )
+        )
     elif args.command == "build-synthetic-data":
         manifest = build_local_medallion(make_synthetic(seed=args.seed), args.out)
         print(json.dumps(manifest, ensure_ascii=False, sort_keys=True))
@@ -128,8 +140,9 @@ def main(argv: list[str] | None = None) -> int:
         report = process_local(args.raw_root, args.out)
         run = args.out / report["run_id"]
         if args.command == "es-build":
-            analytical = build_analytics(run, creation_status=args.creation_status,
-                                         creation_field=args.creation_field, timezone=args.timezone)
+            analytical = build_analytics(
+                run, creation_status=args.creation_status, creation_field=args.creation_field, timezone=args.timezone
+            )
             print(json.dumps(analytical, ensure_ascii=False, sort_keys=True))
         else:
             print(json.dumps({"run_id": report["run_id"], "coverage": report["coverage"]}, ensure_ascii=False))
@@ -137,8 +150,11 @@ def main(argv: list[str] | None = None) -> int:
         authorize("real", "local")
         import pyarrow.parquet as pq
 
-        path = (args.run / "exploration" / "registration_proxy_hourly.parquet"
-                if args.exploratory_registration_proxy else args.run / "gold" / "demand_hourly.parquet")
+        path = (
+            args.run / "exploration" / "registration_proxy_hourly.parquet"
+            if args.exploratory_registration_proxy
+            else args.run / "gold" / "demand_hourly.parquet"
+        )
         if not path.is_file():
             raise ValueError("série temporal ausente; execute es-explore-demand ou valide criação e execute es-build")
         coverage = json.loads((args.run / "coverage.json").read_text(encoding="utf-8"))["coverage"]
@@ -146,15 +162,20 @@ def main(argv: list[str] | None = None) -> int:
         table = pq.read_table(path, columns=["date", "hour", "request_count"])
         values = zip(table["date"].to_pylist(), table["hour"].to_pylist(), table["request_count"].to_pylist())
         result = forecast_temporal_counts(values, months, args.target_date, args.cutoff, slot_hours=args.slot_hours)
-        result["time_basis"] = ("document_registration_unverified" if args.exploratory_registration_proxy
-                                else "verified_request_creation")
-        result["scientific_status"] = ("exploratory_only_not_validated_demand"
-                                       if args.exploratory_registration_proxy else "validated_creation_source_required")
+        result["time_basis"] = "document_registration_unverified" if args.exploratory_registration_proxy else "verified_request_creation"
+        result["scientific_status"] = (
+            "exploratory_only_not_validated_demand" if args.exploratory_registration_proxy else "validated_creation_source_required"
+        )
         print(json.dumps(result, ensure_ascii=False, sort_keys=True))
     elif args.command == "es-profile-requests":
         report = profile_request_times(args.run)
-        print(json.dumps({"run_id": report["run_id"], "audit": report["audit"],
-                          "report": str(args.run / "request_time_profile.json")}, ensure_ascii=False, sort_keys=True))
+        print(
+            json.dumps(
+                {"run_id": report["run_id"], "audit": report["audit"], "report": str(args.run / "request_time_profile.json")},
+                ensure_ascii=False,
+                sort_keys=True,
+            )
+        )
     elif args.command == "es-explore-demand":
         report = build_registration_proxy(args.run, timezone=args.timezone)
         print(json.dumps(report, ensure_ascii=False, sort_keys=True))
@@ -200,25 +221,30 @@ def main(argv: list[str] | None = None) -> int:
 
         authorize("real", "local")
         config = RealExperimentConfig(
-            plan_hour=args.plan_hour, horizon_hours=args.horizon_hours, lookback_days=args.lookback_days,
-            min_presence_rate=args.min_presence_rate, max_reposition_km=args.max_reposition_km,
-            execution_tolerance_minutes=args.execution_tolerance_minutes, oracle_fleet=args.oracle_fleet,
+            plan_hour=args.plan_hour,
+            horizon_hours=args.horizon_hours,
+            lookback_days=args.lookback_days,
+            min_presence_rate=args.min_presence_rate,
+            max_reposition_km=args.max_reposition_km,
+            execution_tolerance_minutes=args.execution_tolerance_minutes,
+            oracle_fleet=args.oracle_fleet,
             algorithm=args.algorithm,
         )
-        result = run_period(str(args.cache), args.start, args.end, config, workers=args.workers,
-                            details=args.details)
+        result = run_period(str(args.cache), args.start, args.end, config, workers=args.workers, details=args.details)
         out = args.out / result["run_id"]
         out.mkdir(parents=True, exist_ok=True)
         for day in result["days"]:
             detail = day.pop("details", None)
             if detail is not None:
                 (out / "days").mkdir(exist_ok=True)
-                (out / "days" / f"{day['target_date']}.json").write_text(
-                    json.dumps(detail, ensure_ascii=False) + "\n", encoding="utf-8")
-        (out / "result.json").write_text(json.dumps(result, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
-                                         encoding="utf-8")
-        print(json.dumps({"run_id": result["run_id"], "config": asdict(config), "totals": result["totals"],
-                          "file": str(out / "result.json")}, ensure_ascii=False))
+                (out / "days" / f"{day['target_date']}.json").write_text(json.dumps(detail, ensure_ascii=False) + "\n", encoding="utf-8")
+        (out / "result.json").write_text(json.dumps(result, indent=2, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
+        print(
+            json.dumps(
+                {"run_id": result["run_id"], "config": asdict(config), "totals": result["totals"], "file": str(out / "result.json")},
+                ensure_ascii=False,
+            )
+        )
     else:
         rows = read_rows(args.path, dataset_kind=args.dataset_kind)
         summary = audit_rows(rows, tuple(args.required), key=args.key)

@@ -1,11 +1,10 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from zoneinfo import ZoneInfo
 
 import pytest
 
 from tcc_frota.availability.rides import ride_intervals
 from tcc_frota.availability.timeline import EvidenceInterval, OperationalState, reconstruct_timeline
-
 
 TZ = ZoneInfo("America/Sao_Paulo")
 
@@ -15,7 +14,16 @@ def at(day: int, hour: int, minute: int = 0) -> datetime:
 
 
 def test_midnight_ride_and_half_open_boundary_leave_unknown_gap():
-    rows = [{"CD_SOLICITACAO": "r1", "CD_VEICULO": "v1", "CD_MOTORISTA": "m1", "TX_STATUS": "CorridaEncerrada", "DT_INICIO_REALIZADA": "2026-10-12 23:50:00", "DT_FIM_REALIZADA": "2026-10-13 00:20:00"}]
+    rows = [
+        {
+            "CD_SOLICITACAO": "r1",
+            "CD_VEICULO": "v1",
+            "CD_MOTORISTA": "m1",
+            "TX_STATUS": "CorridaEncerrada",
+            "DT_INICIO_REALIZADA": "2026-10-12 23:50:00",
+            "DT_FIM_REALIZADA": "2026-10-13 00:20:00",
+        }
+    ]
     rides, audit = ride_intervals(rows, timezone="America/Sao_Paulo", as_of=at(13, 1))
     timeline = reconstruct_timeline(rides, ["v1"], at(12, 23), at(13, 1))
     assert audit["accepted_completed_requests"] == 1
@@ -50,7 +58,13 @@ def test_missing_end_cannot_become_infinite_interval():
 
 
 def test_conflicting_completed_versions_excluded_and_future_ride_excluded():
-    base = {"CD_SOLICITACAO": "r1", "CD_VEICULO": "v", "TX_STATUS": "CorridaEncerrada", "DT_INICIO_REALIZADA": "2026-10-13 08:00:00", "DT_FIM_REALIZADA": "2026-10-13 09:00:00"}
+    base = {
+        "CD_SOLICITACAO": "r1",
+        "CD_VEICULO": "v",
+        "TX_STATUS": "CorridaEncerrada",
+        "DT_INICIO_REALIZADA": "2026-10-13 08:00:00",
+        "DT_FIM_REALIZADA": "2026-10-13 09:00:00",
+    }
     other = dict(base, DT_FIM_REALIZADA="2026-10-13 09:10:00")
     future = dict(base, CD_SOLICITACAO="r2", DT_FIM_REALIZADA="2026-10-13 12:00:00")
     intervals, audit = ride_intervals([base, dict(base), other, future], timezone="America/Sao_Paulo", as_of=at(13, 10))

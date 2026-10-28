@@ -1,9 +1,10 @@
 """Ranking conservador; não recomenda veículos sem probabilidade e região validadas."""
+
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Iterable
 
 from tcc_frota.availability.forecast import CandidateForecast
 from tcc_frota.models import aware
@@ -51,16 +52,24 @@ def rank_experimental_candidates(
     result: list[ExperimentalCandidate] = []
     for item in forecasts:
         if (
-            item.target != need.at or item.region != need.origin_region
-            or item.candidate_probability is None or item.candidate_probability < min_candidate_probability
-            or item.location_age_minutes is None or item.location_age_minutes > max_position_age_minutes
+            item.target != need.at
+            or item.region != need.origin_region
+            or item.candidate_probability is None
+            or item.candidate_probability < min_candidate_probability
+            or item.location_age_minutes is None
+            or item.location_age_minutes > max_position_age_minutes
         ):
             continue
-        result.append(ExperimentalCandidate(
-            item.vehicle_id, item.target, item.region, item.candidate_probability,
-            item.location_age_minutes,
-            "Online histórico sem ocupação conhecida + região Cobli inferida; disponibilidade futura não confirmada",
-        ))
+        result.append(
+            ExperimentalCandidate(
+                item.vehicle_id,
+                item.target,
+                item.region,
+                item.candidate_probability,
+                item.location_age_minutes,
+                "Online histórico sem ocupação conhecida + região Cobli inferida; disponibilidade futura não confirmada",
+            )
+        )
     return sorted(result, key=lambda item: (-item.candidate_probability, item.location_age_minutes, item.vehicle_id))
 
 
@@ -79,17 +88,21 @@ def rank_vehicles(
             continue
         probability = prediction.availability_probability
         if (
-            probability is None or probability < min_probability
-            or not prediction.availability_validated or not prediction.region_validated
+            probability is None
+            or probability < min_probability
+            or not prediction.availability_validated
+            or not prediction.region_validated
             or prediction.region != need.origin_region
         ):
             continue
         if not 0 <= probability <= 1:
             raise ValueError("probabilidade inválida")
-        ranked.append(RankedVehicle(
-            prediction.vehicle_id,
-            probability,
-            probability,
-            "elegibilidade e região confirmadas; probabilidade de disponibilidade informada",
-        ))
+        ranked.append(
+            RankedVehicle(
+                prediction.vehicle_id,
+                probability,
+                probability,
+                "elegibilidade e região confirmadas; probabilidade de disponibilidade informada",
+            )
+        )
     return sorted(ranked, key=lambda item: (-item.score, item.vehicle_id))

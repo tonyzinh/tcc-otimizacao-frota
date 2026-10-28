@@ -1,7 +1,9 @@
 """5.1/5.2: fluxo de custo mínimo e húngaro com posições de espera."""
+
 from datetime import date
 
 import pytest
+from test_v2_policy import instance
 
 from tcc_frota.algoritmos.alvos import largest_remainder, marginal_targets, surplus_deficit, targets
 from tcc_frota.algoritmos.base import PlanContext
@@ -9,8 +11,6 @@ from tcc_frota.algoritmos.fluxo_custo_minimo import FluxoCustoMinimo, FluxoParam
 from tcc_frota.v2.fleet import PlannedDriver
 from tcc_frota.v2.policy import PlanInputs
 from tcc_frota.v2.sim import SimParams, reta_km
-
-from test_v2_policy import instance
 
 SIM = SimParams(4.5, 16.0, 1.3, 180.0)
 
@@ -30,7 +30,7 @@ def test_targets_sum_and_cap():
 
 def test_marginal_targets_saturate_demand():
     out = marginal_targets({"a": 2.0, "b": 0.5}, 10, per_driver=1.0)
-    assert out == {"a": 2, "b": 1}   # depois disso nenhuma vaga acrescenta valor
+    assert out == {"a": 2, "b": 1}  # depois disso nenhuma vaga acrescenta valor
 
 
 def test_surplus_deficit_balance():
@@ -53,7 +53,7 @@ def test_flow_moves_respect_hop_and_are_deterministic(alvo):
 
 
 def test_flow_moves_surplus_to_deficit():
-    zones = {"z1": (-20.30, -40.30), "z2": (-20.31, -40.30)}   # ~1,1 km
+    zones = {"z1": (-20.30, -40.30), "z2": (-20.31, -40.30)}  # ~1,1 km
     drivers = tuple(PlannedDriver(f"d{k}", -20.30, -40.30 + 1e-4 * k, 4, 8) for k in range(2))
     inp = PlanInputs(drivers, zones, {(4, "z2"): 5.0, (4, "z1"): 5.0}, (4,), 1.0, 1.3)
     moves = FluxoCustoMinimo("demanda", 1.0, 3.0).plan(ctx(inp))
@@ -70,6 +70,7 @@ def test_parametric_min_km_filters_short_moves():
 def _brute_force(inp, slots, zone_of, hop):
     """Máximo de vagas preenchidas e, entre esses, menor km (força bruta em instância pequena)."""
     from itertools import product
+
     drivers = sorted(inp.drivers, key=lambda d: d.did)
     best = None
     for choice in product(range(-1, len(slots)), repeat=len(drivers)):
@@ -95,6 +96,7 @@ def _brute_force(inp, slots, zone_of, hop):
 def test_hungarian_matches_brute_force_on_small_instances():
     from tcc_frota.algoritmos.alvos import driver_zones, targets
     from tcc_frota.algoritmos.hungaro import HungaroPosicoesEspera
+
     for seed in range(6):
         inp = instance(seed, n_drivers=5, n_zones=4)
         planner = HungaroPosicoesEspera("demanda", 1.0, 6.0)
@@ -107,6 +109,7 @@ def test_hungarian_matches_brute_force_on_small_instances():
 
 def test_hungarian_respects_hop_and_is_deterministic():
     from tcc_frota.algoritmos.hungaro import HungaroPosicoesEspera
+
     for seed in range(6):
         inp = instance(seed)
         p = HungaroPosicoesEspera("valor_marginal", 1.3, 3.0)

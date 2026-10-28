@@ -7,6 +7,7 @@
 - `misto`: (1 − w)·demanda + w·valor marginal, para o planejador paramétrico do NSGA-II.
 Um teto opcional limita o alvo por zona. Nenhum alvo é política da empresa (RN019).
 """
+
 from __future__ import annotations
 
 import heapq
@@ -36,7 +37,7 @@ def largest_remainder(real: dict[str, float], total: int) -> dict[str, int]:
     total = max(0, total)
     base = {z: int(v) for z, v in real.items()}
     rest = total - sum(base.values())
-    for z in sorted(real, key=lambda z: (-(real[z] - base[z]), z))[:max(0, rest)]:
+    for z in sorted(real, key=lambda z: (-(real[z] - base[z]), z))[: max(0, rest)]:
         base[z] += 1
     return {z: n for z, n in base.items() if n > 0}
 

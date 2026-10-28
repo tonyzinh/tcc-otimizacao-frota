@@ -1,4 +1,5 @@
 """Bronze/Silver/Gold local, restrito a sintéticos nesta versão."""
+
 from __future__ import annotations
 
 import csv
@@ -28,7 +29,9 @@ def build_local_medallion(dataset: SyntheticDataset, root: str | Path) -> dict[s
     bronze_requests, bronze_vehicles = export_synthetic(dataset, root / "bronze")
     raw_requests = list(read_rows(bronze_requests, dataset_kind="synthetic"))
     raw_vehicles = list(read_rows(bronze_vehicles, dataset_kind="synthetic"))
-    request_audit = audit_rows(raw_requests, ("request_id", "created_at", "origin_lat", "origin_lon", "destination_lat", "destination_lon"), key="request_id")
+    request_audit = audit_rows(
+        raw_requests, ("request_id", "created_at", "origin_lat", "origin_lon", "destination_lat", "destination_lon"), key="request_id"
+    )
     vehicle_audit = audit_rows(raw_vehicles, ("vehicle_id", "available_from", "available_until"), key="vehicle_id")
     excluded = Counter()
     silver_requests: list[dict[str, object]] = []
@@ -51,14 +54,39 @@ def build_local_medallion(dataset: SyntheticDataset, root: str | Path) -> dict[s
             excluded["invalid_request"] += 1
             continue
         seen.add(request_id)
-        silver_requests.append({
-            "request_id": request_id, "created_at": stamp.isoformat(), "zone": row["origin_zone"],
-            "origin_lat": lat, "origin_lon": lon, "destination_zone": row["destination_zone"],
-            "destination_lat": dest_lat, "destination_lon": dest_lon,
-            "trip_minutes": duration, "split": row["split"], "dataset_kind": "synthetic",
-        })
+        silver_requests.append(
+            {
+                "request_id": request_id,
+                "created_at": stamp.isoformat(),
+                "zone": row["origin_zone"],
+                "origin_lat": lat,
+                "origin_lon": lon,
+                "destination_zone": row["destination_zone"],
+                "destination_lat": dest_lat,
+                "destination_lon": dest_lon,
+                "trip_minutes": duration,
+                "split": row["split"],
+                "dataset_kind": "synthetic",
+            }
+        )
     silver_path = root / "silver" / "requests.csv"
-    _write_csv(silver_path, ("request_id", "created_at", "zone", "origin_lat", "origin_lon", "destination_zone", "destination_lat", "destination_lon", "trip_minutes", "split", "dataset_kind"), silver_requests)
+    _write_csv(
+        silver_path,
+        (
+            "request_id",
+            "created_at",
+            "zone",
+            "origin_lat",
+            "origin_lon",
+            "destination_zone",
+            "destination_lat",
+            "destination_lon",
+            "trip_minutes",
+            "split",
+            "dataset_kind",
+        ),
+        silver_requests,
+    )
     silver_vehicles: list[dict[str, object]] = []
     seen_vehicles: set[str] = set()
     for row in raw_vehicles:
@@ -74,13 +102,21 @@ def build_local_medallion(dataset: SyntheticDataset, root: str | Path) -> dict[s
             excluded["invalid_or_duplicate_vehicle"] += 1
             continue
         seen_vehicles.add(vehicle_id)
-        silver_vehicles.append({
-            "vehicle_id": vehicle_id, "zone": row["zone"], "lat": lat, "lon": lon,
-            "available_from": start.isoformat(), "available_until": end.isoformat(),
-            "dataset_kind": "synthetic",
-        })
+        silver_vehicles.append(
+            {
+                "vehicle_id": vehicle_id,
+                "zone": row["zone"],
+                "lat": lat,
+                "lon": lon,
+                "available_from": start.isoformat(),
+                "available_until": end.isoformat(),
+                "dataset_kind": "synthetic",
+            }
+        )
     silver_vehicle_path = root / "silver" / "vehicles.csv"
-    _write_csv(silver_vehicle_path, ("vehicle_id", "zone", "lat", "lon", "available_from", "available_until", "dataset_kind"), silver_vehicles)
+    _write_csv(
+        silver_vehicle_path, ("vehicle_id", "zone", "lat", "lon", "available_from", "available_until", "dataset_kind"), silver_vehicles
+    )
     counts = Counter((row["split"], row["zone"], datetime.fromisoformat(str(row["created_at"])).hour) for row in silver_requests)
     gold_rows = [
         {"split": split, "zone": zone, "hour": hour, "request_count": count, "dataset_kind": "synthetic"}
@@ -89,10 +125,14 @@ def build_local_medallion(dataset: SyntheticDataset, root: str | Path) -> dict[s
     gold_path = root / "gold" / "demand.csv"
     _write_csv(gold_path, ("split", "zone", "hour", "request_count", "dataset_kind"), gold_rows)
     availability_path = root / "gold" / "availability_planned.csv"
-    _write_csv(availability_path, ("zone", "vehicle_count", "dataset_kind"), [
-        {"zone": zone, "vehicle_count": count, "dataset_kind": "synthetic"}
-        for zone, count in sorted(Counter(row["zone"] for row in silver_vehicles).items())
-    ])
+    _write_csv(
+        availability_path,
+        ("zone", "vehicle_count", "dataset_kind"),
+        [
+            {"zone": zone, "vehicle_count": count, "dataset_kind": "synthetic"}
+            for zone, count in sorted(Counter(row["zone"] for row in silver_vehicles).items())
+        ],
+    )
     manifest = {
         "dataset_kind": "synthetic",
         "seed": dataset.seed,

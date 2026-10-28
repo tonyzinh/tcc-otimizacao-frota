@@ -19,11 +19,13 @@ def test_diagnostic_reports_coverage_duplicates_and_bad_dates_without_values(tmp
     with path.open("w", encoding="utf-8", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=["CD_SOLICITACAO", "DT_REGISTRO", "TX_STATUS"])
         writer.writeheader()
-        writer.writerows([
-            {"CD_SOLICITACAO": "private-1", "DT_REGISTRO": "2025-01-01 10:00:00", "TX_STATUS": "CorridaEncerrada"},
-            {"CD_SOLICITACAO": "private-1", "DT_REGISTRO": "bad-time", "TX_STATUS": "CorridaEncerrada"},
-            {"CD_SOLICITACAO": "", "DT_REGISTRO": "2024-12-31 23:00:00", "TX_STATUS": ""},
-        ])
+        writer.writerows(
+            [
+                {"CD_SOLICITACAO": "private-1", "DT_REGISTRO": "2025-01-01 10:00:00", "TX_STATUS": "CorridaEncerrada"},
+                {"CD_SOLICITACAO": "private-1", "DT_REGISTRO": "bad-time", "TX_STATUS": "CorridaEncerrada"},
+                {"CD_SOLICITACAO": "", "DT_REGISTRO": "2024-12-31 23:00:00", "TX_STATUS": ""},
+            ]
+        )
     contract = SourceContract("corridas_v1", ("CD_SOLICITACAO", "DT_REGISTRO"), ("DT_REGISTRO",), "CD_SOLICITACAO")
     report = diagnose_source(tmp_path, contract, timezone="America/Sao_Paulo", period_start=date(2025, 1, 1))
     assert report["rows"] == 3
@@ -49,7 +51,9 @@ def test_partitioned_parquet_is_streamed_when_pyarrow_is_installed(tmp_path):
     for month in ("01", "02"):
         directory = tmp_path / "corridas_v1" / "year=2025" / f"month={month}"
         directory.mkdir(parents=True)
-        pq.write_table(pa.table({"CD_SOLICITACAO": [f"r{month}"], "DT_REGISTRO": [f"2025-{month}-01 10:00:00"]}), directory / "part.parquet")
+        pq.write_table(
+            pa.table({"CD_SOLICITACAO": [f"r{month}"], "DT_REGISTRO": [f"2025-{month}-01 10:00:00"]}), directory / "part.parquet"
+        )
     contract = SourceContract("corridas_v1", ("CD_SOLICITACAO", "DT_REGISTRO"), ("DT_REGISTRO",), "CD_SOLICITACAO")
     report = diagnose_source(tmp_path, contract, timezone="America/Sao_Paulo")
     assert report["rows"] == 2

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -7,8 +7,7 @@ from tcc_frota.evaluation.metrics import compare, summarize
 from tcc_frota.models import Commitment, Position, Recommendation, Request, Vehicle
 from tcc_frota.simulation.engine import SimulationConfig, simulate
 
-
-UTC = timezone.utc
+UTC = UTC
 START = datetime(2026, 1, 2, 7, tzinfo=UTC)
 A = Position("a", -20.30, -40.30)
 B = Position("b", -20.31, -40.30)
@@ -44,7 +43,13 @@ def test_vehicle_released_after_trip_and_midnight_crossing():
 
 def test_shared_external_commitment_blocks_vehicle_and_unknown_position():
     commitment = Commitment("v", START, START + timedelta(hours=2), "PJ")
-    result = simulate("baseline", [request(at=START + timedelta(hours=1)), request("later", START + timedelta(hours=3))], [vehicle()], CONFIG, commitments=(commitment,))
+    result = simulate(
+        "baseline",
+        [request(at=START + timedelta(hours=1)), request("later", START + timedelta(hours=3))],
+        [vehicle()],
+        CONFIG,
+        commitments=(commitment,),
+    )
     assert result.served_ids == []
     assert result.excluded["unserved_no_eligible_vehicle_or_wait"] == 2
     known = Commitment("v", START, START + timedelta(hours=2), "PJ", B)
@@ -54,7 +59,9 @@ def test_shared_external_commitment_blocks_vehicle_and_unknown_position():
 
 def test_future_indisponibility_prevents_assignment_that_would_overlap():
     commitment = Commitment("v", START + timedelta(hours=1, minutes=5), START + timedelta(hours=2), "PJ", B)
-    result = simulate("baseline", [request(at=START + timedelta(hours=1), origin=A, minutes=10)], [vehicle()], CONFIG, commitments=(commitment,))
+    result = simulate(
+        "baseline", [request(at=START + timedelta(hours=1), origin=A, minutes=10)], [vehicle()], CONFIG, commitments=(commitment,)
+    )
     assert result.served_ids == []
     assert result.excluded["unserved_no_eligible_vehicle_or_wait"] == 1
 

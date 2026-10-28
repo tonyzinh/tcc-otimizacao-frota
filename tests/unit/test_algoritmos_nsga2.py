@@ -1,4 +1,5 @@
 """5.6 NSGA-II: ordenação não dominada, multidão, operadores e convergência num problema conhecido."""
+
 import random
 
 from tcc_frota.algoritmos import nsga2 as ng
@@ -30,6 +31,7 @@ def test_nsga2_approaches_known_front():
         g = sum((v - lo) / (hi - lo) for v, (lo, hi) in zip(x[1:], ng.BOUNDS[1:]))
         f0 = (x[0] - ng.BOUNDS[0][0]) / (ng.BOUNDS[0][1] - ng.BOUNDS[0][0])
         return (f0, 1 - f0 + g), {}
+
     hist = ng.nsga2(ev, random.Random(3), pop_size=20, generations=30)
     assert len(hist) == 600
     best_g = min(o[0] + o[1] - 1 for _, o, _ in hist)

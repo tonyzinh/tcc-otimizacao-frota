@@ -3,6 +3,7 @@
 Mundo 100% sintético: nenhum dado real. Serve para checar que o simulador e a cadeia de inferência *conseguem* registrar um
 ganho quando ele existe por construção. Planejadores, parâmetros e inferência são os mesmos das Fases 1 e 3.
 """
+
 from __future__ import annotations
 
 import math
@@ -22,8 +23,8 @@ LAT0, LON0 = -20.30, -40.30
 KM_LAT = 111.19
 WINDOW = (4, 11)
 N_DRIVERS = 12
-HOT_RATE, COLD_RATE = 60, 10          # pedidos por dia
-HOP_KM = 2.0                          # distância reta de C à zona quente
+HOT_RATE, COLD_RATE = 60, 10  # pedidos por dia
+HOP_KM = 2.0  # distância reta de C à zona quente
 TRIP_S = 600.0
 JITTER_KM = 0.3
 N_DAYS = 16
@@ -32,7 +33,7 @@ SIDES = {"E": (1, 0), "W": (-1, 0), "N": (0, 1), "S": (0, -1)}
 SEEDS = (11, 23, 37, 41, 53)
 START = date(2026, 3, 16)
 
-SCENARIOS = {       # raio de despacho em km; os demais parâmetros são os de março (reports/tcc_final/result.json)
+SCENARIOS = {  # raio de despacho em km; os demais parâmetros são os de março (reports/tcc_final/result.json)
     "alcancavel": 4.5,
     "fora_do_raio": 1.5,
 }
@@ -119,7 +120,9 @@ def make_scenarios(mode: str, forecast_mode: str, n: int = N_SCENARIOS) -> tuple
     return tuple(out)
 
 
-def run_day(day_index: int, scenario: str, specs, *, mode: str, forecast: str, null_move: bool = False, include_baseline: bool = True) -> list[dict]:
+def run_day(
+    day_index: int, scenario: str, specs, *, mode: str, forecast: str, null_move: bool = False, include_baseline: bool = True
+) -> list[dict]:
     """Um dia: baseline sem reposicionamento e um plano por planejador (e semente). `mode`: fixa|sorteada (zona quente);
     `forecast`: verdadeira|uniforme (informação entregue ao planejador). `null_move`: alvos = posição atual (controle N2)."""
     sim = sim_params(scenario)
@@ -134,24 +137,49 @@ def run_day(day_index: int, scenario: str, specs, *, mode: str, forecast: str, n
     rows = []
 
     def row(name, family, res, seed, km_plan):
-        return {**key, "familia": family, "cenario": name, "semente": seed, "n_requests": res.n_requests, "served": res.served,
-                "pickup_km": res.pickup_km, "reposition_km": res.reposition_km, "empty_km": res.empty_km, "empty_km_sim": res.empty_km_sim,
-                "overnight_km": res.overnight_km, "wait_sum": sum(res.wait_s), "moves_planned": res.moves_planned,
-                "moves_executed": res.moves_executed, "km_planejado": km_plan}
+        return {
+            **key,
+            "familia": family,
+            "cenario": name,
+            "semente": seed,
+            "n_requests": res.n_requests,
+            "served": res.served,
+            "pickup_km": res.pickup_km,
+            "reposition_km": res.reposition_km,
+            "empty_km": res.empty_km,
+            "empty_km_sim": res.empty_km_sim,
+            "overnight_km": res.overnight_km,
+            "wait_sum": sum(res.wait_s),
+            "moves_planned": res.moves_planned,
+            "moves_executed": res.moves_executed,
+            "km_planejado": km_plan,
+        }
+
     if include_baseline:
         rows.append(row("sem_reposicionamento", "nenhum", base, "", 0.0))
-    sides = {s: (HOT_RATE if s == side else 0.0) for s in SIDES} if forecast == "verdadeira" else {s: HOT_RATE / 4 for s in SIDES}
+    sides = {s: (HOT_RATE if s == side else 0.0) for s in SIDES} if forecast == "verdadeira" else dict.fromkeys(SIDES, HOT_RATE / 4)
     sides = {s: r for s, r in sides.items() if r > 0}
     inputs = plan_inputs(drivers, origins, sides, sim.road_factor)
     scenarios = make_scenarios(mode, forecast)
     for spec in specs:
         planner = build_planner(spec)
-        for seed in (SEEDS if planner.stochastic else SEEDS[:1]):
+        for seed in SEEDS if planner.stochastic else SEEDS[:1]:
             if null_move:
                 moves = {d.did: (*origins[d.did], 0.0) for d in drivers}
             else:
-                moves = planner.plan(PlanContext(inputs, START + timedelta(days=day_index), WINDOW, "B", sim, "fim_do_dia",
-                                                 scenarios if getattr(planner, "needs_scenarios", False) else (), seed, {}))
+                moves = planner.plan(
+                    PlanContext(
+                        inputs,
+                        START + timedelta(days=day_index),
+                        WINDOW,
+                        "B",
+                        sim,
+                        "fim_do_dia",
+                        scenarios if getattr(planner, "needs_scenarios", False) else (),
+                        seed,
+                        {},
+                    )
+                )
             res = simulate3(reqs, drivers, sim, w, latlon(moves), max_move_km=planner.max_km, **kw)
             if res.signature != base.signature:
                 raise AssertionError("cenários com entradas diferentes (RN028)")

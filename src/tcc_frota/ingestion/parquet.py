@@ -1,9 +1,9 @@
 """Guardas para leitura de Parquet autorizado em um Volume do Unity Catalog."""
+
 from __future__ import annotations
 
 import re
 from pathlib import PurePosixPath
-
 
 _IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\Z")
 

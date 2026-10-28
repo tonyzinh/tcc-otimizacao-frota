@@ -1,11 +1,12 @@
 """Gold local da v2, equivalente aos notebooks `nb_gld_*_v2` (sem previsão nem algoritmo)."""
+
 from __future__ import annotations
 
 import bisect
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from datetime import timedelta
-from statistics import median, quantiles
+from statistics import quantiles
 
 from tcc_frota.v2 import rules
 from tcc_frota.v2.silver import Silver, _km
@@ -55,26 +56,33 @@ def replay_universe(silver: Silver, gold: Gold) -> None:
             continue
         f["universo_replay"] += 1
         patience_obs = req["s_registro_ate_status_final"] if req["grupo_desfecho"] == "cancelada_solicitante_pre_aceite" else None
-        gold.replay_pedidos.append({
-            "codigo": req["codigo"],
-            "tag_lote": req["tag_lote"],
-            "ts_pedido": req["ts_base"],
-            "data_local": req["data_base"],
-            "hora_local": req["hora_base"],
-            "tipo_servico": req["tipo_servico"],
-            "lat_origem": req["lat_origem"], "lon_origem": req["lon_origem"],
-            "h3_r7_origem": req["h3_r7_origem"], "h3_r8_origem": req["h3_r8_origem"],
-            "lat_destino": req["lat_destino"], "lon_destino": req["lon_destino"],
-            "grupo_desfecho": req["grupo_desfecho"],
-            "fl_aceito": req["fl_aceito"],
-            "fl_cancelada_pos_aceite": req["grupo_desfecho"].startswith("cancelada_pos_aceite"),
-            "motorista_pseud": req["motorista_pseud"],
-            "ts_aceite": req["ts_aceite"], "ts_chegada": req["ts_chegada"], "ts_fim": req["ts_fim"],
-            "dur_viagem_obs_s": req["dur_viagem_s"] if req["status"] == "CorridaEncerrada" else None,
-            "dist_percorrida_km": req["dist_percorrida_km"],
-            "s_espera_ate_desistir": patience_obs,
-            "s_registro_ate_chegada": req["s_registro_ate_chegada"],
-        })
+        gold.replay_pedidos.append(
+            {
+                "codigo": req["codigo"],
+                "tag_lote": req["tag_lote"],
+                "ts_pedido": req["ts_base"],
+                "data_local": req["data_base"],
+                "hora_local": req["hora_base"],
+                "tipo_servico": req["tipo_servico"],
+                "lat_origem": req["lat_origem"],
+                "lon_origem": req["lon_origem"],
+                "h3_r7_origem": req["h3_r7_origem"],
+                "h3_r8_origem": req["h3_r8_origem"],
+                "lat_destino": req["lat_destino"],
+                "lon_destino": req["lon_destino"],
+                "grupo_desfecho": req["grupo_desfecho"],
+                "fl_aceito": req["fl_aceito"],
+                "fl_cancelada_pos_aceite": req["grupo_desfecho"].startswith("cancelada_pos_aceite"),
+                "motorista_pseud": req["motorista_pseud"],
+                "ts_aceite": req["ts_aceite"],
+                "ts_chegada": req["ts_chegada"],
+                "ts_fim": req["ts_fim"],
+                "dur_viagem_obs_s": req["dur_viagem_s"] if req["status"] == "CorridaEncerrada" else None,
+                "dist_percorrida_km": req["dist_percorrida_km"],
+                "s_espera_ate_desistir": patience_obs,
+                "s_registro_ate_chegada": req["s_registro_ate_chegada"],
+            }
+        )
 
 
 def demand_by_zone_hour(gold: Gold) -> None:
@@ -96,8 +104,22 @@ def fleet_tables(silver: Silver, gold: Gold) -> None:
     for row in silver.posicoes:
         if row["motorista_pseud"] is None:
             continue
-        keep = {k: row[k] for k in ("tag_lote", "ts_snapshot", "motorista_pseud", "estado", "passageiro_embarcado",
-                                    "lat", "lon", "h3_r7", "h3_r8", "fl_coordenada_valida", "fl_posicao_atual")}
+        keep = {
+            k: row[k]
+            for k in (
+                "tag_lote",
+                "ts_snapshot",
+                "motorista_pseud",
+                "estado",
+                "passageiro_embarcado",
+                "lat",
+                "lon",
+                "h3_r7",
+                "h3_r8",
+                "fl_coordenada_valida",
+                "fl_posicao_atual",
+            )
+        }
         gold.frota_snapshot.append(keep)
         by_driver[row["motorista_pseud"]].append(keep)
     hours: dict[tuple, Counter] = defaultdict(Counter)
@@ -113,13 +135,21 @@ def fleet_tables(silver: Silver, gold: Gold) -> None:
             seq += 1
             first = next((r for r in current if r["fl_coordenada_valida"]), current[0])
             last = next((r for r in reversed(current) if r["fl_coordenada_valida"]), current[-1])
-            gold.frota_sessoes.append({
-                "motorista_pseud": driver, "seq_sessao": seq,
-                "ts_inicio": current[0]["ts_snapshot"], "ts_fim": current[-1]["ts_snapshot"] + SNAPSHOT_STEP,
-                "lat_inicio": first["lat"], "lon_inicio": first["lon"], "h3_r7_inicio": first["h3_r7"],
-                "lat_fim": last["lat"], "lon_fim": last["lon"], "h3_r7_fim": last["h3_r7"],
-                "qtd_fotos": len(current),
-            })
+            gold.frota_sessoes.append(
+                {
+                    "motorista_pseud": driver,
+                    "seq_sessao": seq,
+                    "ts_inicio": current[0]["ts_snapshot"],
+                    "ts_fim": current[-1]["ts_snapshot"] + SNAPSHOT_STEP,
+                    "lat_inicio": first["lat"],
+                    "lon_inicio": first["lon"],
+                    "h3_r7_inicio": first["h3_r7"],
+                    "lat_fim": last["lat"],
+                    "lon_fim": last["lon"],
+                    "h3_r7_fim": last["h3_r7"],
+                    "qtd_fotos": len(current),
+                }
+            )
 
         for row in rows:
             working = row["estado"] in rules.WORKING_STATES
@@ -151,9 +181,14 @@ def calibration(silver: Silver, gold: Gold) -> None:
             reta = _km(r["lat_origem"], r["lon_origem"], r["lat_destino"], r["lon_destino"])
             if reta >= 0.5:
                 trip_ratio.append(r["dist_percorrida_km"] / reta)
-    rows.append({"medida": "fator_rua_reta_viagem", "unidade": "razao",
-                 "fonte": "nU_DISTPERCORRIDA / Haversine(origem, destino solicitado), encerradas, reta >= 0,5 km",
-                 **summary(trip_ratio)})
+    rows.append(
+        {
+            "medida": "fator_rua_reta_viagem",
+            "unidade": "razao",
+            "fonte": "nU_DISTPERCORRIDA / Haversine(origem, destino solicitado), encerradas, reta >= 0,5 km",
+            **summary(trip_ratio),
+        }
+    )
     # (2) Fator rua/reta da busca e velocidade até o passageiro: distMotorista (histórico).
     positions: dict[str, list[dict]] = defaultdict(list)
     for p in silver.posicoes:
@@ -162,7 +197,7 @@ def calibration(silver: Silver, gold: Gold) -> None:
     for v in positions.values():
         v.sort(key=lambda p: p["ts_snapshot"])
     times = {d: [p["ts_snapshot"] for p in v] for d, v in positions.items()}
-    pick_ratio, pick_speed, pick_speed_reta = [], [], []
+    pick_ratio, pick_speed, _pick_speed_reta = [], [], []
     for h in silver.historico:
         req = reqs.get(h["codigo"])
         if not req or not h["dist_motorista_m"] or not req["ts_aceite"] or not req["ts_chegada"]:
@@ -180,12 +215,22 @@ def calibration(silver: Silver, gold: Gold) -> None:
                     reta = _km(snap["lat"], snap["lon"], req["lat_origem"], req["lon_origem"])
                     if reta >= 0.5:
                         pick_ratio.append(road_km / reta)
-    rows.append({"medida": "fator_rua_reta_busca", "unidade": "razao",
-                 "fonte": "distMotorista / Haversine(foto livre anterior ao aceite, origem), reta >= 0,5 km",
-                 **summary(pick_ratio)})
-    rows.append({"medida": "velocidade_busca", "unidade": "km/h (distância por rua)",
-                 "fonte": "distMotorista / (chegada - aceite), tempo >= 60 s",
-                 **summary(pick_speed)})
+    rows.append(
+        {
+            "medida": "fator_rua_reta_busca",
+            "unidade": "razao",
+            "fonte": "distMotorista / Haversine(foto livre anterior ao aceite, origem), reta >= 0,5 km",
+            **summary(pick_ratio),
+        }
+    )
+    rows.append(
+        {
+            "medida": "velocidade_busca",
+            "unidade": "km/h (distância por rua)",
+            "fonte": "distMotorista / (chegada - aceite), tempo >= 60 s",
+            **summary(pick_speed),
+        }
+    )
     # (3) Tempos observados nas imediatas de demanda.
     by_group: dict[str, list[float]] = defaultdict(list)
     search = []
@@ -195,11 +240,16 @@ def calibration(silver: Silver, gold: Gold) -> None:
     for r in silver.solicitacoes:
         if r["fl_imediata"] and r["fl_demanda"] and r["fl_na_caixa"] and r["s_registro_ate_status_final"] is not None:
             by_group[r["grupo_desfecho"]].append(r["s_registro_ate_status_final"])
-    rows.append({"medida": "tempo_busca_registro_ate_chegada", "unidade": "s",
-                 "fonte": "imediatas encerradas na caixa", **summary(search)})
+    rows.append({"medida": "tempo_busca_registro_ate_chegada", "unidade": "s", "fonte": "imediatas encerradas na caixa", **summary(search)})
     for group in ("nao_atendida", "nao_atendida_limite_espera", "cancelada_solicitante_pre_aceite"):
-        rows.append({"medida": f"tempo_registro_ate_{group}", "unidade": "s",
-                     "fonte": "logStatus do status final", **summary(by_group.get(group, []))})
+        rows.append(
+            {
+                "medida": f"tempo_registro_ate_{group}",
+                "unidade": "s",
+                "fonte": "logStatus do status final",
+                **summary(by_group.get(group, [])),
+            }
+        )
     gold.calibracao = rows
 
 
@@ -216,8 +266,7 @@ def empty_km(silver: Silver, gold: Gold) -> None:
             days[key]["km_busca_estimado"] += c["km_busca_estimado"]
         if c["dist_percorrida_km"] is not None:
             days[key]["km_com_passageiro_registrado"] += c["dist_percorrida_km"]
-    gold.km_vazio = [{"data_local": k[0], "parcela_busca": "estimada: reta da foto x fator", **dict(v)}
-                     for k, v in sorted(days.items())]
+    gold.km_vazio = [{"data_local": k[0], "parcela_busca": "estimada: reta da foto x fator", **dict(v)} for k, v in sorted(days.items())]
 
 
 def quality(silver: Silver, gold: Gold) -> None:
@@ -225,21 +274,50 @@ def quality(silver: Silver, gold: Gold) -> None:
     months: dict[str, list[dict]] = defaultdict(list)
     for r in silver.solicitacoes:
         months[r["ts_registro"].strftime("%Y-%m") if r["ts_registro"] else "sem_data"].append(r)
-    fields = ("lat_origem", "lat_destino", "ts_aceite", "ts_chegada", "ts_inicio", "ts_fim", "dur_viagem_s",
-              "dist_percorrida_km", "motorista_pseud", "lat_destino_real", "nu_dr_real_pendente")
+    fields = (
+        "lat_origem",
+        "lat_destino",
+        "ts_aceite",
+        "ts_chegada",
+        "ts_inicio",
+        "ts_fim",
+        "dur_viagem_s",
+        "dist_percorrida_km",
+        "motorista_pseud",
+        "lat_destino_real",
+        "nu_dr_real_pendente",
+    )
     for month, rows in sorted(months.items()):
         enc = [r for r in rows if r["status"] == "CorridaEncerrada"]
         out.append({"grupo": "volume", "mes": month, "medida": "solicitacoes", "valor": len(rows)})
         out.append({"grupo": "volume", "mes": month, "medida": "imediatas", "valor": sum(r["fl_imediata"] for r in rows)})
         out.append({"grupo": "volume", "mes": month, "medida": "fora_da_caixa", "valor": sum(not r["fl_na_caixa"] for r in rows)})
-        out.append({"grupo": "qualidade", "mes": month, "medida": "encerradas_tempos_ordenados_pct",
-                    "valor": 100 * sum(r["fl_tempos_ordenados"] for r in enc) / max(1, len(enc))})
+        out.append(
+            {
+                "grupo": "qualidade",
+                "mes": month,
+                "medida": "encerradas_tempos_ordenados_pct",
+                "valor": 100 * sum(r["fl_tempos_ordenados"] for r in enc) / max(1, len(enc)),
+            }
+        )
         for f in fields:
-            out.append({"grupo": "cobertura_encerradas_pct", "mes": month, "medida": f,
-                        "valor": 100 * sum(r[f] is not None for r in enc) / max(1, len(enc))})
+            out.append(
+                {
+                    "grupo": "cobertura_encerradas_pct",
+                    "mes": month,
+                    "medida": f,
+                    "valor": 100 * sum(r[f] is not None for r in enc) / max(1, len(enc)),
+                }
+            )
         nao = [r for r in rows if r["status"] == "NaoAtendida"]
-        out.append({"grupo": "qualidade", "mes": month, "medida": "nao_atendidas_com_origem_pct",
-                    "valor": 100 * sum(r["lat_origem"] is not None for r in nao) / max(1, len(nao))})
+        out.append(
+            {
+                "grupo": "qualidade",
+                "mes": month,
+                "medida": "nao_atendidas_com_origem_pct",
+                "valor": 100 * sum(r["lat_origem"] is not None for r in nao) / max(1, len(nao)),
+            }
+        )
         for status, n in Counter(r["status"] for r in rows).items():
             out.append({"grupo": "status", "mes": month, "medida": status, "valor": n})
     for key, n in sorted(gold.filtros.items()):
@@ -249,16 +327,16 @@ def quality(silver: Silver, gold: Gold) -> None:
         if s["fl_tem_foto"]:
             by_tag[s["tag_lote"]].append(s["fl_consistente_com_posicoes"])
     for tag, flags in sorted(by_tag.items()):
-        out.append({"grupo": "frota", "mes": tag, "medida": "fotos_consistentes_com_sumario_pct",
-                    "valor": 100 * sum(flags) / max(1, len(flags))})
+        out.append(
+            {"grupo": "frota", "mes": tag, "medida": "fotos_consistentes_com_sumario_pct", "valor": 100 * sum(flags) / max(1, len(flags))}
+        )
     snaps: dict[str, list] = defaultdict(list)
     for p in gold.frota_snapshot:
         snaps[p["tag_lote"]].append(p["ts_snapshot"])
     for tag, ts in sorted(snaps.items()):
         uniq = sorted(set(ts))
         gaps = [(b - a).total_seconds() / 60 for a, b in zip(uniq, uniq[1:])]
-        out.append({"grupo": "frota", "mes": tag, "medida": "lacunas_foto_maior_que_10min",
-                    "valor": sum(g > 10.5 for g in gaps)})
+        out.append({"grupo": "frota", "mes": tag, "medida": "lacunas_foto_maior_que_10min", "valor": sum(g > 10.5 for g in gaps)})
         out.append({"grupo": "frota", "mes": tag, "medida": "maior_lacuna_foto_min", "valor": max(gaps) if gaps else None})
     dormida = [d["km_reta_dormida"] for d in silver.dormida if d["km_reta_dormida"] is not None]
     s = summary(dormida)

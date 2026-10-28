@@ -1,4 +1,5 @@
 """Avaliação de cenários com origem e unidade explícitas."""
+
 from __future__ import annotations
 
 from tcc_frota.models import ScenarioResult
@@ -33,7 +34,10 @@ def summarize(result: ScenarioResult, *, dataset_kind: str = "synthetic") -> dic
 
 
 def compare(
-    baseline: ScenarioResult, proposed: ScenarioResult, *, minimum_coverage: float | None = None,
+    baseline: ScenarioResult,
+    proposed: ScenarioResult,
+    *,
+    minimum_coverage: float | None = None,
     dataset_kind: str = "synthetic",
 ) -> dict[str, object]:
     if baseline.input_signature != proposed.input_signature or not baseline.input_signature:
@@ -62,7 +66,7 @@ def compare(
         "comparable_inputs": True,
         "interpretation": (
             "contrafactual sintético; distância geodésica estimada; sem economia real observada"
-            if dataset_kind == "synthetic" else
-            "contrafactual sobre pedidos e frota reais; distância geodésica estimada; sem economia real observada"
+            if dataset_kind == "synthetic"
+            else "contrafactual sobre pedidos e frota reais; distância geodésica estimada; sem economia real observada"
         ),
     }

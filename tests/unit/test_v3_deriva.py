@@ -1,8 +1,7 @@
 import pytest
 
 from tcc_frota.v2.sim import SimDriver, SimParams, SimRequest, reta_km
-from tcc_frota.v3.deriva import (Cruise, GoTo, LocalCruise, Observed, ObservedTracks, ReactiveConfig, ReturnHome,
-                                 observed_pieces)
+from tcc_frota.v3.deriva import Cruise, GoTo, LocalCruise, Observed, ObservedTracks, ReactiveConfig, ReturnHome, observed_pieces
 from tcc_frota.v3.sim import simulate3
 
 PARAMS = SimParams(radius_km=5.0, speed_kmh=30.0, road_factor=1.0, patience_s=300.0)
@@ -21,9 +20,9 @@ def driver(did="d0", start=4 * 3600.0, end=10 * 3600.0, lat=LAT0, lon=LON0):
 
 def test_goto_para_no_destino_e_conta_km():
     g = GoTo(0.0, (LAT0, LON0), (LAT0 + 3 * K, LON0), 30.0, 1.0)
-    (lat, _), km = g.position(360.0)           # 6 min a 30 km/h = 3 km
+    (lat, _), km = g.position(360.0)  # 6 min a 30 km/h = 3 km
     assert km == pytest.approx(3.0, rel=1e-3) and lat == pytest.approx(LAT0 + 3 * K, rel=1e-6)
-    assert g.position(10_000.0)[1] == pytest.approx(3.0, rel=1e-3)         # não passa do destino
+    assert g.position(10_000.0)[1] == pytest.approx(3.0, rel=1e-3)  # não passa do destino
     assert g.position(0.0)[1] == 0.0
 
 
@@ -44,17 +43,22 @@ def test_cruise_reprodutivel():
 
 
 def test_observed_integra_pecas_parciais():
-    o = Observed(100.0, (LAT0, LON0), ((0.0, 600.0, 6 * K, 0.0, 6.0),))     # 6 km em 600 s
-    (lat, _), km = o.position(400.0)                                       # 300 s dentro da peça = metade
+    o = Observed(100.0, (LAT0, LON0), ((0.0, 600.0, 6 * K, 0.0, 6.0),))  # 6 km em 600 s
+    (lat, _), km = o.position(400.0)  # 300 s dentro da peça = metade
     assert km == pytest.approx(300 / 600 * 6.0)
     assert lat == pytest.approx(LAT0 + 3 * K, rel=1e-6)
 
 
 def test_observed_pieces_descarta_gaps_e_saltos():
-    snaps = [(0.0, LAT0, LON0, 1), (600.0, LAT0 + K, LON0, 1),              # ok: 1 km em 10 min
-             (1200.0, LAT0 + K, LON0, 3),                                    # em corrida: descarta
-             (1800.0, LAT0 + K, LON0, 1), (3000.0, LAT0 + 2 * K, LON0, 1),  # gap de 20 min: descarta
-             (3600.0, LAT0 + 2 * K, LON0, 1), (3660.0, LAT0 + 12 * K, LON0, 1)]   # 10 km em 1 min: salto de GPS
+    snaps = [
+        (0.0, LAT0, LON0, 1),
+        (600.0, LAT0 + K, LON0, 1),  # ok: 1 km em 10 min
+        (1200.0, LAT0 + K, LON0, 3),  # em corrida: descarta
+        (1800.0, LAT0 + K, LON0, 1),
+        (3000.0, LAT0 + 2 * K, LON0, 1),  # gap de 20 min: descarta
+        (3600.0, LAT0 + 2 * K, LON0, 1),
+        (3660.0, LAT0 + 12 * K, LON0, 1),
+    ]  # 10 km em 1 min: salto de GPS
     pieces = observed_pieces(snaps, 1.3)
     assert len(pieces) == 2
     assert pieces[0][4] == pytest.approx(reta_km(LAT0, LON0, LAT0 + K, LON0) * 1.3)
@@ -71,7 +75,7 @@ def test_retorno_a_origem_paga_km_e_volta():
 
 def test_veiculo_em_deriva_continua_despachavel_na_posicao_interpolada():
     # B1: livre a 1 km de casa voltando; pedido na casa chega depois: busca menor que a do baseline parado
-    r2 = req(2, 4 * 3600.0 + 60 + 600 + 400)          # depois da corrida (pedido 1) e do retorno parcial
+    r2 = req(2, 4 * 3600.0 + 60 + 600 + 400)  # depois da corrida (pedido 1) e do retorno parcial
     stay = simulate3([req(1, 4 * 3600.0 + 60), r2], [driver()], PARAMS, W)
     back = simulate3([req(1, 4 * 3600.0 + 60), r2], [driver()], PARAMS, W, drift=ReturnHome())
     assert back.served == stay.served == 2
@@ -87,12 +91,12 @@ def test_irrecuperavel_nunca_e_atendido_e_nao_muda_o_resto():
 
 def test_reativo_envia_livre_para_pedido_perdido():
     # d0 ocupado em corrida longa e d1 livre a 2 km de um ponto onde pedidos são perdidos
-    far = SimDriver("d1", ((4 * 3600.0, 10 * 3600.0, LAT0 + 10 * K, LON0),))     # fora do raio (5 km): não atende
+    far = SimDriver("d1", ((4 * 3600.0, 10 * 3600.0, LAT0 + 10 * K, LON0),))  # fora do raio (5 km): não atende
     lost = [req(i, 4 * 3600.0 + 100 + i, dlat_km=0.0) for i in range(1, 3)]
     no = simulate3(lost, [far], PARAMS, W)
     yes = simulate3(lost, [far], PARAMS, W, reactive=ReactiveConfig(tick_s=300, lookback_s=900, max_km=12.0))
     assert no.served == 0 and no.drift_km == 0.0
-    assert yes.drift_km > 0.0           # foi mandado em direção à origem dos pedidos perdidos
+    assert yes.drift_km > 0.0  # foi mandado em direção à origem dos pedidos perdidos
 
 
 def test_politicas_sem_efeito_quando_desligadas():

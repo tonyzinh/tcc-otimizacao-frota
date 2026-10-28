@@ -11,6 +11,7 @@ corridas atendidas esperadas = min(λ_zona,hora, κ × motoristas presentes na z
 - `proportional`: vagas proporcionais à demanda prevista, preenchidas pelo par mais próximo.
 Nenhum é política da empresa; limites são parâmetros experimentais (RN019).
 """
+
 from __future__ import annotations
 
 from collections import defaultdict
@@ -24,10 +25,10 @@ from tcc_frota.v2.sim import reta_km
 @dataclass(frozen=True)
 class PlanInputs:
     drivers: tuple[PlannedDriver, ...]
-    zones: dict[str, tuple[float, float]]        # centróide ponderado pela demanda do treino
-    demand: dict[tuple[int, str], float]         # λ[(hora, zona)] previsto para a janela
+    zones: dict[str, tuple[float, float]]  # centróide ponderado pela demanda do treino
+    demand: dict[tuple[int, str], float]  # λ[(hora, zona)] previsto para a janela
     hours: tuple[int, ...]
-    kappa: float                                 # corridas por motorista-hora
+    kappa: float  # corridas por motorista-hora
     road_factor: float
 
 
@@ -95,8 +96,7 @@ def marginal_greedy(inputs: PlanInputs, *, alpha: float, rho_km: float, max_km: 
         cov.apply(did, z, +1)
     targets = _targets(inputs)
     by_id = {d.did: d for d in inputs.drivers}
-    dist = {(d.did, z): reta_km(d.lat, d.lon, *inputs.zones[z]) * inputs.road_factor
-            for d in inputs.drivers for z in targets}
+    dist = {(d.did, z): reta_km(d.lat, d.lon, *inputs.zones[z]) * inputs.road_factor for d in inputs.drivers for z in targets}
     moves: dict[str, tuple[float, float]] = {}
     gain_total = km_total = 0.0
     steps = 0
@@ -167,8 +167,9 @@ def proportional(inputs: PlanInputs, *, max_km: float) -> Plan:
             expected[z] += v
     capacity = inputs.kappa * len(inputs.hours)
     slots = [z for z, n in target_slots(dict(expected), capacity, len(inputs.drivers)).items() for _ in range(n)]
-    pairs = sorted((reta_km(d.lat, d.lon, *inputs.zones[z]) * inputs.road_factor, d.did, i)
-                   for d in inputs.drivers for i, z in enumerate(slots))
+    pairs = sorted(
+        (reta_km(d.lat, d.lon, *inputs.zones[z]) * inputs.road_factor, d.did, i) for d in inputs.drivers for i, z in enumerate(slots)
+    )
     used_d, used_s, moves, km_total = set(), set(), {}, 0.0
     for km, did, i in pairs:
         if did in used_d or i in used_s or km > max_km:

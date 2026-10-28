@@ -4,13 +4,14 @@ Grades: `docs/ORCAMENTO_CONFIGURACOES.md`. A calibração usa só 2–15/03, reg
 Saídas agregadas (sem dado pessoal) em `resultados/`; linhas por dia e semente também em
 `reports/runs/bateria/` (ignorado), para reprocessamento.
 """
+
 from __future__ import annotations
 
 import csv
 import json
 import subprocess
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from tcc_frota.algoritmos.base import PlannerSpec
@@ -21,13 +22,23 @@ RESULTS = Path("resultados")
 RUNS = Path("reports/runs/bateria")
 FINALISTS = RESULTS / "finalistas.json"
 REGISTRY_CSV = RESULTS / "registro_configuracoes.csv"
-FLOOR = 0.99   # corridas >= 0,99 x baseline (δ = 1%)
-EXTRA_FAMILIES = ("mpc", "despacho")   # fora da tabela principal (intradiário e D+0)
+FLOOR = 0.99  # corridas >= 0,99 x baseline (δ = 1%)
+EXTRA_FAMILIES = ("mpc", "despacho")  # fora da tabela principal (intradiário e D+0)
 EXTRAS_JSON = RESULTS / "finalistas_extras.json"
 CALIB_PERIOD, CALIB_REGIME, CALIB_WINDOW = "mar2026", "B", ex.MAIN_WINDOW
 
-DAY_FIELDS = ("n_requests", "served", "pickup_km", "reposition_km", "empty_km", "wait_sum", "moves_planned",
-              "moves_executed", "km_planejado", "plan_seconds")
+DAY_FIELDS = (
+    "n_requests",
+    "served",
+    "pickup_km",
+    "reposition_km",
+    "empty_km",
+    "wait_sum",
+    "moves_planned",
+    "moves_executed",
+    "km_planejado",
+    "plan_seconds",
+)
 
 
 def git_head() -> str:
@@ -57,15 +68,32 @@ def grid(family: str) -> list[PlannerSpec]:
         for cap in (1.0, 1.5, 3.0):
             for beta in (1.0, 0.99):
                 for mu in (0.0, 0.5):
-                    specs.append(PlannerSpec(family, f"milp|cap{cap:g}|b{beta:g}|mu{mu:g}",
-                                             {"cap": cap, "beta": beta, "mu": mu, "max_km": 4.0, "time_limit": 30.0}))
+                    specs.append(
+                        PlannerSpec(
+                            family,
+                            f"milp|cap{cap:g}|b{beta:g}|mu{mu:g}",
+                            {"cap": cap, "beta": beta, "mu": mu, "max_km": 4.0, "time_limit": 30.0},
+                        )
+                    )
     elif family == "robusto_cenarios":
         m = fin["milp"]["parametros"]
         for s in (5, 10, 20):
             for obj in ("esperado", "cvar"):
-                specs.append(PlannerSpec(family, f"robusto|S{s}|{obj}",
-                                         {"n_cenarios": s, "objetivo": obj, "cap": m["cap"], "beta": m["beta"],
-                                          "mu": m["mu"], "max_km": 4.0, "time_limit": 60.0}))
+                specs.append(
+                    PlannerSpec(
+                        family,
+                        f"robusto|S{s}|{obj}",
+                        {
+                            "n_cenarios": s,
+                            "objetivo": obj,
+                            "cap": m["cap"],
+                            "beta": m["beta"],
+                            "mu": m["mu"],
+                            "max_km": 4.0,
+                            "time_limit": 60.0,
+                        },
+                    )
+                )
     elif family == "busca_local":
         for start in ("guloso", "fluxo"):
             for budget in (100, 300):
@@ -77,13 +105,17 @@ def grid(family: str) -> list[PlannerSpec]:
     elif family == "recozimento":
         for t0 in (0.005, 0.02):
             for r in (0.98, 0.995):
-                specs.append(PlannerSpec(family, f"sa|T{t0:g}|r{r:g}",
-                                         {"t0": t0, "resfriamento": r, "avaliacoes": 300, "max_km": 4.0}))
+                specs.append(PlannerSpec(family, f"sa|T{t0:g}|r{r:g}", {"t0": t0, "resfriamento": r, "avaliacoes": 300, "max_km": 4.0}))
     elif family == "pso":
         for p_stay in (0.8, 0.95):
             for w in (0.5, 0.8):
-                specs.append(PlannerSpec(family, f"pso|p{p_stay:g}|w{w:g}",
-                                         {"p_ficar": p_stay, "inercia": w, "particulas": 15, "iteracoes": 20, "max_km": 4.0}))
+                specs.append(
+                    PlannerSpec(
+                        family,
+                        f"pso|p{p_stay:g}|w{w:g}",
+                        {"p_ficar": p_stay, "inercia": w, "particulas": 15, "iteracoes": 20, "max_km": 4.0},
+                    )
+                )
     elif family == "nsga2":
         busca = json.loads((RESULTS / "calibracao" / "nsga2_busca.json").read_text(encoding="utf-8"))
         specs.append(PlannerSpec(family, "nsga2|pop20|ger15", {"finalistas": busca["finalistas"]}))
@@ -111,8 +143,9 @@ def per_day(rows: list[dict]) -> dict[tuple[str, str], dict]:
 
 def paired(days: dict[tuple[str, str], dict], scenario: str) -> list[dict]:
     dates = sorted(d for (c, d) in days if c == scenario)
-    return [{"data": d, "b": days[("sem_reposicionamento", d)], "p": days[(scenario, d)]}
-            for d in dates if ("sem_reposicionamento", d) in days]
+    return [
+        {"data": d, "b": days[("sem_reposicionamento", d)], "p": days[(scenario, d)]} for d in dates if ("sem_reposicionamento", d) in days
+    ]
 
 
 def summarise(rows: list[dict]) -> list[dict]:
@@ -125,20 +158,32 @@ def summarise(rows: list[dict]) -> list[dict]:
         km_ride = tot["empty_km"] / tot["served"] if tot["served"] else float("inf")
         km_ride_b = base["empty_km"] / base["served"]
         first = pairs[0]["p"]
-        out.append({
-            "cenario": scen, "familia": first["familia"], "parametros": first["parametros"], "dias": len(pairs),
-            "sementes_por_dia": first["sementes"],
-            "corridas_base": base["served"], "corridas": tot["served"],
-            "var_corridas_pct": 100 * (tot["served"] / base["served"] - 1),
-            "km_vazio_por_corrida_base": km_ride_b, "km_vazio_por_corrida": km_ride,
-            "var_km_vazio_por_corrida_pct": 100 * (km_ride / km_ride_b - 1),
-            "km_busca_por_corrida": tot["pickup_km"] / tot["served"] if tot["served"] else float("nan"),
-            "km_repos_por_corrida": tot["reposition_km"] / tot["served"] if tot["served"] else float("nan"),
-            "movimentos_executados": tot["moves_executed"], "movimentos_planejados": tot["moves_planned"],
-            "km_planejado": tot["km_planejado"], "tempo_plano_medio_s": tot["plan_seconds"] / len(pairs),
-            "dias_com_reducao": sum(p["p"]["empty_km"] / max(p["p"]["served"], 1e-9) < p["b"]["empty_km"] / max(p["b"]["served"], 1e-9) - 1e-12 for p in pairs),
-            "satisfaz_piso": tot["served"] >= FLOOR * base["served"] - 1e-9,
-        })
+        out.append(
+            {
+                "cenario": scen,
+                "familia": first["familia"],
+                "parametros": first["parametros"],
+                "dias": len(pairs),
+                "sementes_por_dia": first["sementes"],
+                "corridas_base": base["served"],
+                "corridas": tot["served"],
+                "var_corridas_pct": 100 * (tot["served"] / base["served"] - 1),
+                "km_vazio_por_corrida_base": km_ride_b,
+                "km_vazio_por_corrida": km_ride,
+                "var_km_vazio_por_corrida_pct": 100 * (km_ride / km_ride_b - 1),
+                "km_busca_por_corrida": tot["pickup_km"] / tot["served"] if tot["served"] else float("nan"),
+                "km_repos_por_corrida": tot["reposition_km"] / tot["served"] if tot["served"] else float("nan"),
+                "movimentos_executados": tot["moves_executed"],
+                "movimentos_planejados": tot["moves_planned"],
+                "km_planejado": tot["km_planejado"],
+                "tempo_plano_medio_s": tot["plan_seconds"] / len(pairs),
+                "dias_com_reducao": sum(
+                    p["p"]["empty_km"] / max(p["p"]["served"], 1e-9) < p["b"]["empty_km"] / max(p["b"]["served"], 1e-9) - 1e-12
+                    for p in pairs
+                ),
+                "satisfaz_piso": tot["served"] >= FLOOR * base["served"] - 1e-9,
+            }
+        )
     return out
 
 
@@ -152,24 +197,50 @@ def choose(summary: list[dict]) -> dict:
     return {**best, "regra": "sem configuração viável: maior razão de corridas"}
 
 
-REGISTRY_COLS = ("registrado_em", "codigo", "etapa", "familia", "cenario", "parametros", "sementes", "dias",
-                 "corridas_base", "corridas", "var_corridas_pct", "km_vazio_por_corrida_base", "km_vazio_por_corrida",
-                 "var_km_vazio_por_corrida_pct", "km_busca_por_corrida", "km_repos_por_corrida",
-                 "movimentos_planejados", "movimentos_executados", "km_planejado", "tempo_plano_medio_s",
-                 "dias_com_reducao", "satisfaz_piso", "selecionado")
+REGISTRY_COLS = (
+    "registrado_em",
+    "codigo",
+    "etapa",
+    "familia",
+    "cenario",
+    "parametros",
+    "sementes",
+    "dias",
+    "corridas_base",
+    "corridas",
+    "var_corridas_pct",
+    "km_vazio_por_corrida_base",
+    "km_vazio_por_corrida",
+    "var_km_vazio_por_corrida_pct",
+    "km_busca_por_corrida",
+    "km_repos_por_corrida",
+    "movimentos_planejados",
+    "movimentos_executados",
+    "km_planejado",
+    "tempo_plano_medio_s",
+    "dias_com_reducao",
+    "satisfaz_piso",
+    "selecionado",
+)
 
 
 def append_registry(summary: list[dict], chosen: str, stage: str, seeds: str) -> None:
     RESULTS.mkdir(exist_ok=True)
     new = not REGISTRY_CSV.exists()
-    stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    stamp = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     with REGISTRY_CSV.open("a", encoding="utf-8", newline="") as handle:
         w = csv.DictWriter(handle, fieldnames=REGISTRY_COLS, extrasaction="ignore")
         if new:
             w.writeheader()
         for s in summary:
-            row = {**s, "registrado_em": stamp, "codigo": git_head(), "etapa": stage, "sementes": seeds,
-                   "selecionado": s["cenario"] == chosen}
+            row = {
+                **s,
+                "registrado_em": stamp,
+                "codigo": git_head(),
+                "etapa": stage,
+                "sementes": seeds,
+                "selecionado": s["cenario"] == chosen,
+            }
             w.writerow({k: (round(v, 6) if isinstance(v, float) else v) for k, v in row.items()})
 
 
@@ -190,8 +261,9 @@ def read_rows(path: Path) -> list[dict]:
         return list(csv.DictReader(handle))
 
 
-def calibrate(family: str, *, workers: int = 12, raw: Path = Path("data/raw"), echo=print,
-              register: bool = True, out_name: str | None = None) -> dict:
+def calibrate(
+    family: str, *, workers: int = 12, raw: Path = Path("data/raw"), echo=print, register: bool = True, out_name: str | None = None
+) -> dict:
     """Roda a grade da família nos dias de calibração, registra tudo e grava o finalista candidato."""
     frozen = load_frozen()
     extra = family in EXTRA_FAMILIES
@@ -202,8 +274,11 @@ def calibrate(family: str, *, workers: int = 12, raw: Path = Path("data/raw"), e
     else:
         specs = grid(family)
     sim = frozen.sims[CALIB_PERIOD]
-    tasks = [(CALIB_PERIOD, day, CALIB_WINDOW, CALIB_REGIME, sim, [s], frozen.model, SEEDS, k == 0) + (("extra",) if extra else ())
-             for day in ex.PERIODS[CALIB_PERIOD].calibration for k, s in enumerate(specs)]
+    tasks = [
+        (CALIB_PERIOD, day, CALIB_WINDOW, CALIB_REGIME, sim, [s], frozen.model, SEEDS, k == 0) + (("extra",) if extra else ())
+        for day in ex.PERIODS[CALIB_PERIOD].calibration
+        for k, s in enumerate(specs)
+    ]
     echo(f"[{family}] {len(specs)} configurações × {len(ex.PERIODS[CALIB_PERIOD].calibration)} dias")
     rows = run_tasks(tasks, raw, workers, echo=echo)
     write_rows(RUNS / f"calibracao_{out_name or family}.csv", rows)
@@ -214,12 +289,16 @@ def calibrate(family: str, *, workers: int = 12, raw: Path = Path("data/raw"), e
         append_registry(summary, best["cenario"], "calibracao", ",".join(map(str, SEEDS)) if stochastic else "deterministico")
         cand = RESULTS / "calibracao" / f"{family}.json"
         cand.parent.mkdir(parents=True, exist_ok=True)
-        cand.write_text(json.dumps({"familia": family, "codigo": git_head(), "finalista": best, "grade": summary},
-                                   ensure_ascii=False, indent=2), encoding="utf-8")
+        cand.write_text(
+            json.dumps({"familia": family, "codigo": git_head(), "finalista": best, "grade": summary}, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
     for s in sorted(summary, key=lambda s: s["km_vazio_por_corrida"]):
-        echo(f"  {s['cenario']:<45} corridas {s['var_corridas_pct']:+6.2f}%  km vazio/corrida "
-             f"{s['var_km_vazio_por_corrida_pct']:+6.2f}%  mov {s['movimentos_executados']:.0f}  t {s['tempo_plano_medio_s']:.2f}s"
-             f"{'  <- finalista' if s['cenario'] == best['cenario'] else ''}")
+        echo(
+            f"  {s['cenario']:<45} corridas {s['var_corridas_pct']:+6.2f}%  km vazio/corrida "
+            f"{s['var_km_vazio_por_corrida_pct']:+6.2f}%  mov {s['movimentos_executados']:.0f}  t {s['tempo_plano_medio_s']:.2f}s"
+            f"{'  <- finalista' if s['cenario'] == best['cenario'] else ''}"
+        )
     return best
 
 
@@ -229,11 +308,25 @@ def freeze(family: str) -> dict:
     best = cand["finalista"]
     target = EXTRAS_JSON if family in EXTRA_FAMILIES else FINALISTS
     fin = json.loads(target.read_text(encoding="utf-8")) if target.exists() else {}
-    fin[family] = {"cenario": best["cenario"], "parametros": json.loads(best["parametros"]),
-                   "regra": best["regra"], "calibracao": {k: best[k] for k in (
-                       "corridas_base", "corridas", "var_corridas_pct", "km_vazio_por_corrida_base",
-                       "km_vazio_por_corrida", "var_km_vazio_por_corrida_pct", "tempo_plano_medio_s")},
-                   "congelado_em": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "codigo": git_head()}
+    fin[family] = {
+        "cenario": best["cenario"],
+        "parametros": json.loads(best["parametros"]),
+        "regra": best["regra"],
+        "calibracao": {
+            k: best[k]
+            for k in (
+                "corridas_base",
+                "corridas",
+                "var_corridas_pct",
+                "km_vazio_por_corrida_base",
+                "km_vazio_por_corrida",
+                "var_km_vazio_por_corrida_pct",
+                "tempo_plano_medio_s",
+            )
+        },
+        "congelado_em": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "codigo": git_head(),
+    }
     target.write_text(json.dumps(fin, ensure_ascii=False, indent=2), encoding="utf-8")
     return fin[family]
 
@@ -242,22 +335,35 @@ def calibration_report(family: str, note: str) -> str:
     """Relatório curto da calibração (tabela gerada do JSON gravado; a nota é o comentário do autor)."""
     cand = json.loads((RESULTS / "calibracao" / f"{family}.json").read_text(encoding="utf-8"))
     best = cand["finalista"]["cenario"]
-    lines = [f"## {family}", "", f"Código `{cand['codigo']}`; calibração 2–15/03, regime B, 04–11h; "
-             f"baseline {cand['grade'][0]['corridas_base']:.0f} corridas e "
-             f"{cand['grade'][0]['km_vazio_por_corrida_base']:.3f} km vazios por corrida.", "",
-             "| Configuração | Corridas (%) | KM vazio/corrida (%) | B/corrida | R/corrida | Mov. exec. | Dias com redução | Piso | Tempo (s/dia) |",
-             "|---|---:|---:|---:|---:|---:|---:|:---:|---:|"]
+    lines = [
+        f"## {family}",
+        "",
+        f"Código `{cand['codigo']}`; calibração 2–15/03, regime B, 04–11h; "
+        f"baseline {cand['grade'][0]['corridas_base']:.0f} corridas e "
+        f"{cand['grade'][0]['km_vazio_por_corrida_base']:.3f} km vazios por corrida.",
+        "",
+        "| Configuração | Corridas (%) | KM vazio/corrida (%) | B/corrida | R/corrida | Mov. exec. | Dias com redução | Piso | Tempo (s/dia) |",
+        "|---|---:|---:|---:|---:|---:|---:|:---:|---:|",
+    ]
     for s in sorted(cand["grade"], key=lambda s: s["km_vazio_por_corrida"]):
         mark = " **(finalista)**" if s["cenario"] == best else ""
-        lines.append(f"| `{s['cenario']}`{mark} | {s['var_corridas_pct']:+.2f} | {s['var_km_vazio_por_corrida_pct']:+.2f} | "
-                     f"{s['km_busca_por_corrida']:.3f} | {s['km_repos_por_corrida']:.3f} | {s['movimentos_executados']:.0f} | "
-                     f"{s['dias_com_reducao']}/{s['dias']} | {'sim' if s['satisfaz_piso'] else 'não'} | {s['tempo_plano_medio_s']:.2f} |")
+        lines.append(
+            f"| `{s['cenario']}`{mark} | {s['var_corridas_pct']:+.2f} | {s['var_km_vazio_por_corrida_pct']:+.2f} | "
+            f"{s['km_busca_por_corrida']:.3f} | {s['km_repos_por_corrida']:.3f} | {s['movimentos_executados']:.0f} | "
+            f"{s['dias_com_reducao']}/{s['dias']} | {'sim' if s['satisfaz_piso'] else 'não'} | {s['tempo_plano_medio_s']:.2f} |"
+        )
     lines += ["", note, ""]
     text = "\n".join(lines)
     path = RESULTS / "calibracao" / "RELATORIOS.md"
-    head = "" if path.exists() else ("# Relatórios curtos de calibração (por família)\n\nGerados por "
-                                     "`protocolo.calibration_report` a partir de `resultados/calibracao/<família>.json`. "
-                                     "Estimativas de simulação; não são KM rodado nem economia observada.\n\n")
+    head = (
+        ""
+        if path.exists()
+        else (
+            "# Relatórios curtos de calibração (por família)\n\nGerados por "
+            "`protocolo.calibration_report` a partir de `resultados/calibracao/<família>.json`. "
+            "Estimativas de simulação; não são KM rodado nem economia observada.\n\n"
+        )
+    )
     with path.open("a", encoding="utf-8") as handle:
         handle.write(head + text + "\n")
     return text
@@ -288,8 +394,7 @@ def test_specs(families: list[str] | None = None) -> list[PlannerSpec]:
     return specs
 
 
-def run_test(period: str, *, workers: int = 12, raw: Path = Path("data/raw"), families: list[str] | None = None,
-             echo=print) -> Path:
+def run_test(period: str, *, workers: int = 12, raw: Path = Path("data/raw"), families: list[str] | None = None, echo=print) -> Path:
     assert_frozen_committed()
     frozen = load_frozen()
     specs = test_specs(families)
@@ -302,8 +407,19 @@ def run_test(period: str, *, workers: int = 12, raw: Path = Path("data/raw"), fa
     for day in ex.PERIODS[period].test:
         for regime in TEST_REGIMES:
             for k, s in enumerate(specs):
-                tasks.append((period, day, CALIB_WINDOW, regime, frozen.sims[period], [s], frozen.model, SEEDS,
-                              k == 0 and (day.isoformat(), regime) not in has_base))
+                tasks.append(
+                    (
+                        period,
+                        day,
+                        CALIB_WINDOW,
+                        regime,
+                        frozen.sims[period],
+                        [s],
+                        frozen.model,
+                        SEEDS,
+                        k == 0 and (day.isoformat(), regime) not in has_base,
+                    )
+                )
     echo(f"[teste {period}] {len(specs)} algoritmos × {len(ex.PERIODS[period].test)} dias × {len(TEST_REGIMES)} regimes")
     rows = keep + run_tasks(tasks, raw, workers, echo=echo)
     rows.sort(key=lambda r: (r["regime"], r["data"], r["cenario"], str(r["semente"])))
@@ -324,9 +440,16 @@ def analyse_test(period: str) -> list[dict]:
         res = {}
         for scen in scenarios:
             pairs = paired(days, scen)
-            res[scen] = {"periodo": period, "regime": regime, "cenario": scen, "familia": pairs[0]["p"]["familia"],
-                         "parametros": pairs[0]["p"]["parametros"], "sementes_por_dia": pairs[0]["p"]["sementes"],
-                         "m_comparacoes": m, **analyse(pairs, m)}
+            res[scen] = {
+                "periodo": period,
+                "regime": regime,
+                "cenario": scen,
+                "familia": pairs[0]["p"]["familia"],
+                "parametros": pairs[0]["p"]["parametros"],
+                "sementes_por_dia": pairs[0]["p"]["sementes"],
+                "m_comparacoes": m,
+                **analyse(pairs, m),
+            }
         adj = holm({k: v["p_km_vazio_por_corrida"] for k, v in res.items()})
         for k, v in res.items():
             v["p_km_vazio_por_corrida_holm"] = adj[k]
@@ -344,9 +467,9 @@ def _nsga2_worker(args) -> dict:
     from tcc_frota.algoritmos import nsga2
     from tcc_frota.algoritmos.bateria import build_study
 
-    started = datetime.now(timezone.utc)
+    started = datetime.now(UTC)
     out = nsga2.search(build_study(Path(raw)), load_frozen(), seed)
-    out["segundos"] = (datetime.now(timezone.utc) - started).total_seconds()
+    out["segundos"] = (datetime.now(UTC) - started).total_seconds()
     return out
 
 
@@ -357,10 +480,14 @@ def nsga2_search(raw: Path = Path("data/raw"), seeds: tuple[int, ...] = SEEDS) -
         results = pool.map(_nsga2_worker, [(str(raw), s) for s in seeds])
     rows = [r for res in results for r in res["avaliacoes"]]
     write_rows(RESULTS / "nsga2_avaliacoes_calibracao.csv", rows)
-    busca = {"codigo": git_head(), "populacao": 20, "geracoes": 15,
-             "finalistas": {str(r["semente"]): r["finalista"] for r in results},
-             "regras": {str(r["semente"]): r["regra"] for r in results},
-             "segundos": {str(r["semente"]): r["segundos"] for r in results}}
+    busca = {
+        "codigo": git_head(),
+        "populacao": 20,
+        "geracoes": 15,
+        "finalistas": {str(r["semente"]): r["finalista"] for r in results},
+        "regras": {str(r["semente"]): r["regra"] for r in results},
+        "segundos": {str(r["semente"]): r["segundos"] for r in results},
+    }
     (RESULTS / "calibracao").mkdir(parents=True, exist_ok=True)
     (RESULTS / "calibracao" / "nsga2_busca.json").write_text(json.dumps(busca, ensure_ascii=False, indent=2), encoding="utf-8")
     return busca
@@ -386,10 +513,18 @@ def run_test_extra(period: str, *, workers: int = 12, raw: Path = Path("data/raw
     extras = json.loads(EXTRAS_JSON.read_text(encoding="utf-8"))
     specs = [PlannerSpec(f, f"fin_{f}", v["parametros"]) for f, v in extras.items()]
     if "despacho" in extras:
-        specs.append(PlannerSpec("combinado", "combinado_reposicionamento_despacho",
-                                 {"reposicionamento": combo_choice(), "despacho": extras["despacho"]["parametros"]}))
-    tasks = [(period, day, CALIB_WINDOW, "B", frozen.sims[period], [s], frozen.model, SEEDS[:1], k == 0, "extra")
-             for day in ex.PERIODS[period].test for k, s in enumerate(specs)]
+        specs.append(
+            PlannerSpec(
+                "combinado",
+                "combinado_reposicionamento_despacho",
+                {"reposicionamento": combo_choice(), "despacho": extras["despacho"]["parametros"]},
+            )
+        )
+    tasks = [
+        (period, day, CALIB_WINDOW, "B", frozen.sims[period], [s], frozen.model, SEEDS[:1], k == 0, "extra")
+        for day in ex.PERIODS[period].test
+        for k, s in enumerate(specs)
+    ]
     echo(f"[extras {period}] {len(specs)} cenários × {len(ex.PERIODS[period].test)} dias")
     rows = run_tasks(tasks, raw, workers, echo=echo)
     path = RESULTS / f"extras_{MONTH_LABEL[period]}_dias.csv"
@@ -400,8 +535,16 @@ def run_test_extra(period: str, *, workers: int = 12, raw: Path = Path("data/raw
     out = []
     for scen in sorted({c for c, _ in days if c != "sem_reposicionamento"}):
         pairs = paired(days, scen)
-        out.append({"periodo": period, "regime": "B", "cenario": scen, "familia": pairs[0]["p"]["familia"],
-                    "rotulo": {"mpc": "Cenário intradiário", "despacho": "D+0", "combinado": "D+1 + D+0"}[pairs[0]["p"]["familia"]],
-                    "parametros": pairs[0]["p"]["parametros"], **analyse(pairs, 1)})
+        out.append(
+            {
+                "periodo": period,
+                "regime": "B",
+                "cenario": scen,
+                "familia": pairs[0]["p"]["familia"],
+                "rotulo": {"mpc": "Cenário intradiário", "despacho": "D+0", "combinado": "D+1 + D+0"}[pairs[0]["p"]["familia"]],
+                "parametros": pairs[0]["p"]["parametros"],
+                **analyse(pairs, 1),
+            }
+        )
     write_rows(RESULTS / f"extras_{MONTH_LABEL[period]}.csv", out)
     return path

@@ -12,8 +12,14 @@ DAYS = [date(2026, 3, 16) + timedelta(days=i) for i in range(16)]
 def _pairs(served_b, served_p, empty_b, empty_p):
     n = len(served_b)
     zeros = np.zeros(n)
-    mk = lambda s, e: {"n_requests": np.full(n, 100.0), "served": np.array(s, float), "pickup_km": np.array(e, float),
-                       "reposition_km": zeros, "empty_km": np.array(e, float), "wait_sum": zeros}
+    mk = lambda s, e: {
+        "n_requests": np.full(n, 100.0),
+        "served": np.array(s, float),
+        "pickup_km": np.array(e, float),
+        "reposition_km": zeros,
+        "empty_km": np.array(e, float),
+        "wait_sum": zeros,
+    }
     return inf.Pairs(("m", "04-11", "B", "x"), tuple(DAYS[:n]), mk(served_b, empty_b), mk(served_p, empty_p))
 
 
@@ -67,11 +73,13 @@ def test_divisao_por_zero_vira_nan():
 def test_load_pairs_pareia_baseline(tmp_path):
     f = tmp_path / "d.csv"
     head = "periodo,data,janela,regime,cenario,n_requests,served,pickup_km,reposition_km,empty_km,wait_sum\n"
-    f.write_text(head +
-                 "m,2026-03-16,04-11,B,sem_reposicionamento,10,5,10,0,10,100\n"
-                 "m,2026-03-16,04-11,B,plano,10,6,10,2,12,100\n"
-                 "m,2026-03-17,04-11,B,sem_reposicionamento,10,4,8,0,8,100\n"
-                 "m,2026-03-17,04-11,B,plano,10,4,8,1,9,100\n", encoding="utf-8")
+    f.write_text(
+        head + "m,2026-03-16,04-11,B,sem_reposicionamento,10,5,10,0,10,100\n"
+        "m,2026-03-16,04-11,B,plano,10,6,10,2,12,100\n"
+        "m,2026-03-17,04-11,B,sem_reposicionamento,10,4,8,0,8,100\n"
+        "m,2026-03-17,04-11,B,plano,10,4,8,1,9,100\n",
+        encoding="utf-8",
+    )
     out = inf.load_pairs(f)
     pr = out[("m", "04-11", "B", "plano")]
     assert pr.b["served"].tolist() == [5, 4] and pr.p["served"].tolist() == [6, 4]
@@ -79,8 +87,11 @@ def test_load_pairs_pareia_baseline(tmp_path):
 
 def test_load_pairs_sem_baseline_falha(tmp_path):
     f = tmp_path / "d.csv"
-    f.write_text("periodo,data,janela,regime,cenario,n_requests,served,pickup_km,reposition_km,empty_km,wait_sum\n"
-                 "m,2026-03-16,04-11,B,plano,10,6,10,2,12,100\n", encoding="utf-8")
+    f.write_text(
+        "periodo,data,janela,regime,cenario,n_requests,served,pickup_km,reposition_km,empty_km,wait_sum\n"
+        "m,2026-03-16,04-11,B,plano,10,6,10,2,12,100\n",
+        encoding="utf-8",
+    )
     with pytest.raises(ValueError):
         inf.load_pairs(f)
 
@@ -104,7 +115,7 @@ def test_romano_wolf_uma_hipotese_igual_ao_p_bruto():
 def test_romano_wolf_considera_dependencia():
     rng = np.random.default_rng(2)
     common = rng.standard_normal((4000, 1))
-    corr = np.repeat(common, 4, axis=1)                 # testes idênticos
+    corr = np.repeat(common, 4, axis=1)  # testes idênticos
     indep = rng.standard_normal((4000, 4))
     t = np.full(4, 1.8)
     assert inf.romano_wolf(t, corr).max() < inf.romano_wolf(t, indep).max()
@@ -123,7 +134,7 @@ def test_fieller_limitado_e_ilimitado():
     lo, hi = inf.fieller(a, b)
     assert lo < 2.0 < hi
     b0 = rng.standard_normal(16)
-    b0 -= b0.mean()                                    # média do denominador = 0
+    b0 -= b0.mean()  # média do denominador = 0
     assert inf.fieller(rng.standard_normal(16), b0) is None
 
 
@@ -132,8 +143,8 @@ def test_mde_e_t_stat():
     iv = inf.Interval(-2.0, -3.0, -1.0, 0.5, np.zeros(3))
     assert inf.t_stat(iv, "reducao") == pytest.approx(4.0)
     assert inf.t_stat(iv, "aumento") == pytest.approx(-4.0)
-    assert inf.t_stat(iv, "nao_inferior") == pytest.approx(-2.0)          # (−2 − (−1)) / 0,5
-    assert inf.t_stat(iv, "nao_inferior_sens") == pytest.approx(0.0)      # −2 − (−2)
+    assert inf.t_stat(iv, "nao_inferior") == pytest.approx(-2.0)  # (−2 − (−1)) / 0,5
+    assert inf.t_stat(iv, "nao_inferior_sens") == pytest.approx(0.0)  # −2 − (−2)
     assert inf.t_stat(inf.Interval(0, 0, 0, 0.0, np.zeros(3)), "reducao") == 0.0
     with pytest.raises(ValueError):
         inf.t_stat(iv, "x")

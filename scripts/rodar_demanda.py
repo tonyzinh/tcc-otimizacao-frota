@@ -3,12 +3,12 @@
 Uso: TCC_REAL_DATA_AUTHORIZED=YES PYTHONPATH=src python scripts/rodar_demanda.py
 Saídas: resultados/demanda/*.csv, resultados/demanda/previsto_real_por_hora.png, tabelas/tab_demanda_wape.tex.
 """
+
 from __future__ import annotations
 
 import csv
 import os
 import sys
-from collections import defaultdict
 from pathlib import Path
 from statistics import mean
 
@@ -33,8 +33,12 @@ def write(path: Path, rows: list[dict]) -> None:
 def records(model: str, days, history, cfg, alpha=None) -> list[dict]:
     out = []
     for t in days:
-        pred = {"M0": lambda: dm.m0(t, history, cfg), "M1": lambda: dm.m1(t, history, cfg),
-                "M2": lambda: dm.m2(t, history, cfg, alpha), "Msim": lambda: dm.msim(t, history, cfg)}[model]()
+        pred = {
+            "M0": lambda: dm.m0(t, history, cfg),
+            "M1": lambda: dm.m1(t, history, cfg),
+            "M2": lambda: dm.m2(t, history, cfg, alpha),
+            "Msim": lambda: dm.msim(t, history, cfg),
+        }[model]()
         if not pred:
             continue
         out += [{"data": t.isoformat(), **r} for r in dm.day_errors(pred, t, history, dm.strata(t, history, cfg))]
@@ -50,11 +54,20 @@ def main() -> int:
     # 1) conferência: WAPE médio diário do modelo do simulador = tab07 do artigo
     check = []
     for name, days in SETS.items():
-        vals = [fc.errors(fc.predict("media_dia_semana", t, history, range(4, 11), cfg), t, history, range(4, 11))["wape_zona_hora"]
-                for t in days]
+        vals = [
+            fc.errors(fc.predict("media_dia_semana", t, history, range(4, 11), cfg), t, history, range(4, 11))["wape_zona_hora"]
+            for t in days
+        ]
         got = mean(vals)
-        check.append({"conjunto": name, "wape_medio_diario_reproduzido": got, "wape_tab07": TAB07[name],
-                      "diferenca": got - TAB07[name], "confere": abs(got - TAB07[name]) < 5e-5})
+        check.append(
+            {
+                "conjunto": name,
+                "wape_medio_diario_reproduzido": got,
+                "wape_tab07": TAB07[name],
+                "diferenca": got - TAB07[name],
+                "confere": abs(got - TAB07[name]) < 5e-5,
+            }
+        )
     write(OUT / "conferencia_tab07.csv", check)
     print(check)
     if not all(c["confere"] for c in check):
@@ -63,8 +76,10 @@ def main() -> int:
     # 2) α do M2 só na calibração de março (WAPE agregado global)
     sel = []
     for a in dm.ALPHAS:
-        agg = {r["escopo"]: r for r in dm.aggregate(records("M2", SETS["calibracao_mar"], history, cfg, a),
-                                                      [d.isoformat() for d in SETS["calibracao_mar"]])}
+        agg = {
+            r["escopo"]: r
+            for r in dm.aggregate(records("M2", SETS["calibracao_mar"], history, cfg, a), [d.isoformat() for d in SETS["calibracao_mar"]])
+        }
         sel.append({"alpha": a, "wape_global_calibracao": agg["global"]["wape"]})
     alpha = min(sel, key=lambda r: (r["wape_global_calibracao"], -r["alpha"]))["alpha"]
     for r in sel:
@@ -79,21 +94,40 @@ def main() -> int:
             rec = records(model, days, history, cfg, alpha if model == "M2" else None)
             used = sorted({r["data"] for r in rec})
             for r in dm.aggregate(rec, used):
-                rows.append({"modelo": model, "conjunto": name, "alpha_m2": alpha if model == "M2" else "",
-                             "dias_sem_previsao": len(iso) - len(used), "rotulo": "exploratorio", **r})
+                rows.append(
+                    {
+                        "modelo": model,
+                        "conjunto": name,
+                        "alpha_m2": alpha if model == "M2" else "",
+                        "dias_sem_previsao": len(iso) - len(used),
+                        "rotulo": "exploratorio",
+                        **r,
+                    }
+                )
             for h in dm.HOURS:
-                hourly.append({"modelo": model, "conjunto": name, "hora": h,
-                               "real": sum(r["y"] for r in rec if r["hora"] == h),
-                               "previsto": sum(r["yhat"] for r in rec if r["hora"] == h)})
+                hourly.append(
+                    {
+                        "modelo": model,
+                        "conjunto": name,
+                        "hora": h,
+                        "real": sum(r["y"] for r in rec if r["hora"] == h),
+                        "previsto": sum(r["yhat"] for r in rec if r["hora"] == h),
+                    }
+                )
     write(OUT / "wape.csv", rows)
     write(OUT / "previsto_real_por_hora.csv", hourly)
     # 4) cobertura: solicitações do universo, na janela, com célula H3
     cov = []
     for name, days in SETS.items():
         reqs = [r for d in days for r in study.requests_by_date.get(d, []) if 4 <= r["hora_local"] < 11]
-        cov.append({"conjunto": name, "solicitacoes_universo_janela": len(reqs),
-                    "com_celula_h3": sum(bool(r["h3_r7_origem"]) for r in reqs),
-                    "cobertura_pct": 100 * sum(bool(r["h3_r7_origem"]) for r in reqs) / len(reqs) if reqs else float("nan")})
+        cov.append(
+            {
+                "conjunto": name,
+                "solicitacoes_universo_janela": len(reqs),
+                "com_celula_h3": sum(bool(r["h3_r7_origem"]) for r in reqs),
+                "cobertura_pct": 100 * sum(bool(r["h3_r7_origem"]) for r in reqs) / len(reqs) if reqs else float("nan"),
+            }
+        )
     write(OUT / "cobertura.csv", cov)
     figure(hourly)
     latex(rows)
@@ -113,8 +147,13 @@ def figure(hourly: list[dict]) -> None:
         real = [next(r["real"] for r in sel if r["hora"] == h and r["modelo"] == "M0") for h in dm.HOURS]
         ax.bar(dm.HOURS, real, color="#BBBBBB", label="real")
         for m, c in colors.items():
-            ax.plot(dm.HOURS, [next(r["previsto"] for r in sel if r["hora"] == h and r["modelo"] == m) for h in dm.HOURS],
-                    marker="o", color=c, label=m)
+            ax.plot(
+                dm.HOURS,
+                [next(r["previsto"] for r in sel if r["hora"] == h and r["modelo"] == m) for h in dm.HOURS],
+                marker="o",
+                color=c,
+                label=m,
+            )
         ax.set_title(title)
         ax.set_xlabel("Hora")
     axes[0].set_ylabel("Solicitações (soma dos dias)")
@@ -129,11 +168,21 @@ def latex(rows: list[dict]) -> None:
     br = lambda x: f"{x:.3f}".replace(".", "{,}")
     pct = lambda x: f"{100 * x:+.1f}".replace(".", "{,}")
     scopes = ("global", "faixa_04-07", "faixa_07-10", "faixa_10-11", "estrato_alto", "estrato_baixo")
-    labels = {"global": "Global", "faixa_04-07": "04--07", "faixa_07-10": "07--10", "faixa_10-11": "10--11",
-              "estrato_alto": r"Células $\geq$ 1/dia", "estrato_baixo": "Demais células"}
-    lines = [r"% Gerado por scripts/rodar_demanda.py — exploratório (docs/ESCOPO_FECHADO.md); dados reais.",
-             r"\begin{tabular}{llrrrr}", r"\hline",
-             r"Mês & Escopo & M0 & M1 & M2 & Msim \\", r"\hline"]
+    labels = {
+        "global": "Global",
+        "faixa_04-07": "04--07",
+        "faixa_07-10": "07--10",
+        "faixa_10-11": "10--11",
+        "estrato_alto": r"Células $\geq$ 1/dia",
+        "estrato_baixo": "Demais células",
+    }
+    lines = [
+        r"% Gerado por scripts/rodar_demanda.py — exploratório (docs/ESCOPO_FECHADO.md); dados reais.",
+        r"\begin{tabular}{llrrrr}",
+        r"\hline",
+        r"Mês & Escopo & M0 & M1 & M2 & Msim \\",
+        r"\hline",
+    ]
     for name, mes in (("teste_mar", "mar"), ("teste_set", "set")):
         for s in scopes:
             cells = []
@@ -141,12 +190,15 @@ def latex(rows: list[dict]) -> None:
                 r = next(x for x in rows if x["conjunto"] == name and x["modelo"] == m and x["escopo"] == s)
                 cells.append(f"{br(r['wape'])} [{br(r['wape_ic_inf'])}; {br(r['wape_ic_sup'])}]")
             lines.append(f"{mes} & {labels[s]} & " + " & ".join(cells) + r" \\")
-        vies = [pct(next(x for x in rows if x["conjunto"] == name and x["modelo"] == m and x["escopo"] == "global")["vies"])
-                for m in dm.MODELS]
+        vies = [
+            pct(next(x for x in rows if x["conjunto"] == name and x["modelo"] == m and x["escopo"] == "global")["vies"]) for m in dm.MODELS
+        ]
         lines.append(f"{mes} & Viés global (\\%) & " + " & ".join(vies) + r" \\")
         lines.append(r"\hline")
-    lines += [r"\multicolumn{6}{l}{\footnotesize WAPE agregado (soma dos erros absolutos por hora ÷ soma das solicitações); IC 95\% por bootstrap de dias.} \\",
-              r"\end{tabular}"]
+    lines += [
+        r"\multicolumn{6}{l}{\footnotesize WAPE agregado (soma dos erros absolutos por hora ÷ soma das solicitações); IC 95\% por bootstrap de dias.} \\",
+        r"\end{tabular}",
+    ]
     Path("tabelas/tab_demanda_wape.tex").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -168,8 +220,14 @@ def diagnostic_alpha(day=None) -> None:
     for a in (1e-6, 0.01):
         errs = dm.day_errors(dm.m2(t, history, cfg, a), t, history, strat)
         for s in ("alto", "baixo"):
-            rows.append({"dia_calibracao": t.isoformat(), "alpha": a, "estrato": s,
-                         "real": sum(r["y"] for r in errs if r["estrato"] == s),
-                         "previsto": sum(r["yhat"] for r in errs if r["estrato"] == s),
-                         "uso": "diagnostico; alpha congelado = 0,01 (grade pre-registrada)"})
+            rows.append(
+                {
+                    "dia_calibracao": t.isoformat(),
+                    "alpha": a,
+                    "estrato": s,
+                    "real": sum(r["y"] for r in errs if r["estrato"] == s),
+                    "previsto": sum(r["yhat"] for r in errs if r["estrato"] == s),
+                    "uso": "diagnostico; alpha congelado = 0,01 (grade pre-registrada)",
+                }
+            )
     write(OUT / "diagnostico_alpha_m2.csv", rows)

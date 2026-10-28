@@ -1,12 +1,9 @@
-import csv
-from datetime import datetime, timezone
-
 import pytest
 
 from tcc_frota.distance import RouteDistance, estimated_meters, observed_meters
-from tcc_frota.models import Position
 from tcc_frota.ingestion.files import authorize, read_rows
 from tcc_frota.ingestion.history import parse_coordinate, reconstruct_history
+from tcc_frota.models import Position
 from tcc_frota.quality.audit import audit_rows
 
 
@@ -62,8 +59,21 @@ def test_known_real_extract_cannot_be_mislabeled_synthetic(tmp_path):
 
 def test_history_dedup_creation_and_source_distances():
     rows = [
-        {"CD_SOLICITACAO": "1", "DT_REGISTRO": "2026-01-01T08:00:00+00:00", "TX_STATUS": "AguardandoCondutor", "DT_INICIO_REALIZADA": "2026-01-01T08:20:00+00:00"},
-        {"CD_SOLICITACAO": "1", "DT_REGISTRO": "2026-01-01T09:00:00+00:00", "TX_STATUS": "CorridaEncerrada", "NU_DISTPERCORRIDA": "1200", "NU_DISTANCIA_ACEITE_CHEGUEI": "350", "TX_ORIGEM_LAT": "-20,3", "TX_ORIGEM_LNG": "-40,2"},
+        {
+            "CD_SOLICITACAO": "1",
+            "DT_REGISTRO": "2026-01-01T08:00:00+00:00",
+            "TX_STATUS": "AguardandoCondutor",
+            "DT_INICIO_REALIZADA": "2026-01-01T08:20:00+00:00",
+        },
+        {
+            "CD_SOLICITACAO": "1",
+            "DT_REGISTRO": "2026-01-01T09:00:00+00:00",
+            "TX_STATUS": "CorridaEncerrada",
+            "NU_DISTPERCORRIDA": "1200",
+            "NU_DISTANCIA_ACEITE_CHEGUEI": "350",
+            "TX_ORIGEM_LAT": "-20,3",
+            "TX_ORIGEM_LNG": "-40,2",
+        },
         {"CD_SOLICITACAO": "", "DT_REGISTRO": "2026-01-01T09:00:00+00:00"},
     ]
     items, audit = reconstruct_history(rows)

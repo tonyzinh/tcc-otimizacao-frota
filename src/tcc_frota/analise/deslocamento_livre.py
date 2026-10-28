@@ -7,6 +7,7 @@ intervalos com deslocamento > 0,5 km. Também a cobertura descritiva de `nU_DR_R
 Os identificadores de motorista das fotos e das corridas não coincidem: nada é cruzado entre as fontes.
 Só agregados por mês saem do módulo.
 """
+
 from __future__ import annotations
 
 import csv
@@ -53,26 +54,42 @@ def free_movement(snapshots: list[dict]) -> list[dict]:
         days = sorted(days_seen[month])
         vals = [per_day.get((month, d), 0.0) for d in days]
         n, moved = counts[month]
-        out.append({"mes": month, "dias_com_fotos_na_janela": len(days), "intervalos_livre_livre": n,
-                    "km_dia_reta_media": mean(vals) if vals else float("nan"),
-                    "km_dia_reta_mediana": median(vals) if vals else float("nan"),
-                    "km_dia_x1_4_media": FACTOR * mean(vals) if vals else float("nan"),
-                    "fracao_intervalos_mov_maior_0_5km_pct": 100 * moved / n if n else float("nan")})
+        out.append(
+            {
+                "mes": month,
+                "dias_com_fotos_na_janela": len(days),
+                "intervalos_livre_livre": n,
+                "km_dia_reta_media": mean(vals) if vals else float("nan"),
+                "km_dia_reta_mediana": median(vals) if vals else float("nan"),
+                "km_dia_x1_4_media": FACTOR * mean(vals) if vals else float("nan"),
+                "fracao_intervalos_mov_maior_0_5km_pct": 100 * moved / n if n else float("nan"),
+            }
+        )
     return out
 
 
 def field_coverage(solicitacoes: list[dict]) -> list[dict]:
     out = []
     for month, (y, m) in MONTHS.items():
-        rows = [r for r in solicitacoes if r["status"] == "CorridaEncerrada" and r["data_base"]
-                and r["data_base"].year == y and r["data_base"].month == m]
+        rows = [
+            r
+            for r in solicitacoes
+            if r["status"] == "CorridaEncerrada" and r["data_base"] and r["data_base"].year == y and r["data_base"].month == m
+        ]
         dr = [r["nu_dr_real_pendente"] for r in rows if r["nu_dr_real_pendente"] is not None]
         nums = sorted(float(v) for v in dr if isinstance(v, (int, float)))
-        out.append({"mes": month, "corridas_encerradas": len(rows),
-                    "nu_dr_real_preenchido_pct": 100 * len(dr) / len(rows) if rows else float("nan"),
-                    "nu_dr_real_mediana": median(nums) if nums else float("nan"),
-                    "nu_dr_real_p90": nums[int(0.9 * (len(nums) - 1))] if nums else float("nan"),
-                    "h3_reposicionamento_real_preenchido_pct": 100 * sum(r["fl_h3_repos_real_pendente"] for r in rows) / len(rows) if rows else float("nan")})
+        out.append(
+            {
+                "mes": month,
+                "corridas_encerradas": len(rows),
+                "nu_dr_real_preenchido_pct": 100 * len(dr) / len(rows) if rows else float("nan"),
+                "nu_dr_real_mediana": median(nums) if nums else float("nan"),
+                "nu_dr_real_p90": nums[int(0.9 * (len(nums) - 1))] if nums else float("nan"),
+                "h3_reposicionamento_real_preenchido_pct": 100 * sum(r["fl_h3_repos_real_pendente"] for r in rows) / len(rows)
+                if rows
+                else float("nan"),
+            }
+        )
     return out
 
 

@@ -1,11 +1,12 @@
 """Linha do tempo conservadora com intervalos semiabertos [início, fim)."""
+
 from __future__ import annotations
 
 from collections import defaultdict
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Iterable
 
 from tcc_frota.models import aware
 
@@ -115,7 +116,10 @@ def reconstruct_timeline(
                 OperationalState.INDISPONIVEL in active_states or OperationalState.EM_REPOSICIONAMENTO in active_states
             )
             conflict = conflicting_positive or len(drivers) > 1 or overlapping_rides or contradictory_statuses or contradictory_occupations
-            if (len(drivers) > 1 or contradictory_statuses) and state not in {OperationalState.EM_CORRIDA, OperationalState.EM_REPOSICIONAMENTO}:
+            if (len(drivers) > 1 or contradictory_statuses) and state not in {
+                OperationalState.EM_CORRIDA,
+                OperationalState.EM_REPOSICIONAMENTO,
+            }:
                 state = OperationalState.DESCONHECIDO
             if state == OperationalState.DESCONHECIDO:
                 confidence = "SEM_EVIDENCIA"
@@ -127,7 +131,18 @@ def reconstruct_timeline(
                 confidence = "INFERIDO"
             else:
                 confidence = "OBSERVADO"
-            result.append(TimelineSegment(vehicle_id, left, right, state, confidence, tuple(sorted({item.source for item in active})), conflict, next(iter(drivers)) if len(drivers) == 1 else None))
+            result.append(
+                TimelineSegment(
+                    vehicle_id,
+                    left,
+                    right,
+                    state,
+                    confidence,
+                    tuple(sorted({item.source for item in active})),
+                    conflict,
+                    next(iter(drivers)) if len(drivers) == 1 else None,
+                )
+            )
     return result
 
 

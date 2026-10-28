@@ -1,4 +1,5 @@
 """Leitura local sequencial sem materializar os extratos completos."""
+
 from __future__ import annotations
 
 import csv
@@ -21,7 +22,7 @@ def source_schema(path: Path) -> dict[str, str]:
     if path.suffix.lower() == ".csv":
         with path.open("r", encoding=_csv_encoding(path), newline="") as stream:
             header = next(csv.reader(stream), [])
-        return {name: "csv_text" for name in header}
+        return dict.fromkeys(header, "csv_text")
     if path.suffix.lower() == ".parquet":
         import pyarrow.parquet as pq
 

@@ -1,4 +1,5 @@
 """Fases D e E: fórmula do valor líquido, leitor do YAML privado e deslocamento de livres (valores genéricos)."""
+
 from datetime import datetime, timedelta
 
 import pytest
@@ -8,9 +9,9 @@ from tcc_frota.analise.valor_liquido import cost_per_km, load_costs
 
 
 def test_cost_formula_and_breakeven():
-    c = cost_per_km(1.0, 0.5, 20.0)          # 1 + 0,5·60/20 = 2,5 R$/km
+    c = cost_per_km(1.0, 0.5, 20.0)  # 1 + 0,5·60/20 = 2,5 R$/km
     assert c == pytest.approx(2.5)
-    assert 20.0 / c == pytest.approx(8.0)     # e* = margem / custo
+    assert 20.0 / c == pytest.approx(8.0)  # e* = margem / custo
 
 
 def test_private_yaml_reader(tmp_path):
@@ -25,10 +26,15 @@ def snap(did, t, estado, lat, lon=-40.3):
 
 def test_free_movement_counts_only_free_to_free_within_gap_and_window():
     t0 = datetime(2026, 3, 5, 5, 0)
-    rows = [snap("a", t0, 1, -20.30), snap("a", t0 + timedelta(minutes=10), 1, -20.31),     # 1,1 km, conta
-            snap("a", t0 + timedelta(minutes=20), 3, -20.35),                              # ocupado, não conta
-            snap("a", t0 + timedelta(minutes=30), 1, -20.36), snap("a", t0 + timedelta(minutes=50), 1, -20.40),  # gap 20 min
-            snap("b", datetime(2026, 3, 5, 12, 0), 1, -20.3), snap("b", datetime(2026, 3, 5, 12, 10), 1, -20.4)]  # fora da janela
+    rows = [
+        snap("a", t0, 1, -20.30),
+        snap("a", t0 + timedelta(minutes=10), 1, -20.31),  # 1,1 km, conta
+        snap("a", t0 + timedelta(minutes=20), 3, -20.35),  # ocupado, não conta
+        snap("a", t0 + timedelta(minutes=30), 1, -20.36),
+        snap("a", t0 + timedelta(minutes=50), 1, -20.40),  # gap 20 min
+        snap("b", datetime(2026, 3, 5, 12, 0), 1, -20.3),
+        snap("b", datetime(2026, 3, 5, 12, 10), 1, -20.4),
+    ]  # fora da janela
     out = {r["mes"]: r for r in free_movement(rows)}
     assert out["mar2026"]["intervalos_livre_livre"] == 1
     assert out["mar2026"]["km_dia_reta_media"] == pytest.approx(1.112, abs=0.01)
@@ -37,14 +43,23 @@ def test_free_movement_counts_only_free_to_free_within_gap_and_window():
 
 def test_authors_grid_and_reading_rule():
     from tcc_frota.analise.valor_liquido import classify, grid_cells
+
     cells = grid_cells()
     assert len(cells) == 135
     lo, hi = min(c["e_estrela_km"] for c in cells), max(c["e_estrela_km"] for c in cells)
     assert lo == pytest.approx(10 / (1.5 + 0.45 * 60 / 14)) and hi == pytest.approx(30 / (0.5 + 0.15 * 60 / 20))
     base = {"corridas_extras_por_dia": 1.0, "e_ic_inf": 0.0}
-    rows = classify([{**base, "e_km_vazio_por_corrida_extra": 1.0, "e_ic_sup": 2.0},
-                     {**base, "e_km_vazio_por_corrida_extra": 100.0, "e_ic_sup": 200.0},
-                     {**base, "e_km_vazio_por_corrida_extra": 12.0, "e_ic_sup": 20.0},
-                     {**base, "e_km_vazio_por_corrida_extra": float("nan"), "e_ic_sup": float("nan")}])
-    assert [r["classificacao"] for r in rows] == ["compensa em toda a grade", "compensa em nenhuma célula",
-                                                  "compensa em parte da grade", "não se aplica (sem corridas extras)"]
+    rows = classify(
+        [
+            {**base, "e_km_vazio_por_corrida_extra": 1.0, "e_ic_sup": 2.0},
+            {**base, "e_km_vazio_por_corrida_extra": 100.0, "e_ic_sup": 200.0},
+            {**base, "e_km_vazio_por_corrida_extra": 12.0, "e_ic_sup": 20.0},
+            {**base, "e_km_vazio_por_corrida_extra": float("nan"), "e_ic_sup": float("nan")},
+        ]
+    )
+    assert [r["classificacao"] for r in rows] == [
+        "compensa em toda a grade",
+        "compensa em nenhuma célula",
+        "compensa em parte da grade",
+        "não se aplica (sem corridas extras)",
+    ]

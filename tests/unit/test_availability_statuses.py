@@ -4,7 +4,6 @@ from zoneinfo import ZoneInfo
 from tcc_frota.availability.statuses import status_intervals
 from tcc_frota.availability.timeline import OperationalState, reconstruct_timeline
 
-
 TZ = ZoneInfo("America/Sao_Paulo")
 
 
@@ -14,9 +13,13 @@ def at(hour: int) -> datetime:
 
 def row(key: str, status: str, *, finish: str = "2026-10-13 09:00:00") -> dict[str, str]:
     return {
-        "CD_LOG_STATUS_MOTORISTA": key, "CD_MOTORISTA": "m1", "CD_VEICULO": "v1",
-        "TX_STATUS": status, "inicio_evento": "2026-10-13 08:00:00",
-        "fim_evento": finish, "qualidade_intervalo": "COMPLETO",
+        "CD_LOG_STATUS_MOTORISTA": key,
+        "CD_MOTORISTA": "m1",
+        "CD_VEICULO": "v1",
+        "TX_STATUS": status,
+        "inicio_evento": "2026-10-13 08:00:00",
+        "fim_evento": finish,
+        "qualidade_intervalo": "COMPLETO",
         "qualidade_relacionamento": "RELACIONADO",
     }
 

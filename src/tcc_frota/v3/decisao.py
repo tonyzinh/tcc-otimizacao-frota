@@ -11,6 +11,7 @@ Entrada: o e* da operação (km vazio extra aceito por corrida adicional atendid
 A regra é a proposta do autor (não é política da empresa). Não corrige para múltiplos testes: use uma linha por decisão.
 Só lê agregados diários (sem IDs nem coordenadas).
 """
+
 from __future__ import annotations
 
 import csv
@@ -30,6 +31,7 @@ MIN_DIAS = 8
 @dataclass(frozen=True)
 class DiasAgregados:
     """Agregados diários de um braço: mesmas datas, mesma ordem."""
+
     datas: tuple[date, ...]
     atendidas: tuple[float, ...]
     km_vazio: tuple[float, ...]
@@ -70,6 +72,7 @@ def _pares(plano: DiasAgregados, base: DiasAgregados) -> inf.Pairs:
         d = {k: np.zeros(n) for k in inf.FIELDS}
         d["served"], d["empty_km"] = np.array(a.atendidas, float), np.array(a.km_vazio, float)
         return d
+
     return inf.Pairs(("decisao", "", "", ""), plano.datas, bloco(base), bloco(plano))
 
 
@@ -94,19 +97,40 @@ def decidir(e_star: float, plano: DiasAgregados, baseline: DiasAgregados, *, rep
         decisao = NAO_ADOTAR
     else:
         decisao = INCONCLUSIVO
-    return Decisao(float(e_star), len(pr.dates), float(inf.stat_d_served_day(pr)), float(inf.stat_d_empty_day(pr)), point,
-                   wide.lo, wide.hi, name, inf.mde(max(ses)) if ses else float("nan"), decisao)
+    return Decisao(
+        float(e_star),
+        len(pr.dates),
+        float(inf.stat_d_served_day(pr)),
+        float(inf.stat_d_empty_day(pr)),
+        point,
+        wide.lo,
+        wide.hi,
+        name,
+        inf.mde(max(ses)) if ses else float("nan"),
+        decisao,
+    )
 
 
-def dias_de_csv(path: Path, *, periodo: str, cenario: str, grupo: str | None = None, par: str | None = None,
-                baseline: str = "sem_reposicionamento", campo_km: str = "empty_km") -> tuple[DiasAgregados, DiasAgregados]:
+def dias_de_csv(
+    path: Path,
+    *,
+    periodo: str,
+    cenario: str,
+    grupo: str | None = None,
+    par: str | None = None,
+    baseline: str = "sem_reposicionamento",
+    campo_km: str = "empty_km",
+) -> tuple[DiasAgregados, DiasAgregados]:
     """Lê um CSV diário agregado no formato `fase4_dias.csv` (ou `fase2_controle_dias.csv`) e devolve (plano, baseline)."""
     with open(path, encoding="utf-8", newline="") as h:
         rows = [r for r in csv.DictReader(h) if r["periodo"] == periodo]
-    plano = {r["data"]: r for r in rows if r["cenario"] == cenario and (grupo is None or r["grupo"] == grupo)
-             and (par is None or r.get("par") == par)}
+    plano = {
+        r["data"]: r
+        for r in rows
+        if r["cenario"] == cenario and (grupo is None or r["grupo"] == grupo) and (par is None or r.get("par") == par)
+    }
     candidatos = [r for r in rows if r["cenario"] == baseline and (par is None or r.get("par") == par)]
-    if grupo is not None and any(r["grupo"] == grupo for r in candidatos):    # arquivos em que o baseline herda o grupo do experimento
+    if grupo is not None and any(r["grupo"] == grupo for r in candidatos):  # arquivos em que o baseline herda o grupo do experimento
         candidatos = [r for r in candidatos if r["grupo"] == grupo]
     base = {r["data"]: r for r in candidatos}
     if len(base) != len(candidatos):
@@ -119,5 +143,7 @@ def dias_de_csv(path: Path, *, periodo: str, cenario: str, grupo: str | None = N
         raise ValueError(f"dias sem baseline: {faltam[:3]}")
     datas_d = tuple(date.fromisoformat(d) for d in datas)
 
-    def bloco(m): return DiasAgregados(datas_d, tuple(float(m[d]["served"]) for d in datas), tuple(float(m[d][campo_km]) for d in datas))
+    def bloco(m):
+        return DiasAgregados(datas_d, tuple(float(m[d]["served"]) for d in datas), tuple(float(m[d][campo_km]) for d in datas))
+
     return bloco(plano), bloco(base)

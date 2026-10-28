@@ -1,10 +1,11 @@
 """Média interpretável por zona, hora e tipo de dia."""
+
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
-from typing import Iterable
 
 from tcc_frota.models import Request, aware
 
@@ -42,8 +43,12 @@ def forecast_error(forecast: Forecast, observed: Iterable[Request]) -> dict[str,
 
 
 def forecast_temporal_counts(
-    counts: Iterable[tuple[date, int, int]], complete_months: Iterable[str],
-    target_date: date, cutoff: datetime, *, slot_hours: int = 1,
+    counts: Iterable[tuple[date, int, int]],
+    complete_months: Iterable[str],
+    target_date: date,
+    cutoff: datetime,
+    *,
+    slot_hours: int = 1,
 ) -> dict[str, object]:
     """Use the existing same-weekday mean on complete historical calendar days.
 
@@ -69,9 +74,13 @@ def forecast_temporal_counts(
     for day, hour, count in counts:
         if day in selected_set and 0 <= hour <= 23 and count >= 0:
             bucket[(day, hour // slot_hours * slot_hours)] += count
-    expected = {str(hour): sum(bucket[(day, hour)] for day in selected) / len(selected)
-                for hour in range(0, 24, slot_hours)}
-    return {"target_date": target_date.isoformat(), "cutoff": cutoff.isoformat(),
-            "slot_hours": slot_hours, "training_days": len(selected),
-            "fallback_all_days": fallback, "expected_by_hour": expected,
-            "spatial_status": "origin_unavailable"}
+    expected = {str(hour): sum(bucket[(day, hour)] for day in selected) / len(selected) for hour in range(0, 24, slot_hours)}
+    return {
+        "target_date": target_date.isoformat(),
+        "cutoff": cutoff.isoformat(),
+        "slot_hours": slot_hours,
+        "training_days": len(selected),
+        "fallback_all_days": fallback,
+        "expected_by_hour": expected,
+        "spatial_status": "origin_unavailable",
+    }

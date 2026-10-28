@@ -4,6 +4,7 @@ Aceita um vizinho pior com probabilidade exp(−ΔJ / T_e), T_e = T₀ · r^e (e
 melhor plano visto. Início: guloso de valor marginal do artigo (α = 0,2). A escolha final entre
 plano inicial, melhor plano e plano vazio é feita nos pseudodias de aceitação, como no LNS.
 """
+
 from __future__ import annotations
 
 from math import exp
@@ -20,11 +21,10 @@ class RecozimentoSimulado(BuscaLocalLNS):
 
     @property
     def params(self) -> dict:
-        return {"t0": self.t0, "resfriamento": self.resfriamento, "avaliacoes": self.avaliacoes, "k": self.k,
-                "max_km": self.max_km}
+        return {"t0": self.t0, "resfriamento": self.resfriamento, "avaliacoes": self.avaliacoes, "k": self.k, "max_km": self.max_km}
 
     def accept(self, delta: float, step: int, rng) -> bool:
         if delta < -1e-12:
             return True
-        t = self.t0 * self.resfriamento ** step
+        t = self.t0 * self.resfriamento**step
         return t > 0 and rng.random() < exp(-delta / t)
