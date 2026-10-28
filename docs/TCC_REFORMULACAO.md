@@ -52,6 +52,17 @@ Todas avaliadas por linha (planejador × período), nível de 5%, correção de 
 *Seria reprovado se:* nenhum planejador orientado a demanda mostrasse ΔN% com IC inferior > 0 e NB(30) com IC inferior > 0 no cenário "fora do raio" (critério D13).
 *Observado:* **aprovado** (sete de sete variantes orientadas a demanda passam) [`fase2_controle_positivo_fora_do_raio_*.csv`].
 
+### Por que a F1 tem NB > 0 em e\* = 20 e 30 e a F4 primária não
+
+Verificado nos arquivos (nenhuma causa foi assumida antes):
+* **Contabilização.** A F1 usa a contabilização bruta da v1 (mundo `login`: o baseline começa a sessão no ponto de login observado e o plano na zona-alvo) e baseline estacionário B0. A F4 primária usa a contabilização `origem` (os dois braços começam na última posição de D, D-B) e os baselines B0–B4.
+* **Reprodução exata.** Rodando a F4 na contabilização bruta com o baseline B0, os números reproduzem os da F1 sem diferença: por exemplo, setembro, guloso α = 0,5, e\* = 30, NB = 0,435 corridas/dia e IC inferior = 0,097 nas duas famílias [`fase1_nb.csv`, `fase4_F4_v1_bruta_nb.csv`]. Na contabilização `origem`, a mesma linha dá NB = −0,042 e IC inferior = −0,288 [`fase4_F4_origem_nb.csv`]. A diferença de contabilização, e não de algoritmo ou de dados, é o que separa os dois resultados.
+* **Onde estão os positivos da F1.** Em e\* = 20 são 3 de 162 linhas e em e\* = 30 são 9 de 162; todas em **setembro**, em planejadores gulosos (α de 0,02 a 0,5) e no proporcional, a maioria em regime B e janelas 07–10 e 04–11. Na subfamília primária (04–11, regime B), em e\* = 30 são 3 de 18, todas em setembro e com α ≥ 0,2. A F4 em contabilização bruta também tem NB > 0 em 4 de 100 linhas (e\* = 20) e 8 de 100 (e\* = 30) [`fase4_F4_v1_bruta_nb.csv`].
+* **Multiplicidade.** Os IC de NB não têm correção para múltiplos testes (a correção de Romano–Wolf vale para as decisões sobre KM/corrida e ΔN, não para os IC de NB), e a F1 tem 162 linhas por valor de e\*.
+* **Leitura.** H1′ é respondida pela F4 primária, porque é a que usa a contabilização confirmada (D-B), baselines com deriva realista e o placebo. Os positivos da F1 e da F4 bruta valem como sensibilidade: aparecem só em setembro, só em contabilização em que o baseline parte do ponto de login, e não sobrevivem à contabilização `origem`. **O mecanismo exato (a posição inicial do baseline) é compatível com o artefato de D10, mas não foi isolado por um experimento adicional.**
+
+**Poder para NB(e\*) (MDE, 80% de poder, 5% bilateral, método de `fase1_mde.csv`).** Na F4 primária, o MDE de NB(e\*) pela pior variante de bootstrap tem mediana entre 0,60 e 1,93 corridas/dia, conforme e\* (5 a 50) e o período; isso equivale a 0,7% a 1,7% da média diária de corridas atendidas do baseline B0 (126,6 em março e 79,1 em setembro) [`fase4_mde_nb.csv`, `fase4_dias.csv`]. Na F1, subfamília 04–11 regime B, a mediana vai de 1,11 a 2,43 corridas/dia (1,1% a 2,6%) [`fase1_mde_nb.csv`]. Portanto o protocolo tem poder para benefícios líquidos a partir de cerca de 1% a 2% das corridas, e **não** distingue benefícios menores. Em 25 das 162 linhas da F1 o MDE é zero porque o plano não executa nenhum movimento (diferença nula em todos os dias).
+
 ## 3b. Premissa do regime B e condicionalidade do resultado
 
 **Decisão D-B do autor (28/10/2026): confirmada** a contabilização principal `start_at_origin`: os dois braços (plano e baseline) começam a sessão na última posição de D, como o regime B pressupõe ("motoristas dormem onde largam"). **O nulo vale condicionado a essa contabilização.**
