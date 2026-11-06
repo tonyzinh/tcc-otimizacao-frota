@@ -1,0 +1,302 @@
+{
+ "gerado_em_utc": "2026-11-06T21:52:02Z",
+ "codigo": "cb00ee3+alteracoes",
+ "dias": [
+  "2026-03-10"
+ ],
+ "lotes": [
+  {
+   "fonte": "Elasticsearch",
+   "entidade": "posicao_ofertas",
+   "lote": "2026-03-10",
+   "linhas": 38153,
+   "rejeitadas": 0,
+   "sha256": "4cebd332f6eb82e443a352c4ce212325d53c9e7e295136742df7bfd4d763eb85",
+   "filtro": {
+    "versao": "R-04/2026-11-06",
+    "regiao": 1,
+    "servicos": [
+     1,
+     11,
+     12,
+     19
+    ]
+   },
+   "limites": "Foto do app a cada ~2 min por região; lista de veículos ofertados (não todos os online); status é enum inferido. Nome, telefone, login, playerId, placa em claro e foto não extraídos.",
+   "fuso": "valores com deslocamento explícito (-03:00 observado); dia = -03:00"
+  },
+  {
+   "fonte": "Elasticsearch",
+   "entidade": "reposicionamento_sugerido",
+   "lote": "2026-03-10",
+   "linhas": 7178,
+   "rejeitadas": 0,
+   "sha256": "1cc1b00a4810f6b7a8b02992e0d7d9609c029e6127ade9cebc2799cefad34f01",
+   "filtro": {
+    "versao": "R-04/2026-11-06",
+    "regiao": 1,
+    "servicos": [
+     1,
+     11,
+     12,
+     19
+    ]
+   },
+   "limites": "Semântica de mode/idMotivo não confirmada; é sugestão/registro do sistema, não deslocamento executado.",
+   "fuso": "valores com deslocamento explícito (-03:00 observado); dia = -03:00"
+  },
+  {
+   "fonte": "Elasticsearch",
+   "entidade": "sumario_ofertas",
+   "lote": "2026-03-10",
+   "linhas": 720,
+   "rejeitadas": 0,
+   "sha256": "23d4ca3979e58fdbd105c63adbb006e3ff1ca3d61bcea814631281ff8c0d324e",
+   "filtro": {
+    "versao": "R-04/2026-11-06",
+    "regiao": 1,
+    "servicos": [
+     1,
+     11,
+     12,
+     19
+    ]
+   },
+   "limites": "Contagem agregada por região, sem separar serviço: pode incluir motoristas de serviços não V1 na região 1.",
+   "fuso": "valores com deslocamento explícito (-03:00 observado); dia = -03:00"
+  },
+  {
+   "fonte": "ODS",
+   "entidade": "jornada_motorista",
+   "lote": "2026-03-10",
+   "linhas": 0,
+   "rejeitadas": 0,
+   "sha256": "937f83f0cbcfa522898bc2eab5c4359f99295387180be1350cca036da079c1e9",
+   "filtro": {
+    "versao": "R-04/2026-11-06",
+    "regiao": 1,
+    "servicos": [
+     1,
+     11,
+     12,
+     19
+    ]
+   },
+   "limites": "Sem campo de região na tabela: coorte = motoristas com solicitação V1 Viagens (região 1, serviços V1) em ±7 dias; motorista que também opere em outra região/produto na mesma semana não é separável com segurança.",
+   "fuso": "sem deslocamento na fonte (RN024 pendente)"
+  },
+  {
+   "fonte": "ODS",
+   "entidade": "log_status_motorista",
+   "lote": "2026-03-10",
+   "linhas": 896,
+   "rejeitadas": 0,
+   "sha256": "627dc007bcf3a8ffb5e1a6517bdf9912755d3b902b3d21c65c523941df22e658",
+   "filtro": {
+    "versao": "R-04/2026-11-06",
+    "regiao": 1,
+    "servicos": [
+     1,
+     11,
+     12,
+     19
+    ]
+   },
+   "limites": "Sem campo de região na tabela: coorte = motoristas com solicitação V1 Viagens (região 1, serviços V1) em ±7 dias; motorista que também opere em outra região/produto na mesma semana não é separável com segurança. Semântica dos códigos de status é enum inferido (não confirmado).",
+   "fuso": "sem deslocamento na fonte (RN024 pendente)"
+  },
+  {
+   "fonte": "ODS",
+   "entidade": "reposicionamento",
+   "lote": "2026-03-10",
+   "linhas": 297,
+   "rejeitadas": 0,
+   "sha256": "288232d7cb841b0b0c204c23aa28fb8fd3b695c72aa8886c538230c4a7892e4c",
+   "filtro": {
+    "versao": "R-04/2026-11-06",
+    "regiao": 1,
+    "servicos": [
+     1,
+     11,
+     12,
+     19
+    ]
+   },
+   "limites": "Sem campo de região na tabela: coorte = motoristas com solicitação V1 Viagens (região 1, serviços V1) em ±7 dias; motorista que também opere em outra região/produto na mesma semana não é separável com segurança. Posições são de motorista (não de passageiro): mantidas sem arredondamento.",
+   "fuso": "sem deslocamento na fonte (RN024 pendente)"
+  },
+  {
+   "fonte": "ODS",
+   "entidade": "solicitacao",
+   "lote": "2026-03-10",
+   "linhas": 1325,
+   "rejeitadas": 0,
+   "sha256": "a7d8b1c722fad96960d1aa2542bc34e3e6be262a48076d02920631eecfc9746c",
+   "filtro": {
+    "versao": "R-04/2026-11-06",
+    "regiao": 1,
+    "servicos": [
+     1,
+     11,
+     12,
+     19
+    ]
+   },
+   "limites": "dt_registro é proxy da criação; uma linha por solicitação no ODS (estado final, sem a cadeia de status); NU_DR_REAL/NU_DISTPERCORRIDA conforme RN; valores monetários não extraídos.",
+   "fuso": "sem deslocamento na fonte (RN024 pendente)"
+  },
+  {
+   "fonte": "ODS",
+   "entidade": "status_solicitacao",
+   "lote": "2026-03-10",
+   "linhas": 5202,
+   "rejeitadas": 0,
+   "sha256": "26b787ac94ca55598455478a549d6ccdf80a2204b27c64383a652218ccbe324c",
+   "filtro": {
+    "versao": "R-04/2026-11-06",
+    "regiao": 1,
+    "servicos": [
+     1,
+     11,
+     12,
+     19
+    ]
+   },
+   "limites": "Lote por data de criação da solicitação (não do evento); eventos de uma solicitação podem cair no dia seguinte.",
+   "fuso": "sem deslocamento na fonte (RN024 pendente)"
+  },
+  {
+   "fonte": "ODS",
+   "entidade": "telemetria_cobli",
+   "lote": "2026-03-10",
+   "linhas": 3227,
+   "rejeitadas": 0,
+   "sha256": "96ee1de82e14d965e457dcb6134635dcd4371343b9933f460552c4b481215eb5",
+   "filtro": {
+    "versao": "R-04/2026-11-06",
+    "regiao": 1,
+    "servicos": [
+     1,
+     11,
+     12,
+     19
+    ]
+   },
+   "limites": "Filtro por VEHICLE_GROUP = 'Operação' (sem campo de região): validado em 10/03/2026 (106 de 113 placas com corrida V1 da região 1); o grupo 'Operação Prime' (14 de 16 placas com corrida V1 região 1) e 'Operação V1 VIX CAM' (4 de 4) ficam FORA, pendentes de decisão. Registra só início/fim de viagens e paradas (type trips/stops), não a trajetória ponto a ponto. available_at = fim do trecho. Nome do motorista não extraído; coordenadas de extremidade (endereços de embarque/desembarque) com 4 casas.",
+   "fuso": "sem deslocamento na fonte (RN024 pendente)"
+  },
+  {
+   "fonte": "ODS",
+   "entidade": "veiculo",
+   "lote": "snapshot",
+   "linhas": 9598,
+   "rejeitadas": 0,
+   "sha256": "b0abdc1ccbf02ceb2a2f7a27b2706d04053f94269fbecb215466255426c4d88c",
+   "filtro": {
+    "versao": "R-04/2026-11-06",
+    "regiao": 1,
+    "servicos": [
+     1,
+     11,
+     12,
+     19
+    ]
+   },
+   "limites": "Foto do estado na extração (sem histórico); TX_STATUS/DT_DESATIVACAO são posteriores à janela: não usar como informação disponível no corte D+1. Placa e chassi não extraídos.",
+   "fuso": "sem deslocamento na fonte (RN024 pendente)"
+  }
+ ],
+ "solicitacao": {
+  "linhas": 1325,
+  "status": {
+   "CorridaEncerrada": 738,
+   "NaoAtendida": 252,
+   "CorridaCanceladaSolicitante": 96,
+   "CorridaCanceladaSolicitantePosAceite": 73,
+   "CorridaCanceladaMotoristaPosAceite": 61,
+   "CorridaCanceladaAgendamento": 41,
+   "LimiteEsperaAtingido": 24,
+   "PagamentoRejeitado": 23,
+   "Retracamento": 16,
+   "CorridaCanceladaOperador": 1
+  },
+  "servicos": {
+   "1": 1278,
+   "12": 47
+  },
+  "regioes": {
+   "1": 1325
+  },
+  "nulos_pct": {
+   "cd_motorista": 32.3,
+   "cd_veiculo": 32.4,
+   "dt_fim_realizada": 0.0,
+   "nu_dr_real": 79.4,
+   "nu_distancia_aceite_cheguei": 44.3,
+   "nu_distpercorrida": 0.0
+  },
+  "tx_tipo_prime": {
+   "Normal": 1325
+  },
+  "tx_modelo_solicitacao": {
+   "Normal": 1325
+  },
+  "chave_unica": true,
+  "encerradas": {
+   "n": 738,
+   "km_corrida": 8303.1,
+   "km_aproximacao_aceite_cheguei": 3246.1,
+   "inicio_antes_do_fim_pct": 100.0
+  }
+ },
+ "status_solicitacao": {
+  "linhas": 5202,
+  "orfas_sem_solicitacao": 0,
+  "status": {
+   "AguardandoCondutor": 1309,
+   "CondutorACaminho": 853,
+   "CondutorChegou": 772,
+   "CorridaIniciada": 738,
+   "CorridaEncerrada": 738,
+   "NaoAtendida": 252,
+   "AguardandoCondutorEmOutraViagem": 197,
+   "CorridaCanceladaSolicitante": 97,
+   "CorridaCanceladaSolicitantePosAceite": 80,
+   "CorridaCanceladaMotoristaPosAceite": 61,
+   "CorridaCanceladaAgendamento": 41,
+   "LimiteEsperaAtingido": 24,
+   "PagamentoRejeitado": 23,
+   "Retracamento": 16,
+   "CorridaCanceladaOperador": 1
+  }
+ },
+ "cobli": {
+  "linhas": 3227,
+  "trips": 1511,
+  "stops": 1716,
+  "placas": 117,
+  "km_trips": 13471.5,
+  "trips_sem_motorista_pct": 22.0,
+  "distancia_nula_ou_zero_pct": 0.0,
+  "fim_antes_inicio": 0
+ },
+ "reconciliacao_km_um_dia": {
+  "cobli_trips_km": 13471.5,
+  "corridas_km + aproximacao_km": 11549.2,
+  "residuo_km": 1922.3,
+  "aviso": "Comparação agregada de um dia, sem casar viagem a viagem; resíduo não é KM morto medido (inclui circulação, retorno, erros de grupo/placa, corridas não encerradas)."
+ },
+ "posicao_ofertas": {
+  "linhas": 38153,
+  "motoristas": 132,
+  "snapshots": 720,
+  "status": {
+   "3": 20513,
+   "1": 12039,
+   "5": 5535,
+   "4": 66
+  },
+  "sem_gps_pct": 0.0,
+  "defasagem_gps_mediana_s": 2.686
+ }
+}
