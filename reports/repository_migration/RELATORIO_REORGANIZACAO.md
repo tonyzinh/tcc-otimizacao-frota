@@ -11,23 +11,23 @@ Commit-base `abf4c5c` (ramo `v2-extensoes`); estado original em `git_status_orig
 
 ## Nova organização
 
-Reorganização **mínima e deliberada** (decisões A1–A6 em [ARQUITETURA_REORGANIZADA](../../docs/ARQUITETURA_REORGANIZADA.md)): a estrutura vertical por domínio já existia e caminhos científicos são citados por hashes e pelo artigo. Mover mais traria risco de reprodutibilidade sem ganho verificável.
+Reorganização **mínima e deliberada** (decisões A1–A6 em [ARQUITETURA_REORGANIZADA](../../docs_antigos/ARQUITETURA_REORGANIZADA.md)): a estrutura vertical por domínio já existia e caminhos científicos são citados por hashes e pelo artigo. Mover mais traria risco de reprodutibilidade sem ganho verificável.
 
 ## Arquivos
 
 | Categoria | Qtde | Itens |
 |---|---:|---|
 | Movidos (`git mv`) | 2 | `reviews/DATA_SCIENCE_AUDIT.md`, `reviews/code_review_report.md` → `reports/thesis_audit/` (conteúdo idêntico) |
-| Modificados | 2 | `docs/V2_PREREGISTRO.md` (nota de caminho na linha de fonte), `README.md` (seção de entrada e índice) |
-| Criados | 10 | `docs/GUIA_COMPLETO_REPOSITORIO.md`, `ARQUITETURA_REORGANIZADA.md`, `COMO_EXECUTAR.md`, `MAPEAMENTO_TCC_CODIGO.md`; `scripts/validar_baseline.py`; `tests/unit/test_estrutura_repositorio.py`; esta pasta (`baseline_antes.json`, `baseline_depois.json`, `git_status_original.txt`, 2 relatórios) |
+| Modificados | 2 | `docs_antigos/V2_PREREGISTRO.md` (nota de caminho na linha de fonte), `README.md` (seção de entrada e índice) |
+| Criados | 10 | `docs_antigos/GUIA_COMPLETO_REPOSITORIO.md`, `ARQUITETURA_REORGANIZADA.md`, `COMO_EXECUTAR.md`, `MAPEAMENTO_TCC_CODIGO.md`; `scripts/validar_baseline.py`; `tests/unit/test_estrutura_repositorio.py`; esta pasta (`baseline_antes.json`, `baseline_depois.json`, `git_status_original.txt`, 2 relatórios) |
 | Preservados | todos os demais | inclusive `reports/tcc_final` (19 hashes idênticos), `reports/tcc_v2`, `resultados/`, `tabelas/`, `config/`, `databricks/` |
-| Não rastreado/preexistente | — | `docs/TCC_CAP3_*`, `docs/TCC_REFERENCIAS_ANOTADAS.md`, `tcc-artigo-latex/` (Git aninhado): intocados |
+| Não rastreado/preexistente | — | `docs/TCC_CAP3_*`, `docs_antigos/TCC_REFERENCIAS_ANOTADAS.md`, `tcc-artigo-latex/` (Git aninhado): intocados |
 
 Compatibilidade: nenhum módulo, comando ou caminho de saída mudou. A única referência ao caminho antigo (`reviews/`) está em `V2_PREREGISTRO.md` (anotada) e no texto histórico da própria auditoria.
 
 ## Desvio do roteiro
 
-`docs/ARQUITETURA.md` não foi criado: no Windows colide com o `docs/arquitetura.md` existente. Usou-se `ARQUITETURA_REORGANIZADA.md`.
+`docs/ARQUITETURA.md` não foi criado: no Windows colide com o `docs_antigos/arquitetura.md` existente. Usou-se `ARQUITETURA_REORGANIZADA.md`.
 
 ## Validação
 

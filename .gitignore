@@ -7,6 +7,7 @@ data/**
 *.pq
 .audit-deps/
 .ui-deps/
+.ref/
 
 # Contexto local dos agentes e documentos internos ficam fora dos commits.
 .claude/

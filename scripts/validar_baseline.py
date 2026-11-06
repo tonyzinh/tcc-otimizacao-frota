@@ -18,12 +18,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-CIENTIFICOS = ("reports/tcc_final", "reports/tcc_v2", "resultados", "tabelas", "config", "databricks")
+CIENTIFICOS = ("reports/tcc_final", "reports/tcc_v2", "resultados", "tabelas", "config")
 OPCIONAIS = {
     "pyarrow",
     "h3",
-    "streamlit",
-    "pyspark",
     "numpy",
     "matplotlib",
     "sklearn",
@@ -45,7 +43,7 @@ def git(*args: str) -> str:
 
 
 def hashes_v1() -> dict:
-    texto = (ROOT / "docs/V2_PREREGISTRO.md").read_text(encoding="utf-8")
+    texto = (ROOT / "docs_antigos/V2_PREREGISTRO.md").read_text(encoding="utf-8")
     linhas = re.findall(r"^\| (\S+\.(?:csv|json)) \| ([0-9a-f]{64}) \|", texto, re.M)
     ok = [n for n, h in linhas if sha(ROOT / "reports/tcc_final" / n) == h]
     return {"arquivos": len(linhas), "iguais": len(ok), "divergentes": [n for n, _ in linhas if n not in ok]}

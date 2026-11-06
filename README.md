@@ -10,13 +10,13 @@ TCC (Ciência da Computação) sobre **reposicionamento preventivo de veículos 
 
 ## Resultado registrado
 
-Em março e setembro de 2026, nenhum dos 13 planejadores avaliados reduziu o KM vazio por corrida; a extensão v2 confirma o nulo e um controle positivo sintético mostra que o simulador e a inferência detectam ganho quando ele existe ([`reports/tcc_v2/RELATORIO_V2.md`](reports/tcc_v2/RELATORIO_V2.md), [`docs/BATERIA_ALGORITMOS.md`](docs/BATERIA_ALGORITMOS.md)). Vale para este simulador, estes dados e estas hipóteses; KM estimado não é KM faturado.
+Em março e setembro de 2026, nenhum dos 13 planejadores avaliados reduziu o KM vazio por corrida; a extensão v2 confirma o nulo e um controle positivo sintético mostra que o simulador e a inferência detectam ganho quando ele existe ([`reports/tcc_v2/RELATORIO_V2.md`](reports/tcc_v2/RELATORIO_V2.md), [`docs_antigos/BATERIA_ALGORITMOS.md`](docs_antigos/BATERIA_ALGORITMOS.md)). Vale para este simulador, estes dados e estas hipóteses; KM estimado não é KM faturado.
 
 ## Arquitetura
 
-Pacote `src/tcc_frota/` por domínio: `v2/` (rodada final, simulador, políticas, estatística), `algoritmos/` (bateria), `v3/` (extensão v2 do TCC), `availability/`, `analise/`, `demand/`, `gold/`, `simulation/`, `optimization/`, `spatial/`, `ingestion/`, `quality/`, `synthetic/`. Fluxo: dados → Silver/Gold → previsão no corte D → `Planner` → simulador de eventos → estatística → tabelas e figuras. Detalhes e diagramas: [guia completo](docs/GUIA_COMPLETO_REPOSITORIO.md), [arquitetura](docs/ARQUITETURA_REORGANIZADA.md).
+Pacote `src/tcc_frota/` por domínio: `v2/` (rodada final, simulador, políticas, estatística), `algoritmos/` (bateria), `v3/` (extensão v2 do TCC), `availability/`, `analise/`, `demand/`, `gold/`, `simulation/`, `optimization/`, `spatial/`, `ingestion/`, `quality/`, `synthetic/`. Fluxo: dados → Silver/Gold → previsão no corte D → `Planner` → simulador de eventos → estatística → tabelas e figuras. Detalhes e diagramas: [guia completo](docs_antigos/GUIA_COMPLETO_REPOSITORIO.md), [arquitetura](docs_antigos/ARQUITETURA_REORGANIZADA.md).
 
-Tecnologias: Python 3.12, NumPy, SciPy (HiGHS), H3, scikit-learn, statsmodels/arch, Matplotlib, PyArrow; PySpark/Delta/Databricks (notebooks escritos, **não validados em workspace**); Streamlit/FleetLab para visualização local; LaTeX para o artigo.
+Tecnologias: Python 3.12, NumPy, SciPy (HiGHS), H3, scikit-learn, statsmodels/arch, Matplotlib, PyArrow; LaTeX para o artigo.
 
 ## Instalação rápida
 
@@ -52,7 +52,7 @@ Testes em `tests/unit`, `tests/integration`, `tests/regression` (valores congela
 | Bateria de 13 algoritmos e guloso seletivo | congeladas | `resultados/`, `tabelas/` |
 | Extensão v2 (pacote `v3`), Fases 1–4 | atual | `reports/tcc_v2/` |
 
-Cuidado com os nomes: o pacote `v3` é a “extensão v2” dos documentos. Mapa completo em [`docs/VERSOES_E_EXPERIMENTOS.md`](docs/VERSOES_E_EXPERIMENTOS.md); comandos em [`docs/GUIA_EXPERIMENTOS.md`](docs/GUIA_EXPERIMENTOS.md). **Nunca regere resultados no lugar de `reports/tcc_final`, `reports/tcc_v2`, `resultados` ou `tabelas`.**
+Cuidado com os nomes: o pacote `v3` é a “extensão v2” dos documentos. Mapa completo em [`docs_antigos/VERSOES_E_EXPERIMENTOS.md`](docs_antigos/VERSOES_E_EXPERIMENTOS.md); comandos em [`docs_antigos/GUIA_EXPERIMENTOS.md`](docs_antigos/GUIA_EXPERIMENTOS.md). **Nunca regere resultados no lugar de `reports/tcc_final`, `reports/tcc_v2`, `resultados` ou `tabelas`.**
 
 ## Reprodutibilidade
 
@@ -60,14 +60,14 @@ Verificado: testes, hashes dos artefatos versionados, importação dos 103 módu
 
 ## Limitações científicas
 
-Simulador e distâncias estimadas (Haversine × fator rua/reta); previsão com erro; pré-registro com carimbo do Git local; fases 5 e 6 da extensão não feitas; regras da empresa não confirmadas. Lista completa: [`docs/limitacoes.md`](docs/limitacoes.md) e [`docs/ESTADO_FINAL_REPOSITORIO.md`](docs/ESTADO_FINAL_REPOSITORIO.md).
+Simulador e distâncias estimadas (Haversine × fator rua/reta); previsão com erro; pré-registro com carimbo do Git local; fases 5 e 6 da extensão não feitas; regras da empresa não confirmadas. Lista completa: [`docs_antigos/limitacoes.md`](docs_antigos/limitacoes.md) e [`docs_antigos/ESTADO_FINAL_REPOSITORIO.md`](docs_antigos/ESTADO_FINAL_REPOSITORIO.md).
 
 ## Índice da documentação
 
-- Entrada: [guia completo](docs/GUIA_COMPLETO_REPOSITORIO.md) · [como executar](docs/COMO_EXECUTAR.md) · [guia do desenvolvedor](docs/GUIA_DESENVOLVEDOR.md) · [guia de experimentos](docs/GUIA_EXPERIMENTOS.md) · [versões e experimentos](docs/VERSOES_E_EXPERIMENTOS.md) · [mapeamento TCC→código](docs/MAPEAMENTO_TCC_CODIGO.md) · [estado final](docs/ESTADO_FINAL_REPOSITORIO.md)
-- Método: [metodologia](docs/metodologia.md) · [simulação](docs/simulacao.md) · [indicadores](docs/indicadores.md) · [pré-registro da extensão v2](docs/V2_PREREGISTRO.md) · [orçamento de configurações](docs/ORCAMENTO_CONFIGURACOES.md)
-- Resultados: [reais](docs/resultados_reais.md) · [bateria](docs/BATERIA_ALGORITMOS.md) · [seletivo](docs/RESULTADO_SELETIVO.md) · [banca](docs/perguntas_banca.md)
-- Dados e segurança: [segurança dos dados](docs/seguranca_dados.md) · [disponibilidade](docs/disponibilidade.md) · [medalhão Databricks](docs/databricks_medalhao.md)
+- Entrada: [guia completo](docs_antigos/GUIA_COMPLETO_REPOSITORIO.md) · [como executar](docs_antigos/COMO_EXECUTAR.md) · [guia do desenvolvedor](docs_antigos/GUIA_DESENVOLVEDOR.md) · [guia de experimentos](docs_antigos/GUIA_EXPERIMENTOS.md) · [versões e experimentos](docs_antigos/VERSOES_E_EXPERIMENTOS.md) · [mapeamento TCC→código](docs_antigos/MAPEAMENTO_TCC_CODIGO.md) · [estado final](docs_antigos/ESTADO_FINAL_REPOSITORIO.md)
+- Método: [metodologia](docs_antigos/metodologia.md) · [simulação](docs_antigos/simulacao.md) · [indicadores](docs_antigos/indicadores.md) · [pré-registro da extensão v2](docs_antigos/V2_PREREGISTRO.md) · [orçamento de configurações](docs_antigos/ORCAMENTO_CONFIGURACOES.md)
+- Resultados: [reais](docs_antigos/resultados_reais.md) · [bateria](docs_antigos/BATERIA_ALGORITMOS.md) · [seletivo](docs_antigos/RESULTADO_SELETIVO.md) · [banca](docs_antigos/perguntas_banca.md)
+- Dados e segurança: [segurança dos dados](docs_antigos/seguranca_dados.md) · [disponibilidade](docs_antigos/disponibilidade.md)
 - Auditorias: [`reports/thesis_audit/`](reports/thesis_audit/) · [`reports/validation_current/`](reports/validation_current/) · [`reports/repository_migration/`](reports/repository_migration/) · [`reports/final_release/`](reports/final_release/)
 
 O manuscrito está em `tcc-artigo-latex/`, repositório Git **independente** (com remoto próprio); faça seus commits lá.

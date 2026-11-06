@@ -65,9 +65,6 @@ def main(argv: list[str] | None = None) -> int:
     explore = sub.add_parser("es-explore-demand", help="série temporal exploratória de dT_REGISTRO")
     explore.add_argument("--run", type=Path, required=True)
     explore.add_argument("--timezone", default="America/Sao_Paulo")
-    gold_export = sub.add_parser("gold-export", help="copia a Gold do Databricks para cache local ignorado")
-    gold_export.add_argument("--out", type=Path, default=Path("reports/runs/gold_cache"))
-    gold_export.add_argument("--v2", action="store_true", help="exporta as tabelas tb_gld_*_v2")
     prepare = sub.add_parser("prepare-raw", help="confere lotes de data/raw contra os manifestos (v2)")
     prepare.add_argument("--raw", type=Path, default=Path("data/raw"))
     prepare.add_argument(
@@ -77,14 +74,6 @@ def main(argv: list[str] | None = None) -> int:
     final.add_argument("--raw", type=Path, default=Path("data/raw"))
     final.add_argument("--out", type=Path, default=Path("reports/runs/tcc_final"))
     final.add_argument("--publish", type=Path, default=None, help="copia só os agregados (CSV e result.json) para esta pasta versionável")
-    fl_export = sub.add_parser("fleetlab-export", help="v2: gera os JSON do FleetLab (uso local, dados pseudonimizados)")
-    fl_export.add_argument("--raw", type=Path, default=Path("data/raw"))
-    fl_export.add_argument("--result", type=Path, default=Path("reports/tcc_final/result.json"))
-    fl_export.add_argument("--sensitivity", type=Path, default=Path("reports/tcc_final/tab13_sensibilidade.csv"))
-    fl_export.add_argument("--out", type=Path, default=Path("reports/runs/fleetlab"))
-    fl_serve = sub.add_parser("fleetlab-serve", help="serve os JSON do FleetLab em 127.0.0.1")
-    fl_serve.add_argument("--root", type=Path, default=Path("reports/runs/fleetlab"))
-    fl_serve.add_argument("--port", type=int, default=8000)
     gold_replay = sub.add_parser("gold-replay", help="experimento D+1 real sobre o cache da Gold")
     gold_replay.add_argument("--cache", type=Path, default=Path("reports/runs/gold_cache"))
     gold_replay.add_argument("--start", type=date.fromisoformat, required=True)
@@ -179,36 +168,11 @@ def main(argv: list[str] | None = None) -> int:
     elif args.command == "es-explore-demand":
         report = build_registration_proxy(args.run, timezone=args.timezone)
         print(json.dumps(report, ensure_ascii=False, sort_keys=True))
-    elif args.command == "gold-export":
-        from databricks.connect import DatabricksSession
-
-        from tcc_frota.gold.export import export_gold
-
-        spark = DatabricksSession.builder.serverless(True).getOrCreate()
-        if args.v2:
-            from tcc_frota.gold.export import export_gold_v2
-
-            out = args.out if args.out != Path("reports/runs/gold_cache") else Path("reports/runs/gold_cache_v2")
-            print(json.dumps(export_gold_v2(spark, out), ensure_ascii=False))
-        else:
-            print(json.dumps(export_gold(spark, args.out), ensure_ascii=False))
     elif args.command == "prepare-raw":
         from tcc_frota.v2.raw import prepare_raw
 
         authorize("real", "local")
         prepare_raw(args.raw, materialize_to=args.materialize_to)
-    elif args.command == "fleetlab-export":
-        from tcc_frota.v2.fleetlab import Exporter
-
-        authorize("real", "local")
-        if "runs" not in args.out.resolve().parts:
-            raise PermissionError("a exportação do FleetLab contém dados individuais: use uma pasta em reports/runs/")
-        print(json.dumps(Exporter(args.raw, args.result, args.out).run(tab13=args.sensitivity), ensure_ascii=False))
-    elif args.command == "fleetlab-serve":
-        from tcc_frota.v2.fleetlab import serve
-
-        authorize("real", "local")
-        serve(args.root, port=args.port)
     elif args.command == "final-run":
         from tcc_frota.v2.final_run import final_run
 

@@ -57,7 +57,7 @@ MILP, LNS, recozimento, NSGA-II e PSO são **técnicas de otimização**; sua pr
 | Gestão dinâmica de frota | **Enganoso** para o D+1; adequado só ao MPC/D+0 |
 | Híbrido despacho + reposicionamento | Só nos experimentos D+0 e D+1+D+0 (fora da tabela principal) |
 
-*Nota sobre “dinâmico”:* o plano D+1 é decidido **uma vez** no corte, com informação fixa; não há revelação sequencial de pedidos nem replanejamento. É um problema **antecipatório/estático sob incerteza de demanda**, não um DVRP no sentido de Psaraftis et al. (2016). O rascunho `docs/TCC_CAP3_TRABALHOS_RELACIONADOS.md` escreve “antecipatório e dinâmico”; recomenda-se “antecipatório (planejamento prévio sob demanda incerta)”, reservando “dinâmico” para a avaliação por simulação de eventos.
+*Nota sobre “dinâmico”:* o plano D+1 é decidido **uma vez** no corte, com informação fixa; não há revelação sequencial de pedidos nem replanejamento. É um problema **antecipatório/estático sob incerteza de demanda**, não um DVRP no sentido de Psaraftis et al. (2016). O rascunho `docs_antigos/TCC_CAP3_TRABALHOS_RELACIONADOS.md` escreve “antecipatório e dinâmico”; recomenda-se “antecipatório (planejamento prévio sob demanda incerta)”, reservando “dinâmico” para a avaliação por simulação de eventos.
 
 ## 7. Comparação com o PRV clássico e variantes
 
@@ -96,7 +96,7 @@ MILP, LNS, recozimento, NSGA-II e PSO são **técnicas de otimização**; sua pr
 | `sections/03-metodologia.tex` (≈ l. 272–274) | “método húngaro resolve de forma exata a atribuição entre veículos e vagas fixadas, mas não o reposicionamento como um todo” | Correto | — |
 | `sections/01-introducao.tex` | “literatura sobre reposicionamento de frotas” | Correto | — |
 | `references/referencias.bib` `toth2002` | *The vehicle routing problem*, 2002 | Correto, mas o rascunho do Cap. 3 usa Toth e Vigo (2014, 2.ª ed.) | Unificar edição; citar Dantzig e Ramser (1959) se o PRV for definido |
-| `docs/TCC_CAP3_TRABALHOS_RELACIONADOS.md` §3.1 | “roteamento estático… O problema aqui é antecipatório e dinâmico” | “Dinâmico” impreciso (seção 6) | “antecipatório, decidido uma vez no corte” |
+| `docs_antigos/TCC_CAP3_TRABALHOS_RELACIONADOS.md` §3.1 | “roteamento estático… O problema aqui é antecipatório e dinâmico” | “Dinâmico” impreciso (seção 6) | “antecipatório, decidido uma vez no corte” |
 | Idem, Pimentel (2025) | PRV com carregamento 3D e janelas | **Apenas contextual**; a relevância é metodológica (comparação de execuções, *trade-offs*), não do problema | Dizer isso explicitamente |
 | `docs/REGRAS_NEGOCIO_TCC.md` l. 149 | “despacho em tempo real e roteamento dinâmico… fora do escopo” | Consistente | — |
 

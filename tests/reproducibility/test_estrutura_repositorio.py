@@ -16,8 +16,6 @@ ROOT = Path(__file__).resolve().parents[2]
 OPCIONAIS = {
     "pyarrow",
     "h3",
-    "streamlit",
-    "pyspark",
     "numpy",
     "matplotlib",
     "sklearn",
@@ -29,10 +27,10 @@ OPCIONAIS = {
     "tzdata",
 }
 DOCS_NOVOS = (
-    "docs/GUIA_COMPLETO_REPOSITORIO.md",
-    "docs/ARQUITETURA_REORGANIZADA.md",
-    "docs/COMO_EXECUTAR.md",
-    "docs/MAPEAMENTO_TCC_CODIGO.md",
+    "docs_antigos/GUIA_COMPLETO_REPOSITORIO.md",
+    "docs_antigos/ARQUITETURA_REORGANIZADA.md",
+    "docs_antigos/COMO_EXECUTAR.md",
+    "docs_antigos/MAPEAMENTO_TCC_CODIGO.md",
     "reports/repository_migration/RELATORIO_REORGANIZACAO.md",
     "reports/repository_migration/VALIDACAO_ANTES_DEPOIS.md",
     "README.md",
@@ -47,7 +45,7 @@ def _git(*args: str) -> list[str]:
 
 
 def test_artefatos_da_v1_continuam_identicos_aos_hashes_do_registro():
-    texto = (ROOT / "docs/V2_PREREGISTRO.md").read_text(encoding="utf-8")
+    texto = (ROOT / "docs_antigos/V2_PREREGISTRO.md").read_text(encoding="utf-8")
     linhas = re.findall(r"^\| (\S+\.(?:csv|json)) \| ([0-9a-f]{64}) \|", texto, re.M)
     assert len(linhas) == 19
     divergentes = [n for n, h in linhas if hashlib.sha256((ROOT / "reports/tcc_final" / n).read_bytes()).hexdigest() != h]
@@ -91,7 +89,8 @@ def test_sem_caminho_absoluto_de_usuario_no_codigo_versionado():
     for p in _git("ls-files", "src", "scripts", "tests", "config"):
         arq = ROOT / p
         if (
-            arq.suffix in {".py", ".yaml", ".ps1", ".toml"}
+            arq.exists()
+            and arq.suffix in {".py", ".yaml", ".ps1", ".toml"}
             and arq.name != Path(__file__).name
             and padrao.search(arq.read_text(encoding="utf-8", errors="replace"))
         ):

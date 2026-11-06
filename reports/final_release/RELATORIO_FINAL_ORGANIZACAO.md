@@ -21,7 +21,7 @@ Sem Ruff nem configuração de estilo (146 de 169 arquivos Python fora do format
 
 ## Contagem
 
-Modificados (rastreados): 151 (146 `.py`, mais `pyproject.toml`, `uv.lock`, `README.md`, `.gitignore`, `docs/V2_PREREGISTRO.md`). Movidos: 3 (`git mv`) + 1 teste estrutural não rastreado. Novos (não rastreados): 18 caminhos, entre eles os documentos desta fase, `tests/regression/`, `scripts/verificar_repositorio.py`, `.pre-commit-config.yaml`, `reports/final_release/` e `reports/validation_current/`. Removidos: 0.
+Modificados (rastreados): 151 (146 `.py`, mais `pyproject.toml`, `uv.lock`, `README.md`, `.gitignore`, `docs_antigos/V2_PREREGISTRO.md`). Movidos: 3 (`git mv`) + 1 teste estrutural não rastreado. Novos (não rastreados): 18 caminhos, entre eles os documentos desta fase, `tests/regression/`, `scripts/verificar_repositorio.py`, `.pre-commit-config.yaml`, `reports/final_release/` e `reports/validation_current/`. Removidos: 0.
 
 ## Compatibilidade
 
@@ -36,9 +36,9 @@ Ver [VALIDACAO_FINAL](VALIDACAO_FINAL.md). Resumo: 19/19 hashes da v1; digests d
 1. `pyproject.toml.bak`: versão antiga do `pyproject.toml` (sem a extra `v2`, `requires-python >=3.12`), rastreada, sem referências em código ou scripts (só citada nos relatórios de reorganização); histórico preservado no Git. **Proposta de remoção** (`git rm`), não executada.
 2. `tcc-artigo-latex/`: repositório Git independente (remoto `tonyzinh/tcc-artigo-latex`, ramo `main`, árvore limpa), não é submódulo. Um `git add tcc-artigo-latex` aqui criaria um gitlink acidental. Opções: manter como está e evitar o `add`; ignorar no `.gitignore`; ou formalizar como submódulo. Não decidi.
 3. Revisar o diff de `uv.lock` (extras antes não travadas).
-4. `docs/TCC_CAP3_TRABALHOS_RELACIONADOS.md` e `docs/TCC_REFERENCIAS_ANOTADAS.md`: rascunhos novos não rastreados; commitar só se forem desejados.
+4. `docs_antigos/TCC_CAP3_TRABALHOS_RELACIONADOS.md` e `docs_antigos/TCC_REFERENCIAS_ANOTADAS.md`: rascunhos novos não rastreados; commitar só se forem desejados.
 5. Terminologia “dinâmico” no Cap. 3 (ver classificação PRV).
 
 ## Limitações
 
-Cobertura, mypy, pre-commit e reexecução com dados reais não verificados (ver `docs/ESTADO_FINAL_REPOSITORIO.md`).
+Cobertura, mypy, pre-commit e reexecução com dados reais não verificados (ver `docs_antigos/ESTADO_FINAL_REPOSITORIO.md`).
