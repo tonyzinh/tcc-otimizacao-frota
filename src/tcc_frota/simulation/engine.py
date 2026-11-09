@@ -1,220 +1,367 @@
-"""Replay cronológico sintético, sem informação futura no plano D+1."""
+"""Motor de simulação de eventos discretos (despacho imediato ou em lotes, compromissos externos, reposicionamento opcional).
+
+Tempos em segundos desde a meia-noite local do dia simulado; distâncias por rua estimadas = linha reta × fator (nunca odômetro), ou
+distância pela rede quando uma métrica é fornecida (cenários sintéticos).
+"""
 
 from __future__ import annotations
 
-import hashlib
 import heapq
-import json
-from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta
 
-from tcc_frota.distance import HaversineDistance, PositionDistance, between_km
-from tcc_frota.models import (
-    Commitment,
-    Event,
-    Position,
-    Recommendation,
-    Request,
-    ScenarioResult,
-    Vehicle,
-    VehicleState,
-    aware,
-)
+from tcc_frota.domain.entities import SimDriver, SimParams, SimRequest, SimResult, reta_km, signature
 
 
-@dataclass(frozen=True)
-class SimulationConfig:
-    start_at: datetime
-    end_at: datetime
-    speed_kmh: float = 30.0
-    max_pickup_minutes: float = 18.0
-
-    def __post_init__(self) -> None:
-        aware(self.start_at)
-        aware(self.end_at)
-        if self.end_at <= self.start_at or self.speed_kmh <= 0 or self.max_pickup_minutes < 0:
-            raise ValueError("configuração temporal inválida")
+def _merge(intervals) -> list[tuple[float, float, float, float]]:
+    out: list[list[float]] = []
+    for s, e, lat, lon in sorted(intervals):
+        if out and s < out[-1][1]:
+            if e > out[-1][1]:
+                out[-1][1:] = [e, lat, lon]
+        else:
+            out.append([s, e, lat, lon])
+    return [tuple(x) for x in out]
 
 
-def _signature(requests: list[Request], vehicles: list[Vehicle], commitments: tuple[Commitment, ...], config: SimulationConfig) -> str:
-    payload = json.dumps(
-        {
-            "requests": [asdict(item) for item in sorted(requests, key=lambda r: r.request_id)],
-            "vehicles": [asdict(item) for item in sorted(vehicles, key=lambda v: v.vehicle_id)],
-            "commitments": [asdict(item) for item in sorted(commitments, key=lambda c: (c.vehicle_id, c.start))],
-            "config": asdict(config),
-        },
-        default=str,
-        sort_keys=True,
-    )
-    return hashlib.sha256(payload.encode()).hexdigest()
+def _merge_com_origem(intervals, origens):
+    """Como `_merge`, preservando a origem (lat, lon) do primeiro compromisso de cada grupo sobreposto."""
+    itens = sorted(zip(intervals, origens, strict=True), key=lambda x: x[0])
+    out: list[list] = []
+    for (s, e, lat, lon), o in itens:
+        if out and s < out[-1][1]:
+            if e > out[-1][1]:
+                out[-1][1:4] = [e, lat, lon]
+        else:
+            out.append([s, e, lat, lon, o])
+    return [tuple(x[:4]) for x in out], [x[4] for x in out]
 
 
 def simulate(
-    name: str,
-    requests: list[Request],
-    vehicles: list[Vehicle],
-    config: SimulationConfig,
-    *,
-    commitments: tuple[Commitment, ...] = (),
-    recommendations: tuple[Recommendation, ...] = (),
-    estimator: PositionDistance | None = None,
-) -> ScenarioResult:
-    estimator = estimator or HaversineDistance()
-    if len({r.request_id for r in requests}) != len(requests):
-        raise ValueError("solicitações duplicadas")
-    if len({v.vehicle_id for v in vehicles}) != len(vehicles):
-        raise ValueError("veículos duplicados")
-    by_vehicle = {v.vehicle_id: v for v in vehicles}
-    for commitment in commitments:
-        if commitment.vehicle_id not in by_vehicle:
-            raise ValueError("compromisso de veículo desconhecido")
-    for vehicle_id in by_vehicle:
-        intervals = sorted((c.start, c.end) for c in commitments if c.vehicle_id == vehicle_id)
-        if any(previous[1] > following[0] for previous, following in zip(intervals, intervals[1:])):
-            raise ValueError("compromissos externos sobrepostos")
-    result = ScenarioResult(
-        name,
-        tuple(sorted(r.request_id for r in requests if config.start_at <= r.created_at < config.end_at)),
-        tuple(sorted(by_vehicle)),
-        input_signature=_signature(requests, vehicles, commitments, config),
-        distance_method=estimator.name,
-    )
-    states = {v.vehicle_id: VehicleState.INDISPONIVEL for v in vehicles}
-    positions: dict[str, Position | None] = {v.vehicle_id: v.position for v in vehicles}
-    active_commitments: set[str] = set()
-    queue: list[tuple[datetime, int, int, str, object]] = []
+    requests: list[SimRequest],
+    drivers: list[SimDriver],
+    params: SimParams,
+    window: tuple[float, float],
+    moves: dict[str, tuple[float, float]] | None = None,
+    tail_s: float = 3 * 3600,
+    max_move_km: float = float("inf"),
+    move_mode: str = "inicio_turno",
+    move_origins: dict[str, tuple[float, float]] | None = None,
+    trace: list | None = None,
+    commit_origins: dict[str, list[tuple[float, float] | None]] | None = None,
+    batch_s: float | None = None,
+    assigner=None,
+    metric=None,
+) -> SimResult:
+    """Replay de um dia com recomendações de reposicionamento.
+
+    `move_mode="inicio_turno"`: o motorista vai à zona-alvo na primeira disponibilidade da janela,
+    partindo da posição real naquele instante, e fica indisponível durante o trajeto.
+    `move_mode="fim_do_dia"`: o motorista vai à zona-alvo ao encerrar D (partindo de
+    `move_origins[did]`, a última posição real de D) e começa a primeira sessão de D+1 já na zona-alvo;
+    não vale para quem já trabalhava mais de 30 min antes da janela.
+    Em ambos, o deslocamento real (por rua estimado) precisa respeitar `max_move_km`; caso contrário a
+    recomendação conta como não executada (não adesão). O KM executado entra no total (RN031).
+    Com `trace` (lista), registra eventos para visualização: (t, tipo, motorista, pedido, (lat, lon), km).
+    O rastro não altera nenhuma decisão do replay.
+
+    `commit_origins` (opcional; `commit_origins[did][i]` = origem do i-ésimo compromisso na ordem de `sorted(d.commitments)`)
+    liga o MODO COM DESLOCAMENTO: uma tarefa só é aceita se, ao terminar, houver tempo para ir da posição final até a origem do
+    compromisso seguinte (distância por rua estimada / velocidade); ao iniciar o compromisso o motorista parte da posição em que
+    ficou livre e o km dessa aproximação é registrado em `commit_approach_km` (fora do KM vazio comparado). Se mesmo assim a folga
+    for insuficiente (posição de entrada incompatível), `commit_events` registra causa "entrada" e o déficit; causa "politica"
+    (uma tarefa simulada que impeça a chegada) não deve ocorrer e é contada. Sem `commit_origins`, comportamento v2 inalterado.
+
+    `metric` (opcional; objeto com `.km(lat1, lon1, lat2, lon2)` = km pela rede viária) substitui Haversine x fator rua/reta em TODAS as
+    distâncias (busca, viagem, reposicionamento, aproximação a compromissos) e passa a medir o raio de despacho por via. Sem `metric`,
+    comportamento inalterado.
+
+    `batch_s` + `assigner` ligam o DESPACHO EM LOTE: pedidos esperam até o próximo múltiplo de `batch_s` (a espera causada pela
+    janela é contada) e, em cada instante de lote, `assigner(t, pedidos_em_espera, candidatos)` devolve pares (rid, did).
+    `candidatos[rid]` = lista ordenada [(distância em linha reta, did)] só com motoristas elegíveis (online, livres, dentro do raio e
+    sem conflito com compromisso). Pedido nunca é considerado antes de chegar. Motorista liberado espera o próximo lote. Sem `batch_s`,
+    o despacho é o imediato da v2 (motorista elegível mais próximo no instante do pedido), inalterado."""
+    if move_mode not in ("inicio_turno", "fim_do_dia"):
+        raise ValueError("move_mode inválido")
+    move_origins = move_origins or {}
+    if len({r.rid for r in requests}) != len(requests) or len({d.did for d in drivers}) != len(drivers):
+        raise ValueError("pedidos ou motoristas duplicados")
+    moves = dict(moves or {})
+    unknown = set(moves) - {d.did for d in drivers}
+    w0, w1 = window
+    res = SimResult(signature(requests, drivers, params, window), moves_planned=len(moves))
+    res.moves_planned = len(moves)
+    for d in unknown:  # recomendação para motorista que não trabalha: não executada
+        moves.pop(d)
+        res.move_outcomes[d] = "absent"
+
+    def dkm(a_lat: float, a_lon: float, b_lat: float, b_lon: float) -> float:
+        if metric is not None:
+            return metric.km(a_lat, a_lon, b_lat, b_lon)
+        return reta_km(a_lat, a_lon, b_lat, b_lon) * params.road_factor
+
+    def ev(t: float, kind: str, did: str | None, rid: int | None, at: tuple[float, float], km: float | None) -> None:
+        if trace is not None:
+            trace.append((t, kind, did, rid, at, km))
+
+    horizon = w1 + tail_s
+    online = {d.did: False for d in drivers}
+    busy_until = {d.did: None for d in drivers}  # None = livre
+    pos: dict[str, tuple[float, float] | None] = {d.did: None for d in drivers}
+    com_deslocamento = commit_origins is not None
+    commits: dict = {}
+    cor: dict = {}
+    for d in drivers:
+        if com_deslocamento:
+            ords = sorted(d.commitments)
+            ors = (commit_origins or {}).get(d.did) or [None] * len(ords)
+            if len(ors) != len(ords):
+                raise ValueError("commit_origins desalinhado com os compromissos")
+            commits[d.did], cor[d.did] = _merge_com_origem(ords, ors)
+        else:
+            commits[d.did], cor[d.did] = _merge(d.commitments), []
+    free_since: dict[str, float | None] = {d.did: None for d in drivers}
+    pos_source: dict[str, str] = {d.did: "desconhecida" for d in drivers}
+    next_commit = {d.did: 0 for d in drivers}
+    pending_move = dict(moves)
+    first_start = {d.did: min((x[0] for x in d.sessions), default=float("inf")) for d in drivers}
+    waiting: dict[int, SimRequest] = {}
+    ticks: set[float] = set()
+    events: list = []
     seq = 0
 
-    def push(at: datetime, priority: int, kind: str, payload: object) -> None:
+    def push(t: float, prio: int, kind: str, data) -> None:
         nonlocal seq
         seq += 1
-        heapq.heappush(queue, (at, priority, seq, kind, payload))
+        heapq.heappush(events, (t, prio, seq, kind, data))
 
-    for vehicle in vehicles:
-        if vehicle.available_from < config.end_at:
-            push(max(vehicle.available_from, config.start_at), 0, "availability_start", vehicle.vehicle_id)
-            push(vehicle.available_until, 0, "availability_end", vehicle.vehicle_id)
-    for commitment in commitments:
-        if commitment.end > config.start_at:
-            push(max(commitment.start, config.start_at), 1, "commitment_start", commitment)
-            push(commitment.end, 0, "commitment_end", commitment)
-    for request in sorted(requests, key=lambda r: (r.created_at, r.request_id)):
-        if config.start_at <= request.created_at < config.end_at:
-            push(request.created_at, 3, "request", request)
-    for recommendation in recommendations:
-        if recommendation.vehicle_id not in by_vehicle:
-            raise ValueError("recomendação de veículo desconhecido")
-        if recommendation.start_at < config.start_at or recommendation.start_at >= config.end_at:
-            raise ValueError("recomendação fora do horizonte")
-        push(recommendation.start_at, 2, "reposition_start", recommendation)
+    for d in drivers:
+        for s, e, lat, lon in d.sessions:
+            if e > w0 and s < horizon:
+                push(max(s, w0), 1, "sess_start", (d.did, lat, lon))
+                push(e, 0, "sess_end", d.did)
+        for i, (s, e, lat, lon) in enumerate(commits[d.did]):
+            if e > w0 and s < horizon:
+                push(max(s, w0), 2, "commit_start", (d.did, i))
+    for r in requests:
+        if w0 <= r.t < w1:
+            res.n_requests += 1
+            res.requests_by_hour[r.hour] = res.requests_by_hour.get(r.hour, 0) + 1
+            push(r.t, 4, "request", r)
 
-    while queue:
-        at, _, _, kind, item = heapq.heappop(queue)
-        if kind == "availability_start":
-            vehicle_id = str(item)
-            vehicle = by_vehicle[vehicle_id]
-            if vehicle.active and vehicle.driver_ready and positions[vehicle_id] is not None and vehicle_id not in active_commitments:
-                states[vehicle_id] = VehicleState.LIVRE
-            result.events.append(Event(at, kind, vehicle_id))
-        elif kind == "availability_end":
-            vehicle_id = str(item)
-            if states[vehicle_id] not in {VehicleState.LIVRE, VehicleState.INDISPONIVEL}:
-                raise ValueError("veículo ocupado após fim da disponibilidade")
-            states[vehicle_id] = VehicleState.INDISPONIVEL
-            result.events.append(Event(at, kind, vehicle_id))
-        elif kind == "commitment_start":
-            commitment = item
-            assert isinstance(commitment, Commitment)
-            vehicle_id = commitment.vehicle_id
-            if states[vehicle_id] not in {VehicleState.LIVRE, VehicleState.INDISPONIVEL}:
-                raise ValueError("compromisso externo sobrepõe viagem ou reposicionamento")
-            active_commitments.add(vehicle_id)
-            states[vehicle_id] = VehicleState.INDISPONIVEL
-            result.events.append(Event(at, kind, vehicle_id))
-        elif kind == "commitment_end":
-            commitment = item
-            assert isinstance(commitment, Commitment)
-            vehicle_id = commitment.vehicle_id
-            active_commitments.discard(vehicle_id)
-            positions[vehicle_id] = commitment.end_position
-            vehicle = by_vehicle[vehicle_id]
-            states[vehicle_id] = (
-                VehicleState.LIVRE
-                if (
-                    vehicle.active
-                    and vehicle.driver_ready
-                    and positions[vehicle_id] is not None
-                    and vehicle.available_from <= at < vehicle.available_until
-                )
-                else VehicleState.INDISPONIVEL
-            )
-            result.events.append(Event(at, kind, vehicle_id))
-        elif kind == "reposition_start":
-            recommendation = item
-            assert isinstance(recommendation, Recommendation)
-            vehicle_id = recommendation.vehicle_id
-            if states[vehicle_id] != VehicleState.LIVRE or positions[vehicle_id] != recommendation.origin:
-                raise ValueError("reposição inviável no replay")
-            actual_km = between_km(estimator, recommendation.origin, recommendation.destination)
-            if abs(actual_km - recommendation.distance_km) > 1e-6:
-                raise ValueError("distância da recomendação difere do estimador")
-            finish = at + timedelta(hours=actual_km / config.speed_kmh)
-            if finish > by_vehicle[vehicle_id].available_until or any(
-                c.vehicle_id == vehicle_id and c.start < finish and c.end > at for c in commitments
-            ):
-                raise ValueError("reposição conflita com disponibilidade")
-            states[vehicle_id] = VehicleState.REPOSICIONANDO
-            result.reposition_km += actual_km
-            push(finish, 0, "reposition_end", recommendation)
-            result.events.append(Event(at, kind, vehicle_id))
-        elif kind == "reposition_end":
-            recommendation = item
-            assert isinstance(recommendation, Recommendation)
-            positions[recommendation.vehicle_id] = recommendation.destination
-            states[recommendation.vehicle_id] = VehicleState.LIVRE
-            result.events.append(Event(at, kind, recommendation.vehicle_id))
-        elif kind == "pickup_arrival":
-            request, vehicle_id = item
-            assert isinstance(request, Request)
-            states[vehicle_id] = VehicleState.EM_VIAGEM
-            result.events.append(Event(at, "pickup_arrival", vehicle_id, request.request_id))
-            result.events.append(Event(at, "trip_start", vehicle_id, request.request_id))
-        elif kind == "trip_end":
-            request, vehicle_id = item
-            assert isinstance(request, Request)
-            positions[vehicle_id] = request.destination
-            vehicle = by_vehicle[vehicle_id]
-            states[vehicle_id] = VehicleState.LIVRE if at < vehicle.available_until else VehicleState.INDISPONIVEL
-            result.events.append(Event(at, kind, vehicle_id, request.request_id))
-        elif kind == "request":
-            request = item
-            assert isinstance(request, Request)
-            options: list[tuple[float, str, float]] = []
-            for vehicle_id, vehicle in by_vehicle.items():
-                position = positions[vehicle_id]
-                if states[vehicle_id] != VehicleState.LIVRE or position is None or request.modality not in vehicle.modalities:
-                    continue
-                pickup_km = between_km(estimator, position, request.origin)
-                wait = 60 * pickup_km / config.speed_kmh
-                finish = at + timedelta(minutes=wait + request.trip_minutes)
-                if wait > config.max_pickup_minutes or finish > vehicle.available_until:
-                    continue
-                if any(c.vehicle_id == vehicle_id and c.start < finish and c.end > at for c in commitments):
-                    continue
-                options.append((pickup_km, vehicle_id, wait))
-            if not options:
-                result.excluded["unserved_no_eligible_vehicle_or_wait"] = result.excluded.get("unserved_no_eligible_vehicle_or_wait", 0) + 1
-                result.events.append(Event(at, "unserved", None, request.request_id))
+    def commit_blocks(did: str, start: float, end: float, end_pos: tuple[float, float] | None = None) -> bool:
+        cs = commits[did]
+        k = next_commit[did]
+        while k < len(cs) and cs[k][1] <= start:
+            k += 1
+        if k >= len(cs):
+            return False
+        folga_fim = end
+        if com_deslocamento and end_pos is not None and cor[did][k] is not None:
+            o = cor[did][k]
+            folga_fim = end + 3600 * dkm(end_pos[0], end_pos[1], o[0], o[1]) / params.speed_kmh
+        return cs[k][0] < folga_fim
+
+    def job_seconds(did: str, r: SimRequest) -> tuple[float, float]:
+        km = dkm(pos[did][0], pos[did][1], r.lat, r.lon)
+        pickup = 3600 * km / params.speed_kmh
+        cancel = params.post_accept_cancel and r.post_accept_cancel
+        return km, pickup + (0.0 if cancel else r.trip_s)
+
+    def assign(did: str, r: SimRequest, t: float) -> None:
+        km, total = job_seconds(did, r)
+        pickup_s = 3600 * km / params.speed_kmh
+        ev(t, "dispatch", did, r.rid, pos[did], km)
+        ev(t + pickup_s, "pickup", did, r.rid, (r.lat, r.lon), None)
+        res.served += 1
+        res.served_ids.add(r.rid)
+        res.pickup_km += km
+        res.wait_s.append(t - r.t + pickup_s)
+        res.served_by_hour[r.hour] = res.served_by_hour.get(r.hour, 0) + 1
+        res.pickup_km_by_hour[r.hour] = res.pickup_km_by_hour.get(r.hour, 0.0) + km
+        busy_until[did] = t + total
+        pos_source[did] = "corrida"
+        res.jobs.append((did, t, t + total, "corrida"))
+        cancel = params.post_accept_cancel and r.post_accept_cancel
+        trip_km = 0.0 if cancel else dkm(r.lat, r.lon, r.dlat, r.dlon)
+        ev(t + total, "dropoff", did, r.rid, (r.lat, r.lon) if cancel else (r.dlat, r.dlon), trip_km)
+        push(t + total, 3, "job_end", (did, (r.lat, r.lon) if cancel else (r.dlat, r.dlon)))
+
+    def eligible(did: str, r: SimRequest, t: float) -> float | None:
+        if not online[did] or busy_until[did] is not None or pos[did] is None:
+            return None
+        d = dkm(pos[did][0], pos[did][1], r.lat, r.lon) if metric is not None else reta_km(pos[did][0], pos[did][1], r.lat, r.lon)
+        if d > params.radius_km:
+            return None
+        _, total = job_seconds(did, r)
+        cancel = params.post_accept_cancel and r.post_accept_cancel
+        if commit_blocks(did, t, t + total, (r.lat, r.lon) if cancel else (r.dlat, r.dlon)):
+            return None
+        return d
+
+    def try_move(did: str, t: float) -> bool:
+        """Executa o reposicionamento pendente; devolve True se o motorista ficou ocupado."""
+        if did not in pending_move:
+            return False
+        lat, lon = pending_move.pop(did)
+        if move_mode == "fim_do_dia":  # só vale ao iniciar o dia; depois disso, não adesão
+            res.move_outcomes[did] = "busy"
+            return False
+        if t >= w1:
+            res.move_outcomes[did] = "not_free_in_window"
+            return False
+        km = dkm(pos[did][0], pos[did][1], lat, lon)
+        end = t + 3600 * km / params.speed_kmh
+        if km <= 1e-9 or km > max_move_km + 1e-9 or commit_blocks(did, t, end, (lat, lon)):
+            res.move_outcomes[did] = "already_there" if km <= 1e-9 else "limit" if km > max_move_km + 1e-9 else "busy"
+            return False
+        res.move_outcomes[did] = "executed"
+        res.move_origins_used[did] = pos[did]
+        ev(t, "reposition_start", did, None, pos[did], km)
+        ev(end, "reposition_end", did, None, (lat, lon), None)
+        res.reposition_km += km
+        res.moves_executed += 1
+        busy_until[did] = end
+        pos_source[did] = "reposicionamento"
+        res.jobs.append((did, t, end, "reposicionamento"))
+        push(end, 3, "job_end", (did, (lat, lon)))
+        return True
+
+    def agendar_lote(t: float) -> None:
+        nxt = t if batch_s and abs(t / batch_s - round(t / batch_s)) < 1e-9 else (int(t // batch_s) + 1) * batch_s
+        if nxt not in ticks:
+            ticks.add(nxt)
+            push(nxt, 4.5, "batch_tick", nxt)
+
+    def become_free(did: str, t: float) -> None:
+        busy_until[did] = None
+        free_since[did] = t
+        if not online[did] or pos[did] is None:
+            return
+        if try_move(did, t):
+            return
+        if batch_s:  # em lote, quem decide é o próximo instante de lote
+            return
+        best = None
+        for rid in sorted(waiting):  # FIFO: pedido mais antigo primeiro
+            r = waiting[rid]
+            if eligible(did, r, t) is not None:
+                best = r
+                break
+        if best is not None:
+            del waiting[best.rid]
+            assign(did, best, t)
+
+    while events:
+        t, _, _, kind, data = heapq.heappop(events)
+        if kind == "sess_start":
+            did, lat, lon = data
+            online[did] = True
+            if busy_until[did] is None:
+                if lat is not None:
+                    pos[did] = (lat, lon)
+                    pos_source[did] = "sessao"
+                    free_since[did] = t
+                if move_mode == "fim_do_dia" and did in pending_move:
+                    target = pending_move.pop(did)
+                    origin = move_origins.get(did) or pos[did]
+                    km = dkm(origin[0], origin[1], target[0], target[1])
+                    if first_start[did] < w0 - 1800:
+                        res.move_outcomes[did] = "early"
+                    elif km <= 1e-9:
+                        res.move_outcomes[did] = "already_there"
+                    elif km > max_move_km + 1e-9:
+                        res.move_outcomes[did] = "limit"
+                    if first_start[did] >= w0 - 1800 and 1e-9 < km <= max_move_km + 1e-9:
+                        res.move_outcomes[did] = "executed"
+                        res.move_origins_used[did] = origin
+                        ev(t, "reposition_start", did, None, origin, km)
+                        ev(t, "reposition_end", did, None, target, None)
+                        res.reposition_km += km
+                        res.moves_executed += 1
+                        res.jobs.append((did, t, t, "reposicionamento_fim_do_dia"))
+                        pos[did] = target
+                become_free(did, t)
+        elif kind == "sess_end":
+            online[data] = False
+        elif kind == "commit_start":
+            did, i = data
+            s, e, lat, lon = commits[did][i]
+            if pending_move.pop(did, None) is not None:  # ocupado antes da primeira disponibilidade
+                res.move_outcomes[did] = "busy"
+            if busy_until[did] is not None:
+                raise AssertionError("compromisso sobreposto a tarefa simulada (RN017)")
+            if com_deslocamento:
+                o = cor[did][i]
+                ev_c: dict = {"did": did, "i": i, "inicio_s": s, "origem_conhecida": o is not None, "posicao_fonte": pos_source[did]}
+                if o is None or pos[did] is None or free_since[did] is None:
+                    ev_c["classe"] = "incerta (origem ou posição desconhecida; sem deslocamento modelado)"
+                else:
+                    km_c = dkm(pos[did][0], pos[did][1], o[0], o[1])
+                    need = 3600 * km_c / params.speed_kmh
+                    deficit = max(0.0, need - max(0.0, s - free_since[did]))
+                    res.commit_approach_km += km_c
+                    ev_c.update({"aproximacao_km": km_c, "tempo_necessario_s": need, "folga_s": s - free_since[did], "deficit_s": deficit})
+                    if deficit > 1e-6:
+                        causa = "politica" if pos_source[did] in ("corrida", "reposicionamento") else "entrada"
+                        ev_c["classe"] = f"insuficiente_por_{causa}"
+                    else:
+                        ev_c["classe"] = "viavel"
+                res.commit_events.append(ev_c)
+                pos_source[did] = "compromisso"
+            next_commit[did] = i
+            busy_until[did] = e
+            res.jobs.append((did, max(s, w0), e, "compromisso"))
+            push(e, 3, "job_end", (did, (lat, lon)))
+        elif kind == "job_end":
+            did, end_pos = data
+            if busy_until[did] is None or abs(busy_until[did] - t) > 1e-6:
                 continue
-            pickup_km, vehicle_id, wait = min(options)
-            states[vehicle_id] = VehicleState.INDO_BUSCAR_PASSAGEIRO
-            result.pickup_km += pickup_km
-            result.served_ids.append(request.request_id)
-            result.vehicles_used.add(vehicle_id)
-            result.wait_minutes.append(wait)
-            arrival = at + timedelta(minutes=wait)
-            push(arrival, 2, "pickup_arrival", (request, vehicle_id))
-            push(arrival + timedelta(minutes=request.trip_minutes), 0, "trip_end", (request, vehicle_id))
-            result.events.append(Event(at, "assigned", vehicle_id, request.request_id))
-    return result
+            pos[did] = end_pos
+            k = next_commit[did]
+            while k < len(commits[did]) and commits[did][k][1] <= t:
+                k += 1
+            next_commit[did] = k
+            become_free(did, t)
+        elif kind == "request":
+            r = data
+            ev(t, "request_created", None, r.rid, (r.lat, r.lon), None)
+            if batch_s:
+                waiting[r.rid] = r
+                patience = params.patience_s if r.patience_s is None else min(params.patience_s, r.patience_s)
+                push(t + patience, 5, "deadline", r.rid)
+                agendar_lote(t)
+                continue
+            options = [(d, did) for did in online if (d := eligible(did, r, t)) is not None]
+            if options:
+                _, did = min(options)
+                assign(did, r, t)
+            else:
+                waiting[r.rid] = r
+                patience = params.patience_s if r.patience_s is None else min(params.patience_s, r.patience_s)
+                push(t + patience, 5, "deadline", r.rid)
+        elif kind == "batch_tick":
+            ticks.discard(data)
+            pend = sorted(waiting.values(), key=lambda r: (r.t, r.rid))
+            cands = {}
+            for r in pend:
+                lst = sorted((d, did) for did in online if (d := eligible(did, r, t)) is not None)
+                if lst:
+                    cands[r.rid] = lst
+            if cands:
+                pares = assigner(t, pend, cands)
+                usados_r: set[int] = set()
+                usados_d: set[str] = set()
+                for rid, did in pares:
+                    if rid in usados_r or did in usados_d or rid not in waiting or all(x[1] != did for x in cands.get(rid, ())):
+                        raise AssertionError("atribuição em lote inválida (duplicada ou inelegível)")
+                    usados_r.add(rid)
+                    usados_d.add(did)
+                    assign(did, waiting.pop(rid), t)
+            if waiting:
+                agendar_lote(t + batch_s)
+        elif kind == "deadline":
+            gone = waiting.pop(data, None)
+            if gone is not None:
+                ev(t, "request_unserved", None, gone.rid, (gone.lat, gone.lon), None)
+    for did in pending_move:
+        res.move_outcomes[did] = "not_free_in_window"
+    return res

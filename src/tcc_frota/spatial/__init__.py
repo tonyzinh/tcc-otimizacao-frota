@@ -1,1 +1,0 @@
-"""Zonas e validação espacial."""

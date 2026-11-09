@@ -1,0 +1,147 @@
+{
+ "dias_desenvolvimento": [
+  "2026-02-10",
+  "2026-03-04",
+  "2026-03-17",
+  "2026-03-25"
+ ],
+ "politicas": {
+  "A_imediato": {
+   "lotes": 0,
+   "pares": 0,
+   "despachos": 4118,
+   "lote_em_multiplo_de_60s": true,
+   "todos_ja_chegaram": true,
+   "ordem_fifo_chegada_id": true,
+   "candidatos_so_de_pedidos_pendentes": true,
+   "candidatos_dentro_do_raio": true,
+   "pares_unicos": true,
+   "hungaro_igual_oraculo_contagem": true,
+   "hungaro_igual_oraculo_custo_km": true,
+   "max_diferenca_custo_km": 0.0,
+   "fifo_igual_independente": true,
+   "nenhum_despacho_antes_da_chegada": true,
+   "pickup_dentro_do_raio_em_linha_reta": true,
+   "espera_inclui_atraso_do_lote": true,
+   "despacho_em_instante_de_lote": true,
+   "sobreposicoes_de_servico_por_motorista": 0,
+   "violacoes_compromisso_por_politica": 0,
+   "violacoes_compromisso_por_entrada": 4
+  },
+  "B_fifo_60s": {
+   "lotes": 2630,
+   "pares": 4150,
+   "despachos": 4150,
+   "lote_em_multiplo_de_60s": true,
+   "todos_ja_chegaram": true,
+   "ordem_fifo_chegada_id": true,
+   "candidatos_so_de_pedidos_pendentes": true,
+   "candidatos_dentro_do_raio": true,
+   "pares_unicos": true,
+   "hungaro_igual_oraculo_contagem": true,
+   "hungaro_igual_oraculo_custo_km": true,
+   "max_diferenca_custo_km": 0.0,
+   "fifo_igual_independente": true,
+   "nenhum_despacho_antes_da_chegada": true,
+   "pickup_dentro_do_raio_em_linha_reta": true,
+   "espera_inclui_atraso_do_lote": true,
+   "despacho_em_instante_de_lote": true,
+   "sobreposicoes_de_servico_por_motorista": 0,
+   "violacoes_compromisso_por_politica": 0,
+   "violacoes_compromisso_por_entrada": 4,
+   "atraso_medio_do_lote_s": 45.30064134615376
+  },
+  "C_hungaro_60s": {
+   "lotes": 2628,
+   "pares": 4179,
+   "despachos": 4179,
+   "lote_em_multiplo_de_60s": true,
+   "todos_ja_chegaram": true,
+   "ordem_fifo_chegada_id": true,
+   "candidatos_so_de_pedidos_pendentes": true,
+   "candidatos_dentro_do_raio": true,
+   "pares_unicos": true,
+   "hungaro_igual_oraculo_contagem": true,
+   "hungaro_igual_oraculo_custo_km": true,
+   "max_diferenca_custo_km": 0.001536328796532871,
+   "fifo_igual_independente": true,
+   "nenhum_despacho_antes_da_chegada": true,
+   "pickup_dentro_do_raio_em_linha_reta": true,
+   "espera_inclui_atraso_do_lote": true,
+   "despacho_em_instante_de_lote": true,
+   "sobreposicoes_de_servico_por_motorista": 0,
+   "violacoes_compromisso_por_politica": 0,
+   "violacoes_compromisso_por_entrada": 5,
+   "atraso_medio_do_lote_s": 40.254130996309925
+  }
+ },
+ "entradas_identicas_entre_politicas": true,
+ "totais_por_dia": {
+  "A_imediato": {
+   "2026-02-10": {
+    "atendidos": 1033,
+    "pedidos": 1569,
+    "km_vazio": 2812.09
+   },
+   "2026-03-04": {
+    "atendidos": 1049,
+    "pedidos": 1301,
+    "km_vazio": 2456.205
+   },
+   "2026-03-17": {
+    "atendidos": 1000,
+    "pedidos": 1342,
+    "km_vazio": 2194.02
+   },
+   "2026-03-25": {
+    "atendidos": 1036,
+    "pedidos": 1407,
+    "km_vazio": 2762.58
+   }
+  },
+  "B_fifo_60s": {
+   "2026-02-10": {
+    "atendidos": 1074,
+    "pedidos": 1569,
+    "km_vazio": 2650.431
+   },
+   "2026-03-04": {
+    "atendidos": 1052,
+    "pedidos": 1301,
+    "km_vazio": 2340.595
+   },
+   "2026-03-17": {
+    "atendidos": 984,
+    "pedidos": 1342,
+    "km_vazio": 2074.847
+   },
+   "2026-03-25": {
+    "atendidos": 1040,
+    "pedidos": 1407,
+    "km_vazio": 2593.06
+   }
+  },
+  "C_hungaro_60s": {
+   "2026-02-10": {
+    "atendidos": 1069,
+    "pedidos": 1569,
+    "km_vazio": 2611.901
+   },
+   "2026-03-04": {
+    "atendidos": 1047,
+    "pedidos": 1301,
+    "km_vazio": 2396.282
+   },
+   "2026-03-17": {
+    "atendidos": 979,
+    "pedidos": 1342,
+    "km_vazio": 2057.241
+   },
+   "2026-03-25": {
+    "atendidos": 1084,
+    "pedidos": 1407,
+    "km_vazio": 2527.43
+   }
+  }
+ }
+}

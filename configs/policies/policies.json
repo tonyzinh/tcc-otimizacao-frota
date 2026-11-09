@@ -1,0 +1,16 @@
+{
+  "nota": "Fonte de verdade executável: tcc_frota.simulation.historical.POLICY_SPECS e tcc_frota.scenarios.runner (testes conferem esta configuração).",
+  "politicas": [
+    {"id": "A", "nome": "Mais próximo livre, despacho imediato", "janela_lote_s": 0, "algoritmo": "nearest_fifo", "papel": "referência (baseline simplificado calibrado, não é a operação manual)",
+     "id_historico_gravado": "B0_imediato_atual", "id_sintetico_gravado": "R0 (nos Parquet) / A (na análise)"},
+    {"id": "B", "nome": "Mais próximo livre, lotes de 60 s", "janela_lote_s": 60, "algoritmo": "nearest_fifo", "papel": "controle: isola o efeito do lote do efeito da atribuição",
+     "id_historico_gravado": "B_lote60s_guloso_fifo", "id_sintetico_gravado": "D_lote60s_guloso_fifo"},
+    {"id": "C", "nome": "Atribuição conjunta (Húngaro), lotes de 60 s", "janela_lote_s": 60, "algoritmo": "hungarian", "papel": "método principal",
+     "id_historico_gravado": "B_lote60s_hungaro", "id_sintetico_gravado": "D_lote60s_hungaro"}
+  ],
+  "contraste_principal": "C × A",
+  "contrastes_complementares": ["C × B", "B × A"],
+  "objetivo_de_C": "lexicográfico: maximizar pedidos atendidos no lote; entre as soluções com esse máximo, minimizar a soma das distâncias de aproximação",
+  "desempate": "custo inteiro (metros × 1e5 + índice de posição), determinístico",
+  "solver": "Kuhn–Munkres com potenciais (implementação própria, O(n²m)); scipy.optimize.linear_sum_assignment só como oráculo em testes"
+}

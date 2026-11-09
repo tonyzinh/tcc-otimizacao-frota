@@ -1,0 +1,37 @@
+{
+ "2026-03-10": {
+  "vigencia_nas_jornadas": {
+   "jornadas_com_inicio": 160,
+   "sem_vinculo_vigente": 22,
+   "um_vinculo_vigente": 138,
+   "varios_vinculos_vigentes": 0,
+   "pct_sem_vinculo_vigente": 13.75
+  },
+  "multiplos_condutores_por_veiculo": {
+   "veiculos": 121,
+   "com_mais_de_um_condutor": 27,
+   "maximo": 3
+  },
+  "trocas_no_dia": {
+   "veiculos": 136,
+   "veiculos_com_mais_de_um_motorista": 50,
+   "motoristas": 152,
+   "motoristas_com_mais_de_um_veiculo": 55
+  },
+  "multiplicacao_de_join": {
+   "jornadas": 161,
+   "linhas_apos_join": 186,
+   "fator": 1.155,
+   "jornadas_sem_vinculo": 22
+  },
+  "jornada_cobre_a_corrida": {
+   "corridas": 896,
+   "sem_condutor_vigente": 146,
+   "condutor_unico": 750,
+   "condutor_unico_com_jornada": 697,
+   "varios_condutores": 0,
+   "varios_com_jornada_de_algum": 0,
+   "varios_com_jornada_de_todos": 0
+  }
+ }
+}

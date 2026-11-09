@@ -1,0 +1,82 @@
+{
+ "dia": "2026-03-07",
+ "estado": "executado",
+ "entrada": {
+  "dia": "2026-03-07",
+  "tipo": "simulacao",
+  "validado_empiricamente": false,
+  "pedidos": 1348,
+  "pedidos_sem_coordenada_descartados": 0,
+  "snapshots_es_sem_horario_descartados": 278,
+  "condicao_inicial": {
+   "condicao": "primeira_posicao_observada",
+   "max_idade_s": 1800.0,
+   "jornadas": 113,
+   "por_estado": {
+    "conhecida_no_inicio": 113
+   },
+   "segundos_jornada_total": 2699398.541999998,
+   "segundos_desconhecidos": 0.0,
+   "pct_jornada_desconhecida": 0.0,
+   "tratamento_do_desconhecido": "motorista indisponível ao despacho até a 1ª observação; jornada sem observação é excluída (contada)",
+   "conhecida_pelo_planejador_vespera": false
+  },
+  "motoristas_online_es": 88,
+  "compromissos_atribuidos": 0,
+  "compromissos_nao_atribuidos_por_placa": 0,
+  "motoristas_simulados": 88,
+  "hipoteses": {
+   "gap_sessao_s": 1200.0,
+   "max_idade_s": 1800.0,
+   "online": "presente em posicao_ofertas (status/enum não usado como livre)",
+   "pedido": "dt_registro como proxy da criação (RN024 pendente)",
+   "compromissos": "conhecidos pelo despacho do simulador desde o início (hipótese; known_at desconhecido)"
+  }
+ },
+ "manifesto": {
+  "tipo": "simulacao",
+  "validado_empiricamente": false,
+  "hipoteses": {
+   "posicao_inicial": "primeira_posicao_observada",
+   "permanencia": "fica_no_destino",
+   "matriz": null,
+   "rotulo": "baseline_simplificado_calibrado_espera_no_destino"
+  },
+  "parametros_sim": {
+   "radius_km": 4.5,
+   "speed_kmh": 16.0793020421524,
+   "road_factor": 1.3012454652253007,
+   "patience_s": 180.0,
+   "post_accept_cancel": false
+  },
+  "janela_s": [
+   0.0,
+   86400.0
+  ],
+  "assinatura_entrada": "a382fdd1f42527f3917b07141b430f9778d856c962f0d21ce2adb4148fe16ef3",
+  "km_vazio_estimado": {
+   "pickup_km": 2210.5121144176883,
+   "reposicionamento_km": 0.0,
+   "total": 2210.5121144176883
+  },
+  "solicitacoes": 1348,
+  "atendidas": 853,
+  "limite": "km estimado (Haversine x fator); velocidade constante; despacho ao mais próximo no raio; compromissos teleportam o motorista"
+ },
+ "auditoria": {
+  "ocupacao_simultanea": 0,
+  "despacho_fora_da_jornada": 0,
+  "despacho_antes_do_pedido": 0,
+  "compromisso_sobreposto": 0,
+  "km_nao_conserva": 0,
+  "reposicionamento_inesperado": 0,
+  "atendimento_inconsistente": 0,
+  "ok": true
+ },
+ "auditoria_compromissos": {
+  "avaliados": 0,
+  "nao_avaliados": 0,
+  "inviaveis": 0
+ },
+ "parametros_herdados": "calibração anterior (não recalibrada para V1 Viagens)"
+}

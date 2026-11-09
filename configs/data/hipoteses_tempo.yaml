@@ -1,0 +1,18 @@
+# Hipóteses de acesso temporal da SIMULAÇÃO (não são evidência de disponibilidade real). Esquema de extração 2.
+# known_at é desconhecido nas fontes; a simulação precisa de uma regra explícita e de sensibilidade.
+versao: 1
+fuso:
+  ods: local_naive      # evidência: ES-ODS, 4 dias, mediana ~1 min; RN024 oficial pendente
+  es: offset_-03:00
+  cobli: utc_naive      # evidência: teste de relógio em 4 dias
+acesso_planejador:
+  regra: evento_mais_atraso    # HIPÓTESE: dado conhecido atraso_s após o evento
+  atraso_base_s: 120           # ~2 min: cadência de snapshots do ES (evidência indireta, mediana ES-ODS ~1 min)
+  cenarios_sensibilidade_s: [0, 120, 300, 900, 1800]   # cenários, não medições
+  posicao:
+    idade_maxima_s: 1800       # posição mais velha que isto não representa o veículo (cenário; reportar também 600 e 3600)
+    cenarios_idade_maxima_s: [600, 1800, 3600]
+proibido:
+  - usar extraido_em como ingestão histórica
+  - usar ultima_atualizacao_em do ODS como atraso de ingestão
+  - usar campo atualizado depois como estado original (ex.: dt_registro_atualizacao, tx_status final)

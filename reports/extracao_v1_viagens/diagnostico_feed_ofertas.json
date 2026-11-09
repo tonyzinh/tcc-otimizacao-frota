@@ -1,0 +1,77 @@
+[
+ {
+  "dia": "2026-03-10",
+  "linhas": 38153,
+  "linhas_sem_horario": 490,
+  "snapshots": {
+   "n": 712,
+   "veiculos_por_snapshot": {
+    "p5": 16.0,
+    "p50": 60.0,
+    "p95": 86.0,
+    "n": 712
+   }
+  },
+  "cadencia_entre_snapshots_s": {
+   "p5": 119.2,
+   "p50": 120.0,
+   "p95": 120.9,
+   "n": 711
+  },
+  "motoristas_distintos": 132,
+  "snapshots_por_motorista": {
+   "p5": 115.5,
+   "p50": 337.0,
+   "p95": 380.0,
+   "n": 132
+  },
+  "horas_entre_primeira_e_ultima": {
+   "p5": 3.9,
+   "p50": 11.5,
+   "p95": 24.0,
+   "n": 132
+  },
+  "duplicidades_doc_motorista": 0,
+  "gps_menos_evento_s": {
+   "p5": -6.5,
+   "p50": -2.7,
+   "p95": -0.5,
+   "n": 37652
+  },
+  "status": {
+   "1": {
+    "linhas": 12039,
+    "pct_passageiro_embarcado": 0.0,
+    "pct_com_solicitacao": 0.0,
+    "pct_com_proxima_solicitacao": 0.0
+   },
+   "3": {
+    "linhas": 20513,
+    "pct_passageiro_embarcado": 48.7,
+    "pct_com_solicitacao": 100.0,
+    "pct_com_proxima_solicitacao": 5.7
+   },
+   "4": {
+    "linhas": 66,
+    "pct_passageiro_embarcado": 0.0,
+    "pct_com_solicitacao": 0.0,
+    "pct_com_proxima_solicitacao": 0.0
+   },
+   "5": {
+    "linhas": 5535,
+    "pct_passageiro_embarcado": 0.0,
+    "pct_com_solicitacao": 0.0,
+    "pct_com_proxima_solicitacao": 0.0
+   }
+  },
+  "linhas_embarcado_pct": 26.2,
+  "corridas_encerradas_observadas": 738,
+  "corridas_sem_nenhuma_linha_do_motorista_no_feed_durante_a_viagem": 141,
+  "status_do_feed_durante_viagens_observadas": {
+   "3": 7194
+  },
+  "motoristas_com_corrida": 124,
+  "motoristas_com_corrida_ausentes_do_feed": 13,
+  "motoristas_no_feed_sem_corrida": 21
+ }
+]

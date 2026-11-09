@@ -1,0 +1,38 @@
+[
+ {
+  "dia": "2026-03-07",
+  "estado": "executado",
+  "pedidos": 1348,
+  "atendidos": 853,
+  "pickup_km_est": 2210.5,
+  "motoristas": 88,
+  "auditoria_ok": true,
+  "violacoes": {},
+  "compromissos_inviaveis": 0,
+  "compromissos_avaliados": 0
+ },
+ {
+  "dia": "2026-03-10",
+  "estado": "executado",
+  "pedidos": 1325,
+  "atendidos": 1084,
+  "pickup_km_est": 2663.9,
+  "motoristas": 132,
+  "auditoria_ok": true,
+  "violacoes": {},
+  "compromissos_inviaveis": 0,
+  "compromissos_avaliados": 0
+ },
+ {
+  "dia": "2026-03-13",
+  "estado": "executado",
+  "pedidos": 1667,
+  "atendidos": 1326,
+  "pickup_km_est": 3234.9,
+  "motoristas": 125,
+  "auditoria_ok": true,
+  "violacoes": {},
+  "compromissos_inviaveis": 0,
+  "compromissos_avaliados": 0
+ }
+]

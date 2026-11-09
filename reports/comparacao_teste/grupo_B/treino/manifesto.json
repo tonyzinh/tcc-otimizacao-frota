@@ -1,0 +1,50 @@
+{
+ "execucao": "B-treino-20261108T104808",
+ "fase": "treino",
+ "grupo": "B",
+ "commit": "3e77cb9e013918b9a4325dd9e43acdd5fc0ec659",
+ "hash_alteracoes_nao_commitadas": "2c5519bb2318e8c15b21e33175022e66371f8ca0585b456084d1d76406a825c4",
+ "hash_codigo_do_mundo": "d5cb1289caea",
+ "dias": [
+  "2026-03-10"
+ ],
+ "sementes": [
+  11,
+  23,
+  37
+ ],
+ "parametros_simulador": {
+  "radius_km": 4.5,
+  "speed_kmh": 16.079,
+  "road_factor": 1.3012,
+  "patience_s": 180.0,
+  "post_accept_cancel": false
+ },
+ "orcamento_avaliacoes": 150,
+ "n_pseudodias": 6,
+ "hop_km": 3.0,
+ "limites_espera_experimentais_s": [
+  300.0,
+  600.0,
+  900.0
+ ],
+ "janelas_lote_s": [
+  30.0,
+  60.0
+ ],
+ "hipoteses": {
+  "disponibilidade": "cenario J (jornada realizada; nao valida previsao de disponibilidade)",
+  "condicao_inicial": "primeira_posicao_observada",
+  "compromissos": "deslocamento explicito ate a origem; conhecidos pelo despacho desde o inicio",
+  "km": "estimado (Haversine x fator rua/reta), nao odometro"
+ },
+ "hashes_manifestos_dos_lotes": {
+  "ods/solicitacao/2026-03-10": "8000534c802f8213",
+  "ods/jornada_motorista/2026-03-10": "974fadad7a04fbce",
+  "ods/compromissos_externos/2026-03-10": "45695e84c9a8fd1a",
+  "ods/veiculo_condutor/2026-03-10": "13466cd85704505d",
+  "es/posicao_ofertas/2026-03-10": "66e7753ff6ad9836"
+ },
+ "configs": [],
+ "posicao_busca": "primeira_de_D"
+}

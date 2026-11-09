@@ -1,0 +1,98 @@
+[
+ {
+  "contraste":"C × A",
+  "papel":"PRINCIPAL",
+  "dias":15,
+  "km_vazio_C":27861.1386481249,
+  "km_vazio_A":29628.2705275952,
+  "variacao_km_vazio_km (negativo = reducao)":-1767.1318794703,
+  "variacao_km_vazio_pct (negativo = reducao)":-5.9643436758,
+  "diferenca_media_diaria_km":-117.8087919647,
+  "ic95_diferenca_media_diaria_km":[
+   -132.9699367889,
+   -102.8614983487
+  ],
+  "dias_com_melhora":14,
+  "dias_com_piora":1,
+  "dias_iguais":0,
+  "diferenca_atendidos":16,
+  "diferenca_atendimento_pontos_percentuais":0.0945738267,
+  "ic95_diferenca_media_diaria_atendidos":[
+   -6.2,
+   8.0016666667
+  ],
+  "diferenca_nao_atendidos":-16,
+  "diferenca_espera_media_s":-15.6501949697,
+  "diferenca_espera_p90_s":-11.626668526,
+  "E1_sem_violacoes":true,
+  "E2_atendimento_preservado":true,
+  "E3_p90_nao_piorou":true,
+  "servico_preservado":true,
+  "classe":"reducao_com_servico_preservado",
+  "km_vazio_B":null
+ },
+ {
+  "contraste":"C × B",
+  "papel":"complementar",
+  "dias":15,
+  "km_vazio_C":27861.1386481249,
+  "km_vazio_A":null,
+  "variacao_km_vazio_km (negativo = reducao)":-783.7714450839,
+  "variacao_km_vazio_pct (negativo = reducao)":-2.7361630479,
+  "diferenca_media_diaria_km":-52.2514296723,
+  "ic95_diferenca_media_diaria_km":[
+   -61.19112403,
+   -43.1000159866
+  ],
+  "dias_com_melhora":14,
+  "dias_com_piora":1,
+  "dias_iguais":0,
+  "diferenca_atendidos":191,
+  "diferenca_atendimento_pontos_percentuais":1.1289750562,
+  "ic95_diferenca_media_diaria_atendidos":[
+   6.8,
+   18.3333333333
+  ],
+  "diferenca_nao_atendidos":-191,
+  "diferenca_espera_media_s":-29.8583200439,
+  "diferenca_espera_p90_s":-24.2045206823,
+  "E1_sem_violacoes":true,
+  "E2_atendimento_preservado":true,
+  "E3_p90_nao_piorou":true,
+  "servico_preservado":true,
+  "classe":"reducao_com_servico_preservado",
+  "km_vazio_B":28644.9100932088
+ },
+ {
+  "contraste":"B × A",
+  "papel":"complementar",
+  "dias":15,
+  "km_vazio_C":null,
+  "km_vazio_A":29628.2705275952,
+  "variacao_km_vazio_km (negativo = reducao)":-983.3604343864,
+  "variacao_km_vazio_pct (negativo = reducao)":-3.3189937073,
+  "diferenca_media_diaria_km":-65.5573622924,
+  "ic95_diferenca_media_diaria_km":[
+   -76.1316438463,
+   -54.7901530937
+  ],
+  "dias_com_melhora":14,
+  "dias_com_piora":1,
+  "dias_iguais":0,
+  "diferenca_atendidos":-175,
+  "diferenca_atendimento_pontos_percentuais":-1.0344012295,
+  "ic95_diferenca_media_diaria_atendidos":[
+   -16.9333333333,
+   -6.5333333333
+  ],
+  "diferenca_nao_atendidos":175,
+  "diferenca_espera_media_s":14.2081250742,
+  "diferenca_espera_p90_s":12.5778521563,
+  "E1_sem_violacoes":true,
+  "E2_atendimento_preservado":false,
+  "E3_p90_nao_piorou":false,
+  "servico_preservado":false,
+  "classe":"reducao_sem_servico_preservado",
+  "km_vazio_B":28644.9100932088
+ }
+]

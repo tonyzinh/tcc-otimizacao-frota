@@ -1,0 +1,220 @@
+[
+ {
+  "dia": "2026-03-07",
+  "solicitacoes": 1348,
+  "por_classe": {
+   "encerrada": 512,
+   "nao_atendida": 433,
+   "cancelada_antes_da_atribuicao": 195,
+   "cancelada_apos_atribuicao": 120,
+   "limite_de_espera": 40,
+   "pagamento_rejeitado": 28,
+   "outro": 20
+  },
+  "por_status_final": {
+   "CorridaEncerrada": 512,
+   "NaoAtendida": 433,
+   "CorridaCanceladaSolicitante": 152,
+   "CorridaCanceladaSolicitantePosAceite": 80,
+   "LimiteEsperaAtingido": 40,
+   "CorridaCanceladaMotoristaPosAceite": 39,
+   "CorridaCanceladaAgendamento": 38,
+   "PagamentoRejeitado": 28,
+   "Retracamento": 20,
+   "CorridaCanceladaOperador": 6
+  },
+  "sem_sequencia_no_log": 20,
+  "tipo": {
+   "TempoReal": 1311,
+   "Agendamento": 37
+  },
+  "com_cd_agendamento": 341,
+  "tipo_servico": {
+   "1": 1273,
+   "12": 75
+  },
+  "aguardando_em_outra_viagem_alguma_vez": 179,
+  "retracamento_na_sequencia": 14,
+  "com_origem": 1348,
+  "com_destino": 1348,
+  "por_faixa_horaria": {
+   "00-05": 143,
+   "06-21": 1095,
+   "22-23": 110
+  },
+  "primeiro_log_menos_dt_registro_s": {
+   "p5": 0.0,
+   "p50": 0.0,
+   "p95": 0.1
+  },
+  "possiveis_novas_tentativas": {
+   "criterio": "mesmo passageiro, <= 10 min, origem <= 150 m (sinalização; nada removido)",
+   "pares": 1281,
+   "pares_consecutivos_versao_1": 431,
+   "nota_pares": "pares = todos os i<j não ordenados dentro dos critérios; consecutivos = só j=i+1 (versão 1, universo 1.325). Sensibilidade, não limite da demanda real.",
+   "solicitacoes_em_algum_par": 746,
+   "cadeias": 214,
+   "tamanho_da_cadeia": {
+    "2": 114,
+    "3": 33,
+    "4": 22,
+    "5": 14,
+    "6": 12,
+    "7": 7,
+    "8": 4,
+    "10": 4,
+    "15": 1,
+    "17": 1,
+    "18": 2
+   },
+   "cadeias_que_terminam_em_corrida_encerrada (descritivo; nao define o universo)": 98
+  },
+  "sem_motorista": 694
+ },
+ {
+  "dia": "2026-03-10",
+  "solicitacoes": 1325,
+  "por_classe": {
+   "encerrada": 738,
+   "nao_atendida": 252,
+   "cancelada_apos_atribuicao": 141,
+   "cancelada_antes_da_atribuicao": 131,
+   "limite_de_espera": 24,
+   "pagamento_rejeitado": 23,
+   "outro": 16
+  },
+  "por_status_final": {
+   "CorridaEncerrada": 738,
+   "NaoAtendida": 252,
+   "CorridaCanceladaSolicitante": 96,
+   "CorridaCanceladaSolicitantePosAceite": 73,
+   "CorridaCanceladaMotoristaPosAceite": 61,
+   "CorridaCanceladaAgendamento": 41,
+   "LimiteEsperaAtingido": 24,
+   "PagamentoRejeitado": 23,
+   "Retracamento": 16,
+   "CorridaCanceladaOperador": 1
+  },
+  "sem_sequencia_no_log": 16,
+  "tipo": {
+   "TempoReal": 1279,
+   "Agendamento": 46
+  },
+  "com_cd_agendamento": 530,
+  "tipo_servico": {
+   "1": 1278,
+   "12": 47
+  },
+  "aguardando_em_outra_viagem_alguma_vez": 197,
+  "retracamento_na_sequencia": 11,
+  "com_origem": 1325,
+  "com_destino": 1325,
+  "por_faixa_horaria": {
+   "00-05": 70,
+   "06-21": 1217,
+   "22-23": 38
+  },
+  "primeiro_log_menos_dt_registro_s": {
+   "p5": 0.0,
+   "p50": 0.0,
+   "p95": 0.1
+  },
+  "possiveis_novas_tentativas": {
+   "criterio": "mesmo passageiro, <= 10 min, origem <= 150 m (sinalização; nada removido)",
+   "pares": 1081,
+   "pares_consecutivos_versao_1": 321,
+   "nota_pares": "pares = todos os i<j não ordenados dentro dos critérios; consecutivos = só j=i+1 (versão 1, universo 1.325). Sensibilidade, não limite da demanda real.",
+   "solicitacoes_em_algum_par": 542,
+   "cadeias": 156,
+   "tamanho_da_cadeia": {
+    "2": 88,
+    "3": 30,
+    "4": 9,
+    "5": 8,
+    "6": 7,
+    "7": 2,
+    "9": 3,
+    "10": 1,
+    "11": 2,
+    "13": 3,
+    "15": 2,
+    "16": 1
+   },
+   "cadeias_que_terminam_em_corrida_encerrada (descritivo; nao define o universo)": 99
+  },
+  "sem_motorista": 428
+ },
+ {
+  "dia": "2026-03-13",
+  "solicitacoes": 1667,
+  "por_classe": {
+   "encerrada": 810,
+   "nao_atendida": 400,
+   "cancelada_apos_atribuicao": 170,
+   "cancelada_antes_da_atribuicao": 158,
+   "limite_de_espera": 56,
+   "pagamento_rejeitado": 39,
+   "outro": 34
+  },
+  "por_status_final": {
+   "CorridaEncerrada": 810,
+   "NaoAtendida": 400,
+   "CorridaCanceladaSolicitante": 119,
+   "CorridaCanceladaSolicitantePosAceite": 107,
+   "CorridaCanceladaMotoristaPosAceite": 57,
+   "LimiteEsperaAtingido": 56,
+   "PagamentoRejeitado": 39,
+   "CorridaCanceladaAgendamento": 37,
+   "Retracamento": 34,
+   "CorridaCanceladaOperador": 8
+  },
+  "sem_sequencia_no_log": 34,
+  "tipo": {
+   "TempoReal": 1622,
+   "Agendamento": 45
+  },
+  "com_cd_agendamento": 517,
+  "tipo_servico": {
+   "1": 1610,
+   "12": 57
+  },
+  "aguardando_em_outra_viagem_alguma_vez": 297,
+  "retracamento_na_sequencia": 24,
+  "com_origem": 1667,
+  "com_destino": 1667,
+  "por_faixa_horaria": {
+   "00-05": 105,
+   "06-21": 1440,
+   "22-23": 122
+  },
+  "primeiro_log_menos_dt_registro_s": {
+   "p5": 0.0,
+   "p50": 0.0,
+   "p95": 0.1
+  },
+  "possiveis_novas_tentativas": {
+   "criterio": "mesmo passageiro, <= 10 min, origem <= 150 m (sinalização; nada removido)",
+   "pares": 1223,
+   "pares_consecutivos_versao_1": 442,
+   "nota_pares": "pares = todos os i<j não ordenados dentro dos critérios; consecutivos = só j=i+1 (versão 1, universo 1.325). Sensibilidade, não limite da demanda real.",
+   "solicitacoes_em_algum_par": 771,
+   "cadeias": 242,
+   "tamanho_da_cadeia": {
+    "2": 144,
+    "3": 39,
+    "4": 24,
+    "5": 6,
+    "6": 12,
+    "7": 3,
+    "8": 4,
+    "9": 5,
+    "11": 1,
+    "12": 1,
+    "15": 1,
+    "16": 2
+   },
+   "cadeias_que_terminam_em_corrida_encerrada (descritivo; nao define o universo)": 154
+  },
+  "sem_motorista": 653
+ }
+]

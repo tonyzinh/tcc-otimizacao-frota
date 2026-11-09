@@ -1,0 +1,42 @@
+{
+ "treino": {
+  "dias": 43,
+  "pedidos": 51909,
+  "ped_min": 377,
+  "ped_max": 2259,
+  "mot_min": 58,
+  "mot_med": 106.79069767441861,
+  "mot_max": 132,
+  "compromissos": 1458
+ },
+ "validacao": {
+  "dias": 16,
+  "pedidos": 20178,
+  "ped_min": 692,
+  "ped_max": 1687,
+  "mot_min": 60,
+  "mot_med": 111.3125,
+  "mot_max": 130,
+  "compromissos": 675
+ },
+ "replicacao": {
+  "dias": 15,
+  "pedidos": 16918,
+  "ped_min": 566,
+  "ped_max": 1583,
+  "mot_min": 49,
+  "mot_med": 86.66666666666667,
+  "mot_max": 100,
+  "compromissos": 674
+ },
+ "final": {
+  "dias": 25,
+  "pedidos": 23523,
+  "ped_min": 459,
+  "ped_max": 1355,
+  "mot_min": 39,
+  "mot_med": 74.32,
+  "mot_max": 95,
+  "compromissos": 842
+ }
+}

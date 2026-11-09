@@ -1,0 +1,188 @@
+{
+ "todos": {
+  "dias": 59,
+  "d_km": {
+   "media": 4.658,
+   "mediana": 2.946,
+   "dp": 48.098,
+   "ic95_bootstrap_dias": [
+    -7.168,
+    17.074
+   ],
+   "dias_B_pior(km)": 32
+  },
+  "d_atend": {
+   "media": 0.068,
+   "mediana": 0.0,
+   "dp": 13.065,
+   "ic95_bootstrap_dias": [
+    -3.153,
+    3.373
+   ],
+   "dias_com_aumento": 29
+  },
+  "d_esp_med": {
+   "media": -1.002,
+   "mediana": 0.0,
+   "dp": 16.408,
+   "ic95_bootstrap_dias": [
+    -5.132,
+    3.284
+   ],
+   "dias_com_aumento": 27
+  },
+  "km_A_total": 123841.7,
+  "km_B_total": 124116.5,
+  "variacao_pct_km_total": 0.222,
+  "atendidos_A_total": 49916,
+  "atendidos_B_total": 49920,
+  "movimentos_planejados": 883,
+  "movimentos_executados": 219,
+  "taxa_execucao": 0.248,
+  "desfechos_dos_movimentos": {
+   "absent": 197,
+   "limit": 454,
+   "executed": 219,
+   "busy": 13
+  },
+  "compromissos_classe_B_politica (deve ser 0)": 0,
+  "compromissos_classe_A_entrada": 60,
+  "compromissos_classe_C_incerta": 66,
+  "aproximacao_compromissos_km": {
+   "A": 13178.4,
+   "B": 13416.0
+  },
+  "persistencia_da_escala": {
+   "planejados": 2516,
+   "presentes_em_D+1": 1986,
+   "fracao_presente": 0.789
+  },
+  "atendidos_so_A": 2621,
+  "atendidos_so_B": 2625,
+  "atendidos_ambas": 47295
+ },
+ "treino": {
+  "dias": 43,
+  "d_km": {
+   "media": 6.038,
+   "mediana": 7.919,
+   "dp": 51.762,
+   "ic95_bootstrap_dias": [
+    -9.007,
+    21.481
+   ],
+   "dias_B_pior(km)": 24
+  },
+  "d_atend": {
+   "media": -0.395,
+   "mediana": 1.0,
+   "dp": 12.583,
+   "ic95_bootstrap_dias": [
+    -4.186,
+    3.233
+   ],
+   "dias_com_aumento": 23
+  },
+  "d_esp_med": {
+   "media": 0.084,
+   "mediana": 0.0,
+   "dp": 17.436,
+   "ic95_bootstrap_dias": [
+    -4.904,
+    5.403
+   ],
+   "dias_com_aumento": 20
+  },
+  "km_A_total": 87763.6,
+  "km_B_total": 88023.2,
+  "variacao_pct_km_total": 0.296,
+  "atendidos_A_total": 35107,
+  "atendidos_B_total": 35090,
+  "movimentos_planejados": 669,
+  "movimentos_executados": 171,
+  "taxa_execucao": 0.256,
+  "desfechos_dos_movimentos": {
+   "absent": 151,
+   "limit": 337,
+   "executed": 171,
+   "busy": 10
+  },
+  "compromissos_classe_B_politica (deve ser 0)": 0,
+  "compromissos_classe_A_entrada": 44,
+  "compromissos_classe_C_incerta": 48,
+  "aproximacao_compromissos_km": {
+   "A": 9364.9,
+   "B": 9495.7
+  },
+  "persistencia_da_escala": {
+   "planejados": 1858,
+   "presentes_em_D+1": 1468,
+   "fracao_presente": 0.79
+  },
+  "atendidos_so_A": 1928,
+  "atendidos_so_B": 1911,
+  "atendidos_ambas": 33179
+ },
+ "validacao": {
+  "dias": 16,
+  "d_km": {
+   "media": 0.947,
+   "mediana": 0.241,
+   "dp": 37.726,
+   "ic95_bootstrap_dias": [
+    -15.987,
+    20.097
+   ],
+   "dias_B_pior(km)": 8
+  },
+  "d_atend": {
+   "media": 1.312,
+   "mediana": 0.0,
+   "dp": 14.641,
+   "ic95_bootstrap_dias": [
+    -5.375,
+    8.562
+   ],
+   "dias_com_aumento": 6
+  },
+  "d_esp_med": {
+   "media": -3.918,
+   "mediana": 0.0,
+   "dp": 13.315,
+   "ic95_bootstrap_dias": [
+    -10.466,
+    2.048
+   ],
+   "dias_com_aumento": 7
+  },
+  "km_A_total": 36078.2,
+  "km_B_total": 36093.3,
+  "variacao_pct_km_total": 0.042,
+  "atendidos_A_total": 14809,
+  "atendidos_B_total": 14830,
+  "movimentos_planejados": 214,
+  "movimentos_executados": 48,
+  "taxa_execucao": 0.224,
+  "desfechos_dos_movimentos": {
+   "absent": 46,
+   "limit": 117,
+   "executed": 48,
+   "busy": 3
+  },
+  "compromissos_classe_B_politica (deve ser 0)": 0,
+  "compromissos_classe_A_entrada": 16,
+  "compromissos_classe_C_incerta": 18,
+  "aproximacao_compromissos_km": {
+   "A": 3813.5,
+   "B": 3920.3
+  },
+  "persistencia_da_escala": {
+   "planejados": 658,
+   "presentes_em_D+1": 518,
+   "fracao_presente": 0.787
+  },
+  "atendidos_so_A": 693,
+  "atendidos_so_B": 714,
+  "atendidos_ambas": 14116
+ }
+}

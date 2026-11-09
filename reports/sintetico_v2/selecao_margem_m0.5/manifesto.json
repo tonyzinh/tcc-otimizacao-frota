@@ -1,0 +1,65 @@
+{
+ "fase": "selecao_margem",
+ "cenarios": [
+  "S1",
+  "S2",
+  "S3",
+  "S4",
+  "S5"
+ ],
+ "sementes": [
+  101,
+  102,
+  103,
+  104,
+  105,
+  106,
+  107,
+  108,
+  109,
+  110
+ ],
+ "config_liquido": {
+  "nome": "N1",
+  "k_selecao": 8,
+  "k_confirmacao": 8,
+  "margem_km": 0.5,
+  "max_movimentos": 40,
+  "triagem_m": 12,
+  "orcamento": 600,
+  "busca_local": false,
+  "orcamento_busca_local": 300,
+  "razao_atendidos_min": 0.995,
+  "razao_p90_max": 1.05
+ },
+ "versao_guloso_liquido": "2.0.0",
+ "versao_gerador": "1.0.0",
+ "hash_configuracao": "e7258b28e20bea697b52f1940ae3e435e79a4a35ac15e7461990a9efd1b951c7",
+ "codigo": {
+  "codigo_relevante_sha256": "65b675c9e6c44ce75503bddabd1bde0506490f72b26f276efdaa51a4a58ed1af",
+  "fontes": {
+   "src/tcc_frota/sintetico/gerador.py": "290db44794b8d8345553ab0e0a77cc04309abffa55af0e0b6b48cbb70d3a2630",
+   "src/tcc_frota/sintetico/geografia.py": "a8ffca8b3f87a824371965e4dda519ee6a1b3849ec53a3892ccea832ec7c0c0e",
+   "src/tcc_frota/sintetico/matriz.py": "cd32812877c0f457e57bfcfefd0cacd0ef80fd045694b759a96240ff0ad8209c",
+   "src/tcc_frota/sintetico/experimento.py": "30ed310cf1246cb506262de878e93358a4d601e1c5f83234cbdd8da01cc8aa23",
+   "src/tcc_frota/sintetico/experimento_liquido.py": "bd8badfd90dbc51ac2b0e3131742762db8ff0deebb9df1e5dab427d41b9a48c6",
+   "src/tcc_frota/sintetico/guloso_liquido.py": "62a112f26fa0864cd412e89c5dcede3dc1200076e76fab4f9414d0ca55e13624",
+   "src/tcc_frota/v2/sim.py": "d618309242a79db9d6e2848d8ac4c24cdb40091fbd5254a7b4aa5d10edbccdbc",
+   "src/tcc_frota/v2/policy.py": "c72ee6d3a29120e4330d0a6ce537df683c6798718b5ef21db530c5a0dd60cf63",
+   "src/tcc_frota/algoritmos/base.py": "0c0396976a8b6b8db60d2c4c8710f8abddb7d26c9e30d938de6966d9a33ae775"
+  },
+  "git_diff_head_sha256": "ce55c1e69a46b8f2a22603f4cb7e0536edf1fc6a736137ce2aed523c6952dcd2",
+  "arquivos_novos_sha256": "67932935b353c4d0abac00fe18a2f7f2934034e661b9cebe6ce3ad43cbad1796",
+  "commit_base": "3e77cb9e013918b9a4325dd9e43acdd5fc0ec659"
+ },
+ "geografia_sha256": {
+  "ibge_3205309.geojson": "7733e4b334b167683d829204f390ea6805708cf548bbae2657e2d30a3356ba34",
+  "ibge_3205200.geojson": "0e586222985152eaa5738cfc9f6d5c418e537f14555e50d305aa77ccec78040c",
+  "ibge_3205002.geojson": "fe6e2dbcfd1202236921f7ad7736924823b18c4a0ead2effeaa45c7eecefef86",
+  "ibge_3201308.geojson": "e58a63ca5523fdd4e6b8438966f77f17811c641181b949075fc3ef67dd77eb0a",
+  "osm_highways_raw.json": "73a19d95231d4c72ae460bfa00b7a83d442ef78005a4a38e00bc1a613264f033"
+ },
+ "python": "3.12.14",
+ "comando": "python scripts/executar_liquido.py --fase selecao_margem --margem 0.5 --workers 5",
+ "segundos": 208.97800730000017
+}

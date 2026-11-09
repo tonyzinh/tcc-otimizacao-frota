@@ -1,0 +1,21 @@
+{
+ "instancias": 300,
+ "enumeradas": 300,
+ "existe_economia_perfeita": 21,
+ "existe_economia_previsto": 0,
+ "economia_so_com_troca_conjunta": 5,
+ "B0_encontra_economia (K_B0<K_A)": 10,
+ "N1_encontra_economia (K_N1<K_A)": 0,
+ "N2_encontra_economia (K_N2<K_A)": 0,
+ "economia_perfeita_e_N1_nao_move_ou_nao_reduz": 21,
+ "economia_perfeita_mas_previsao_nao_captura (K_melhor_previsto>=K_A)": 21,
+ "B0_pior_que_A": 105,
+ "N1_pior_que_A": 0,
+ "N2_pior_que_A": 0,
+ "media_K_A": 10.108024616809061,
+ "media_economia_perfeita": 0.06393977112645229,
+ "media_economia_melhor_previsto_no_dia": 0.0,
+ "media_economia_N1": 0.0,
+ "media_economia_N2": 0.0,
+ "media_economia_B0": -1.1748096407593835
+}

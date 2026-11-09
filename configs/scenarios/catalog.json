@@ -1,0 +1,797 @@
+{
+ "nota": "Os 22 cenários compartilham a mesma estrutura (rede, frota de 100 veículos, geração de pedidos) e variam fatores controlados; não são 22 confirmações independentes. As sementes 20001–20040 foram examinadas antes da decisão de adotar o método.",
+ "cenarios": [
+  {
+   "id": "S1",
+   "nome_legivel": "baseline de demanda uniforme",
+   "descricao": "demanda aproximadamente uniforme entre regiões",
+   "grupo": "principal",
+   "parametros": {
+    "espacial": "uniforme",
+    "posicao_inicial": "uniforme",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": false,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 1,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "confirmatorio_principal",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S1"
+  },
+  {
+   "id": "S2",
+   "nome_legivel": "demanda concentrada e previsível",
+   "descricao": "demanda concentrada e previsível (3 concentrações com janelas de horário)",
+   "grupo": "principal",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "uniforme",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 2,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "confirmatorio_principal",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S2"
+  },
+  {
+   "id": "S3",
+   "nome_legivel": "frota inicialmente desequilibrada",
+   "descricao": "frota inicialmente desequilibrada (85% perto de um ponto distante das concentrações)",
+   "grupo": "principal",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "concentrada",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 3,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "confirmatorio_principal",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S3"
+  },
+  {
+   "id": "S4",
+   "nome_legivel": "mudança inesperada de concentrações",
+   "descricao": "mudança inesperada: no dia avaliado duas concentrações trocam de lugar",
+   "grupo": "principal",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "uniforme",
+    "desvio": "hubs_trocados",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 4,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "confirmatorio_principal",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S4"
+  },
+  {
+   "id": "S5",
+   "nome_legivel": "demanda móvel ao longo do dia",
+   "descricao": "demanda móvel: a região quente muda ao longo do dia (decisão única)",
+   "grupo": "principal",
+   "parametros": {
+    "espacial": "movel",
+    "posicao_inicial": "uniforme",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 5,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "confirmatorio_principal",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S5"
+  },
+  {
+   "id": "S2_frota_abundante",
+   "nome_legivel": "S2 frota abundante",
+   "descricao": "S2 com frota abundante (4 pedidos/veículo)",
+   "grupo": "sensibilidade_frota",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "uniforme",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 4.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 6,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S2_frota_abundante"
+  },
+  {
+   "id": "S2_frota_escassa",
+   "nome_legivel": "S2 frota escassa",
+   "descricao": "S2 com frota escassa (14 pedidos/veículo)",
+   "grupo": "sensibilidade_frota",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "uniforme",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 14.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 7,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S2_frota_escassa"
+  },
+  {
+   "id": "S2_salto6km",
+   "nome_legivel": "S2 salto6km",
+   "descricao": "S2 com salto máximo do guloso de 6 km (artigo: 3 km)",
+   "grupo": "sensibilidade_parametro_do_guloso_antigo",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "uniforme",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 6.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 8,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S2_salto6km"
+  },
+  {
+   "id": "S2_salto10km",
+   "nome_legivel": "S2 salto10km",
+   "descricao": "S2 com salto máximo do guloso de 10 km (artigo: 3 km)",
+   "grupo": "sensibilidade_parametro_do_guloso_antigo",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "uniforme",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 10.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 9,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S2_salto10km"
+  },
+  {
+   "id": "S2_res6",
+   "nome_legivel": "S2 res6",
+   "descricao": "S2 com zonas H3 de resolução 6 (sensibilidade à agregação)",
+   "grupo": "sensibilidade_resolucao_h3",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "uniforme",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 6,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 10,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S2_res6"
+  },
+  {
+   "id": "S2_res8",
+   "nome_legivel": "S2 res8",
+   "descricao": "S2 com zonas H3 de resolução 8 (sensibilidade à agregação)",
+   "grupo": "sensibilidade_resolucao_h3",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "uniforme",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 8,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 11,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S2_res8"
+  },
+  {
+   "id": "S3_frota_abundante",
+   "nome_legivel": "S3 frota abundante",
+   "descricao": "S3 com frota abundante (4 pedidos/veículo)",
+   "grupo": "sensibilidade_frota",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "concentrada",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 4.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 12,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S3_frota_abundante"
+  },
+  {
+   "id": "S3_frota_escassa",
+   "nome_legivel": "S3 frota escassa",
+   "descricao": "S3 com frota escassa (14 pedidos/veículo)",
+   "grupo": "sensibilidade_frota",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "concentrada",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 14.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 13,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S3_frota_escassa"
+  },
+  {
+   "id": "S3_salto6km",
+   "nome_legivel": "S3 salto6km",
+   "descricao": "S3 com salto máximo do guloso de 6 km (artigo: 3 km)",
+   "grupo": "sensibilidade_parametro_do_guloso_antigo",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "concentrada",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 6.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 14,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S3_salto6km"
+  },
+  {
+   "id": "S3_salto10km",
+   "nome_legivel": "S3 salto10km",
+   "descricao": "S3 com salto máximo do guloso de 10 km (artigo: 3 km)",
+   "grupo": "sensibilidade_parametro_do_guloso_antigo",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "concentrada",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 10.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 15,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S3_salto10km"
+  },
+  {
+   "id": "S3_res6",
+   "nome_legivel": "S3 res6",
+   "descricao": "S3 com zonas H3 de resolução 6 (sensibilidade à agregação)",
+   "grupo": "sensibilidade_resolucao_h3",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "concentrada",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 6,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 16,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S3_res6"
+  },
+  {
+   "id": "S3_res8",
+   "nome_legivel": "S3 res8",
+   "descricao": "S3 com zonas H3 de resolução 8 (sensibilidade à agregação)",
+   "grupo": "sensibilidade_resolucao_h3",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "concentrada",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 8,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 17,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S3_res8"
+  },
+  {
+   "id": "S2_previsao_perfeita",
+   "nome_legivel": "S2 previsao perfeita",
+   "descricao": "DIAGNÓSTICO idealizado: S2 com a intensidade verdadeira do dia como previsão",
+   "grupo": "diagnostico_oraculo",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "uniforme",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "perfeita",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 18,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S2_previsao_perfeita"
+  },
+  {
+   "id": "S3_previsao_perfeita",
+   "nome_legivel": "S3 previsao perfeita",
+   "descricao": "DIAGNÓSTICO idealizado: S3 com a intensidade verdadeira do dia como previsão",
+   "grupo": "diagnostico_oraculo",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "concentrada",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "perfeita",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 19,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S3_previsao_perfeita"
+  },
+  {
+   "id": "S4_previsao_perfeita",
+   "nome_legivel": "S4 previsao perfeita",
+   "descricao": "DIAGNÓSTICO idealizado: S4 com a intensidade verdadeira do dia como previsão",
+   "grupo": "diagnostico_oraculo",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "uniforme",
+    "desvio": "hubs_trocados",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "perfeita",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 20,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S4_previsao_perfeita"
+  },
+  {
+   "id": "S5_previsao_perfeita",
+   "nome_legivel": "S5 previsao perfeita",
+   "descricao": "DIAGNÓSTICO idealizado: S5 com a intensidade verdadeira do dia como previsão",
+   "grupo": "diagnostico_oraculo",
+   "parametros": {
+    "espacial": "movel",
+    "posicao_inicial": "uniforme",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "perfeita",
+     "sigma_previsao": 0.0
+    }
+   },
+   "codigo_da_semente": 21,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S5_previsao_perfeita"
+  },
+  {
+   "id": "S2_erro_previsao",
+   "nome_legivel": "S2 erro previsao",
+   "descricao": "S2 com erro multiplicativo lognormal (σ = 0,5) sobre a previsão",
+   "grupo": "sensibilidade_previsao",
+   "parametros": {
+    "espacial": "hubs",
+    "posicao_inicial": "uniforme",
+    "desvio": "nenhum",
+    "n_veiculos": 100,
+    "pedidos_por_veiculo": 8.0,
+    "res_zona": 7,
+    "afeta_despacho_em_lotes": true,
+    "parametros_do_planejador_abandonado": {
+     "max_km_guloso": 3.0,
+     "previsao": "historico",
+     "sigma_previsao": 0.5
+    }
+   },
+   "codigo_da_semente": 22,
+   "sementes": {
+    "desenvolvimento": [
+     101,
+     120
+    ],
+    "avaliacao_final_vista_antes_da_decisao": [
+     20001,
+     20040
+    ]
+   },
+   "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
+   "finalidade": "exploratorio_complementar",
+   "configuracao": "configs/scenarios/catalog.json",
+   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "nome_antigo": "S2_erro_previsao"
+  }
+ ]
+}

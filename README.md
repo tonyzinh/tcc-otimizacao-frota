@@ -1,73 +1,91 @@
-# Otimização da Alocação de Frota em Aplicativos de Transporte Urbano
+# Atribuição conjunta de pedidos a veículos em lotes (algoritmo Húngaro) e km vazio
 
-TCC (Ciência da Computação) sobre **reposicionamento preventivo de veículos com horizonte D+1**: reposicionar, na véspera e só com dados históricos, motoristas ociosos reduz o **KM morto** (km sem passageiro)?
+Trabalho de conclusão de curso sobre **Otimização da Alocação de Frota em Aplicativos de Transporte Urbano**. O repositório avalia, por **simulação**, se atribuir pedidos a veículos de forma **conjunta** (algoritmo Húngaro, lotes de 60 s) reduz o **km vazio** (aproximação do veículo até o passageiro) em relação ao despacho pelo mais próximo livre, sem piorar o atendimento.
 
-## Pergunta, escopo e classificação do problema
+## O método e as três políticas
 
-- **Pergunta:** a alocação preventiva D+1 reduz o KM vazio por corrida em relação a não reposicionar, nos mesmos pedidos, frota, janela e método de distância? Atendimento e cobertura são controles.
-- **Classificação:** problema de **reposicionamento preventivo de veículos**; cada motorista livre recebe no máximo um destino (`Moves = {motorista: (lat, lng, km)}`). **Não é** Problema de Roteamento de Veículos (PRV/VRP): não há rotas de várias paradas. Fundamentação em [`reports/validation_current/16_CLASSIFICACAO_PRV_VRP.md`](reports/validation_current/16_CLASSIFICACAO_PRV_VRP.md).
-- **Fora do escopo:** despacho em tempo real, aplicativo completo, política da empresa. Regras `PROPOSTA`/`PENDENTE` são hipóteses.
+| Id | Política | Papel |
+|---|---|---|
+| **A** | mais próximo livre, despacho imediato | referência (baseline simplificado calibrado; **não** é a operação manual) |
+| **B** | mais próximo livre, lotes de 60 s | controle: isola o efeito do lote |
+| **C** | atribuição conjunta pelo Húngaro, lotes de 60 s | método principal |
 
-## Resultado registrado
+A cada lote, C maximiza o número de pedidos atendidos e, entre as soluções com esse máximo, minimiza a soma das distâncias de aproximação (Kuhn–Munkres, implementação própria). O ótimo é **do lote**, não do dia. Contraste principal: **C × A**; complementar: C × B.
 
-Em março e setembro de 2026, nenhum dos 13 planejadores avaliados reduziu o KM vazio por corrida; a extensão v2 confirma o nulo e um controle positivo sintético mostra que o simulador e a inferência detectam ganho quando ele existe ([`reports/tcc_v2/RELATORIO_V2.md`](reports/tcc_v2/RELATORIO_V2.md), [`docs_antigos/BATERIA_ALGORITMOS.md`](docs_antigos/BATERIA_ALGORITMOS.md)). Vale para este simulador, estes dados e estas hipóteses; KM estimado não é KM faturado.
+## Resultados (evidência citável em `reports/`)
 
-## Arquitetura
+* **Histórico** (dados privados da V1 Viagens, simulação, km estimado): setembro, C × A **−5,96%** de km vazio (+16 atendidos); outubro, C × A **−5,04%**, mas **−85 atendidos** (14.466 vs 14.551 de 23.523; −0,36 p.p. do universo elegível, ≈ −0,58% dos atendidos de A) e o critério de serviço E2 **não foi cumprido**. C × B: −2,74% (set.) e −1,40% (out.), com atendimento preservado.
+* **Sintético** (rede OpenStreetMap, 22 cenários **não independentes**, sementes finais examinadas antes da decisão): mediana −8,4% contra A. Complementar e exploratório.
+* Limites: simulação, não operação real; km estimado; resultado de uma empresa e região.
 
-Pacote `src/tcc_frota/` por domínio: `v2/` (rodada final, simulador, políticas, estatística), `algoritmos/` (bateria), `v3/` (extensão v2 do TCC), `availability/`, `analise/`, `demand/`, `gold/`, `simulation/`, `optimization/`, `spatial/`, `ingestion/`, `quality/`, `synthetic/`. Fluxo: dados → Silver/Gold → previsão no corte D → `Planner` → simulador de eventos → estatística → tabelas e figuras. Detalhes e diagramas: [guia completo](docs_antigos/GUIA_COMPLETO_REPOSITORIO.md), [arquitetura](docs_antigos/ARQUITETURA_REORGANIZADA.md).
+Detalhes e ressalvas: [`docs/methodology.md`](docs/methodology.md). Resultados congelados: `reports/atribuicao_final/`, `reports/sintetico_v2/`.
 
-Tecnologias: Python 3.12, NumPy, SciPy (HiGHS), H3, scikit-learn, statsmodels/arch, Matplotlib, PyArrow; LaTeX para o artigo.
+## Estrutura
 
-## Instalação rápida
-
-```powershell
-python -m pip install -e ".[test,algoritmos,extensao,qualidade]"
+```
+src/tcc_frota/   domain · data · assignment · simulation · scenarios · metrics · visualization · cli
+configs/         data · policies · scenarios · experiments · private (ignorado pelo Git)
+tests/           unit · integration · regression · reproducibility · fixtures
+notebook/        01_data_overview · 02_hungarian_example · 03_greater_vitoria_h3 · 04_historical_results · 05_synthetic_results
+scripts/         extração local (.sh), download de geografia, equivalência, execução dos notebooks
+docs/            architecture · data_dictionary · methodology · reproducibility · repository_migration (+ registros do estudo)
+data/            extraido/ (privado, ignorado) · geografia/ (IBGE/OSM públicos)
+reports/         atribuicao_final/ e sintetico_v2/ (congelados) · figures/ · manifests/
+article/         artigo (LaTeX) e PDF
 ```
 
-Sem instalação editável: `PYTHONPATH=src` e `python -m tcc_frota.cli`. Linux/macOS não foram testados.
+## Instalação
 
-## Execução rápida (dados sintéticos)
+Python **3.12**. Com [uv](https://docs.astral.sh/uv/), preservando o `uv.lock`: `uv sync --frozen --extra test --extra quality --extra notebooks`; ou `pip install -e ".[test,quality,notebooks]"` (sem o lock).
 
-```powershell
-tcc-frota build-synthetic-data --out reports/runs/medallion
-tcc-frota run-synthetic --out reports/runs
-```
-
-O experimento sintético é validação de software, não medição da empresa.
+| Grupo | Onde está declarado | Conteúdo |
+|---|---|---|
+| Execução | `dependencies` | numpy, pandas, pyarrow, scipy, h3, matplotlib, tzdata |
+| Desenvolvimento | extras `test`, `quality` | pytest, pytest-cov, Ruff (versão fixa) |
+| Notebooks e mapa | extra `notebooks` | jupyter_client, ipykernel, nbformat, nbclient, folium |
+| Fontes privadas | extra `fontes` | pyodbc (exige driver ODBC; só com o portão de dados reais) |
+| Compilação do artigo | **fora do `uv.lock`** | XeLaTeX, BibTeX, `latexmk` e a fonte Arial (MiKTeX ou TeX Live) |
 
 ## Testes e qualidade
 
-```powershell
-python -m pytest                          # 283 passed, 1 skipped (28/10/2026)
-python scripts/verificar_repositorio.py   # Ruff, formatação, compilação, pytest, hashes, estrutura
+```bash
+python -m pytest
+python -m ruff check . && python -m ruff format --check .
 ```
 
-Testes em `tests/unit`, `tests/integration`, `tests/regression` (valores congelados) e `tests/reproducibility` (hashes da v1, estrutura, dados fora do Git).
+## Exemplo rápido (sintético, sem dados privados)
 
-## Experimentos e versões
+Precisa de `data/geografia/` (`python scripts/baixar_geografia.py`, fontes públicas).
 
-| Campanha | Estado | Resultados |
-|---|---|---|
-| Rodada final (a “v1” dos documentos; pacote `v2`) | congelada (tag `v1-congelada`, 19 hashes) | `reports/tcc_final/` |
-| Bateria de 13 algoritmos e guloso seletivo | congeladas | `resultados/`, `tabelas/` |
-| Extensão v2 (pacote `v3`), Fases 1–4 | atual | `reports/tcc_v2/` |
+```bash
+tcc-frota run-synthetic --scenarios S1 --seeds 101-103 --out reports/final/exemplo
+tcc-frota analyze-synthetic --input reports/final/exemplo --out reports/final/exemplo/analise
+```
 
-Cuidado com os nomes: o pacote `v3` é a “extensão v2” dos documentos. Mapa completo em [`docs_antigos/VERSOES_E_EXPERIMENTOS.md`](docs_antigos/VERSOES_E_EXPERIMENTOS.md); comandos em [`docs_antigos/GUIA_EXPERIMENTOS.md`](docs_antigos/GUIA_EXPERIMENTOS.md). **Nunca regere resultados no lugar de `reports/tcc_final`, `reports/tcc_v2`, `resultados` ou `tabelas`.**
+## Reproduzir a análise e as figuras
 
-## Reprodutibilidade
+```bash
+tcc-frota analyze-historical --out reports/final/historico      # a partir dos Parquet congelados (locais)
+tcc-frota figures --historical reports/final/historico --out reports/figures
+python scripts/check_equivalence.py --synthetic --analysis      # confere contra os resultados congelados
+```
 
-Verificado: testes, hashes dos artefatos versionados, importação dos 103 módulos, métricas sintéticas determinísticas e a decisão F4 antes/depois das mudanças ([`reports/final_release/VALIDACAO_FINAL.md`](reports/final_release/VALIDACAO_FINAL.md)). **Não verificado:** a reexecução completa com dados reais (`data/raw/` não é versionado; `final-run`, bateria e Fases v3 não foram rerodadas). Dados reais e `reports/runs/` ficam fora do Git; o processamento local foi autorizado pelo proponente. Não envie dados reais a serviços externos.
+## Notebooks
 
-## Limitações científicas
+`python scripts/run_notebooks.py` executa os cinco cadernos em kernel limpo. Os cadernos de resultados leem só agregados congelados; o 03 desenha o mapa H3 do recorte (dados públicos).
 
-Simulador e distâncias estimadas (Haversine × fator rua/reta); previsão com erro; pré-registro com carimbo do Git local; fases 5 e 6 da extensão não feitas; regras da empresa não confirmadas. Lista completa: [`docs_antigos/limitacoes.md`](docs_antigos/limitacoes.md) e [`docs_antigos/ESTADO_FINAL_REPOSITORIO.md`](docs_antigos/ESTADO_FINAL_REPOSITORIO.md).
+## Artigo
 
-## Índice da documentação
+`article/` (XeLaTeX + BibTeX; ver `article/README.md`). PDF: `article/ARTIGO_ATRIBUICAO_HUNGARO.pdf`.
 
-- Entrada: [guia completo](docs_antigos/GUIA_COMPLETO_REPOSITORIO.md) · [como executar](docs_antigos/COMO_EXECUTAR.md) · [guia do desenvolvedor](docs_antigos/GUIA_DESENVOLVEDOR.md) · [guia de experimentos](docs_antigos/GUIA_EXPERIMENTOS.md) · [versões e experimentos](docs_antigos/VERSOES_E_EXPERIMENTOS.md) · [mapeamento TCC→código](docs_antigos/MAPEAMENTO_TCC_CODIGO.md) · [estado final](docs_antigos/ESTADO_FINAL_REPOSITORIO.md)
-- Método: [metodologia](docs_antigos/metodologia.md) · [simulação](docs_antigos/simulacao.md) · [indicadores](docs_antigos/indicadores.md) · [pré-registro da extensão v2](docs_antigos/V2_PREREGISTRO.md) · [orçamento de configurações](docs_antigos/ORCAMENTO_CONFIGURACOES.md)
-- Resultados: [reais](docs_antigos/resultados_reais.md) · [bateria](docs_antigos/BATERIA_ALGORITMOS.md) · [seletivo](docs_antigos/RESULTADO_SELETIVO.md) · [banca](docs_antigos/perguntas_banca.md)
-- Dados e segurança: [segurança dos dados](docs_antigos/seguranca_dados.md) · [disponibilidade](docs_antigos/disponibilidade.md)
-- Auditorias: [`reports/thesis_audit/`](reports/thesis_audit/) · [`reports/validation_current/`](reports/validation_current/) · [`reports/repository_migration/`](reports/repository_migration/) · [`reports/final_release/`](reports/final_release/)
+## Dados privados e autorização
 
-O manuscrito está em `tcc-artigo-latex/`, repositório Git **independente** (com remoto próprio); faça seus commits lá.
+Dados reais da empresa: **só processamento local e agregado**; nada de dados brutos, identificadores de motoristas ou coordenadas individuais em logs, commits ou serviços externos. `data/` é ignorado pelo Git. A execução sobre dados reais exige `TCC_REAL_DATA_AUTHORIZED=YES`, liberado só pelo proprietário. Sem os dados, as partes sintética e agregada continuam reproduzíveis.
+
+## Limitações
+
+Simulação com km estimado (reta × 1,3012 na linha histórica; Dijkstra sobre OSM na sintética); baseline simplificado; disponibilidade reconstruída retrospectivamente; parâmetros herdados da calibração de março; ótimo por lote ≠ ótimo diário; sem implantação nem efeito operacional medido.
+
+## Histórico
+
+O estudo anterior (reposicionamento preventivo D+1 e a bateria de 13 algoritmos, sem redução de km vazio) está preservado como evidência em `reports/tcc_final/`, `reports/tcc_v2/` e `resultados/`; a documentação antiga e o código correspondente saíram da árvore ativa (cópia externa; ver o documento abaixo) (ver [`docs/repository_migration.md`](docs/repository_migration.md)).

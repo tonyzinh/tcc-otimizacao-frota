@@ -1,6 +1,6 @@
 # Verificações leves e locais. Não tocam em artefatos científicos congelados (listados em `exclude`).
 # Instalação: `pip install pre-commit && pre-commit install`. Configuração não testada nesta sessão.
-exclude: ^(reports/(tcc_final|tcc_v2)|resultados|tabelas|tcc-artigo-latex)/
+exclude: ^(reports/(tcc_final|tcc_v2)|resultados)/
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.17.3

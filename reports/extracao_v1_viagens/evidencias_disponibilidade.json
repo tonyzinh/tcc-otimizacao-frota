@@ -1,0 +1,44 @@
+{
+ "fontes": {
+  "es.posicao_ofertas": {
+   "permite_afirmar": "o veículo/motorista constava do processo de oferta no instante (snapshot a cada ~120 s, 16-86 veículos); com status 3 e solicitação associada, estava em viagem; posição GPS com horário",
+   "permanece_desconhecido": "se estava livre (enum de status é inferido); ausência não prova indisponibilidade; não é cadastro da frota"
+  },
+  "ods.jornada_motorista": {
+   "permite_afirmar": "janela de atividade REGISTRADA para o condutor (início/fim realizados)",
+   "permanece_desconhecido": "pausas, quem dirigiu cada veículo, disponibilidade a cada instante; vínculo veículo-condutor é cadastral e pode divergir"
+  },
+  "ods.log_status_motorista": {
+   "permite_afirmar": "eventos de status/login do motorista (família de ID do motorista)",
+   "permanece_desconhecido": "semântica de bl_login/tx_status não confirmada; CD_VEICULO_CONDUTOR vem vazio na fonte"
+  },
+  "ods.solicitacao": {
+   "permite_afirmar": "viagens V1 observadas (aceite, início, fim, destino real): ocupação histórica",
+   "permanece_desconhecido": "só vale para reconstrução; na simulação, a ocupação é a do simulador"
+  },
+  "ods.compromissos_externos": {
+   "permite_afirmar": "corridas fora do universo V1 (outro serviço/região) que ocuparam o veículo, com origem e destino",
+   "permanece_desconhecido": "quando passaram a ser conhecidas pelo planejador (known_at desconhecido; dt_registro é só hipótese)"
+  },
+  "vinculo.motorista_veiculo": {
+   "permite_afirmar": "no instante, o motorista aparece com a placa no feed e/ou na solicitação",
+   "permanece_desconhecido": "vínculo fora desses instantes; placa pode ter mais de um motorista no dia"
+  }
+ },
+ "dias": [
+  {
+   "dia": "2026-03-10",
+   "linhas": 2957,
+   "horas_por_estado_e_fonte": {
+    "desconhecido|lacuna_no_feed": 264.8,
+    "ocupado_com_evidencia|es.posicao_ofertas": 683.2,
+    "ocupado_com_evidencia|ods.solicitacao": 331.6,
+    "presente_sem_viagem_es|es.posicao_ofertas": 587.7
+   },
+   "motoristas": 150,
+   "jornada_registrada": {
+    "disponivel": false
+   }
+  }
+ ]
+}

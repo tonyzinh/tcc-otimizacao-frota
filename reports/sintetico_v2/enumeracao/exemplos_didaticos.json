@@ -1,0 +1,663 @@
+[
+ {
+  "A": {
+   "km_vazio": 9.636066124596216,
+   "busca": 9.636066124596216,
+   "atendidos": 5
+  },
+  "plano": {
+   "km_vazio": 9.20873389575236,
+   "busca": 7.47409064410917,
+   "reposicionamento": 1.7346432516431896,
+   "atendidos": 5
+  },
+  "movimentos": [
+   {
+    "veiculo": "V003",
+    "km": 1.735,
+    "hora": 6.0
+   }
+  ],
+  "viagens": [
+   {
+    "pedido": 0,
+    "hora": 7.06,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 1,
+    "hora": 7.7,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 2,
+    "hora": 9.11,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 3,
+    "hora": 9.8,
+    "A_veiculo": "V001",
+    "A_busca_km": 1.627,
+    "plano_veiculo": "V003",
+    "plano_busca_km": 0.0
+   },
+   {
+    "pedido": 6,
+    "hora": 13.08,
+    "A_veiculo": "V000",
+    "A_busca_km": 2.378,
+    "plano_veiculo": "V001",
+    "plano_busca_km": 1.735
+   },
+   {
+    "pedido": 4,
+    "hora": 13.18,
+    "A_veiculo": "V002",
+    "A_busca_km": 1.627,
+    "plano_veiculo": "V002",
+    "plano_busca_km": 1.627
+   },
+   {
+    "pedido": 5,
+    "hora": 13.38,
+    "A_veiculo": "V000",
+    "A_busca_km": 2.378,
+    "plano_veiculo": "V001",
+    "plano_busca_km": 2.378
+   },
+   {
+    "pedido": 8,
+    "hora": 19.74,
+    "A_veiculo": "V000",
+    "A_busca_km": 1.627,
+    "plano_veiculo": "V004",
+    "plano_busca_km": 1.735
+   },
+   {
+    "pedido": 7,
+    "hora": 19.99,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   }
+  ],
+  "pedidos_atendidos_iguais": true,
+  "cenario": "mini2",
+  "semente": 20,
+  "origem_do_plano": "informacao_perfeita (diagnóstico, NÃO executável D+1)"
+ },
+ {
+  "A": {
+   "km_vazio": 8.117229559043537,
+   "busca": 8.117229559043537,
+   "atendidos": 4
+  },
+  "plano": {
+   "km_vazio": 7.47409064410917,
+   "busca": 5.73944739246598,
+   "reposicionamento": 1.7346432516431896,
+   "atendidos": 4
+  },
+  "movimentos": [
+   {
+    "veiculo": "V003",
+    "km": 1.735,
+    "hora": 6.0
+   }
+  ],
+  "viagens": [
+   {
+    "pedido": 0,
+    "hora": 7.24,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 2,
+    "hora": 8.2,
+    "A_veiculo": "V000",
+    "A_busca_km": 2.378,
+    "plano_veiculo": "V000",
+    "plano_busca_km": 2.378
+   },
+   {
+    "pedido": 3,
+    "hora": 8.22,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 1,
+    "hora": 8.28,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 4,
+    "hora": 12.29,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 5,
+    "hora": 13.4,
+    "A_veiculo": "V004",
+    "A_busca_km": 2.378,
+    "plano_veiculo": "V003",
+    "plano_busca_km": 1.627
+   },
+   {
+    "pedido": 6,
+    "hora": 15.06,
+    "A_veiculo": "V004",
+    "A_busca_km": 1.626,
+    "plano_veiculo": "V004",
+    "plano_busca_km": 0.0
+   },
+   {
+    "pedido": 8,
+    "hora": 19.14,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 7,
+    "hora": 19.28,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 9,
+    "hora": 20.73,
+    "A_veiculo": "V001",
+    "A_busca_km": 1.735,
+    "plano_veiculo": "V001",
+    "plano_busca_km": 1.735
+   }
+  ],
+  "pedidos_atendidos_iguais": true,
+  "cenario": "mini2",
+  "semente": 10,
+  "origem_do_plano": "informacao_perfeita (diagnóstico, NÃO executável D+1)"
+ },
+ {
+  "A": {
+   "km_vazio": 18.093183215116714,
+   "busca": 18.093183215116714,
+   "atendidos": 10
+  },
+  "plano": {
+   "km_vazio": 17.109904420647396,
+   "busca": 14.731737058787779,
+   "reposicionamento": 2.3781673618596164,
+   "atendidos": 10
+  },
+  "movimentos": [
+   {
+    "veiculo": "V002",
+    "km": 2.378,
+    "hora": 8.0
+   }
+  ],
+  "viagens": [
+   {
+    "pedido": 1,
+    "hora": 6.1,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 0,
+    "hora": 6.53,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 2,
+    "hora": 7.94,
+    "A_veiculo": "V001",
+    "A_busca_km": 2.378,
+    "plano_veiculo": "V001",
+    "plano_busca_km": 2.378
+   },
+   {
+    "pedido": 5,
+    "hora": 8.14,
+    "A_veiculo": "V003",
+    "A_busca_km": 1.627,
+    "plano_veiculo": "V003",
+    "plano_busca_km": 1.627
+   },
+   {
+    "pedido": 7,
+    "hora": 8.21,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 6,
+    "hora": 8.54,
+    "A_veiculo": "V000",
+    "A_busca_km": 1.626,
+    "plano_veiculo": "V000",
+    "plano_busca_km": 1.626
+   },
+   {
+    "pedido": 3,
+    "hora": 8.67,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 4,
+    "hora": 8.8,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 11,
+    "hora": 9.2,
+    "A_veiculo": "V000",
+    "A_busca_km": 1.627,
+    "plano_veiculo": "V000",
+    "plano_busca_km": 1.627
+   },
+   {
+    "pedido": 9,
+    "hora": 9.23,
+    "A_veiculo": "V001",
+    "A_busca_km": 1.735,
+    "plano_veiculo": "V002",
+    "plano_busca_km": 0.0
+   },
+   {
+    "pedido": 8,
+    "hora": 9.66,
+    "A_veiculo": "V003",
+    "A_busca_km": 1.735,
+    "plano_veiculo": "V003",
+    "plano_busca_km": 1.735
+   },
+   {
+    "pedido": 10,
+    "hora": 9.83,
+    "A_veiculo": "V002",
+    "A_busca_km": 1.627,
+    "plano_veiculo": "V001",
+    "plano_busca_km": 0.0
+   },
+   {
+    "pedido": 12,
+    "hora": 10.28,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 13,
+    "hora": 10.89,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 14,
+    "hora": 11.25,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 16,
+    "hora": 12.23,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 15,
+    "hora": 12.87,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 18,
+    "hora": 13.05,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 19,
+    "hora": 13.27,
+    "A_veiculo": "V000",
+    "A_busca_km": 2.378,
+    "plano_veiculo": "V000",
+    "plano_busca_km": 2.378
+   },
+   {
+    "pedido": 17,
+    "hora": 13.28,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 21,
+    "hora": 14.18,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 20,
+    "hora": 14.55,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 24,
+    "hora": 16.04,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 22,
+    "hora": 16.81,
+    "A_veiculo": "V002",
+    "A_busca_km": 1.735,
+    "plano_veiculo": "V001",
+    "plano_busca_km": 1.735
+   },
+   {
+    "pedido": 23,
+    "hora": 16.84,
+    "A_veiculo": "V000",
+    "A_busca_km": 1.627,
+    "plano_veiculo": "V000",
+    "plano_busca_km": 1.627
+   },
+   {
+    "pedido": 25,
+    "hora": 17.21,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 26,
+    "hora": 18.37,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 28,
+    "hora": 20.25,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 27,
+    "hora": 20.81,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 29,
+    "hora": 21.69,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   }
+  ],
+  "pedidos_atendidos_iguais": true,
+  "cenario": "mini5",
+  "semente": 3,
+  "origem_do_plano": "informacao_perfeita (diagnóstico, NÃO executável D+1)"
+ },
+ {
+  "A": {
+   "km_vazio": 12.01410041125034,
+   "busca": 12.01410041125034,
+   "atendidos": 6
+  },
+  "plano": {
+   "km_vazio": 10.387549847676283,
+   "busca": 6.382586443157028,
+   "reposicionamento": 4.0049634045192555,
+   "atendidos": 6
+  },
+  "movimentos": [
+   {
+    "veiculo": "V001",
+    "km": 2.378,
+    "hora": 8.0
+   },
+   {
+    "veiculo": "V000",
+    "km": 1.627,
+    "hora": 10.0
+   }
+  ],
+  "viagens": [
+   {
+    "pedido": 0,
+    "hora": 8.61,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 1,
+    "hora": 9.25,
+    "A_veiculo": "V002",
+    "A_busca_km": 2.378,
+    "plano_veiculo": "V002",
+    "plano_busca_km": 2.378
+   },
+   {
+    "pedido": 2,
+    "hora": 12.81,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 3,
+    "hora": 13.93,
+    "A_veiculo": "V000",
+    "A_busca_km": 1.627,
+    "plano_veiculo": "V000",
+    "plano_busca_km": 0.0
+   },
+   {
+    "pedido": 4,
+    "hora": 13.95,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 6,
+    "hora": 14.28,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 5,
+    "hora": 14.93,
+    "A_veiculo": "V003",
+    "A_busca_km": 1.627,
+    "plano_veiculo": "V001",
+    "plano_busca_km": 0.0
+   },
+   {
+    "pedido": 9,
+    "hora": 15.03,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 7,
+    "hora": 15.46,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 8,
+    "hora": 15.74,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 10,
+    "hora": 15.89,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 11,
+    "hora": 16.3,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 13,
+    "hora": 17.1,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 12,
+    "hora": 18.0,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 15,
+    "hora": 18.26,
+    "A_veiculo": "V003",
+    "A_busca_km": 2.378,
+    "plano_veiculo": "V003",
+    "plano_busca_km": 0.0
+   },
+   {
+    "pedido": 14,
+    "hora": 18.84,
+    "A_veiculo": "V000",
+    "A_busca_km": 2.378,
+    "plano_veiculo": "V000",
+    "plano_busca_km": 2.378
+   },
+   {
+    "pedido": 16,
+    "hora": 19.04,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 18,
+    "hora": 19.41,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   },
+   {
+    "pedido": 17,
+    "hora": 19.85,
+    "A_veiculo": "V003",
+    "A_busca_km": 1.626,
+    "plano_veiculo": "V003",
+    "plano_busca_km": 1.626
+   },
+   {
+    "pedido": 19,
+    "hora": 20.45,
+    "A_veiculo": null,
+    "A_busca_km": null,
+    "plano_veiculo": null,
+    "plano_busca_km": null
+   }
+  ],
+  "pedidos_atendidos_iguais": true,
+  "cenario": "mini5",
+  "semente": 23,
+  "origem_do_plano": "informacao_perfeita (diagnóstico, NÃO executável D+1)"
+ }
+]

@@ -1,0 +1,185 @@
+% =============================================================================
+% Comandos do template
+% Usuários normalmente não precisam alterar este arquivo.
+% =============================================================================
+\makeatletter
+
+% ---------------------------------------------------------------------------
+% Metadados (preenchidos em config/metadata.tex)
+% ---------------------------------------------------------------------------
+\newcommand{\tcc@titulo}{}
+\newcommand{\tcc@tituloingles}{}
+\newcommand{\tcc@curso}{}
+\newcommand{\tcc@instituicao}{}
+\newcommand{\tcc@cidade}{}
+\newcommand{\tcc@ano}{\the\year}
+\newcommand{\tcc@palavraschave}{}
+\newcommand{\tcc@keywords}{}
+\newcommand{\tcc@autores}{}
+\newcommand{\tcc@nomesautores}{}
+\newcommand{\tcc@orientador}{}
+
+\newcommand{\titulo}[1]{\renewcommand{\tcc@titulo}{#1}}
+\newcommand{\tituloingles}[1]{\renewcommand{\tcc@tituloingles}{#1}}
+\newcommand{\curso}[1]{\renewcommand{\tcc@curso}{#1}}
+\newcommand{\instituicao}[1]{\renewcommand{\tcc@instituicao}{#1}}
+\newcommand{\cidade}[1]{\renewcommand{\tcc@cidade}{#1}}
+\newcommand{\ano}[1]{\renewcommand{\tcc@ano}{#1}}
+\newcommand{\palavraschave}[1]{\renewcommand{\tcc@palavraschave}{#1}}
+\newcommand{\keywords}[1]{\renewcommand{\tcc@keywords}{#1}}
+
+% \autor[ORCID]{Nome}{Formação, vínculo}{e-mail}
+% (ORCID e e-mail só aparecem quando informados: nada é inventado)
+\newcommand{\autor}[4][]{%
+  \appto\tcc@autores{\tcc@blocoautor{#1}{#2}{#3}{#4}}%
+  \ifdefempty{\tcc@nomesautores}
+    {\appto\tcc@nomesautores{#2}}
+    {\appto\tcc@nomesautores{, #2}}%
+}
+
+% \orientador[ORCID]{Nome}{Titulação, vínculo}{e-mail}
+\newcommand{\orientador}[4][]{%
+  \renewcommand{\tcc@orientador}{\tcc@blocoautor{#1}{#2}{#3}{#4}}%
+}
+
+% Acesso aos metadados dentro do texto
+\newcommand{\imprimirtitulo}{\tcc@titulo}
+\newcommand{\imprimirtituloingles}{\tcc@tituloingles}
+\newcommand{\imprimircurso}{\tcc@curso}
+\newcommand{\imprimirinstituicao}{\tcc@instituicao}
+\newcommand{\imprimircidade}{\tcc@cidade}
+\newcommand{\imprimirano}{\tcc@ano}
+
+% ---------------------------------------------------------------------------
+% Primeira página: títulos (centralizados, 14 pt) e autores (à esquerda).
+% Layout dos artigos FAESA aprovados (.ref/): autores à direita, nome em
+% maiúsculas, formação/vínculo e e-mail sublinhado abaixo, sem nota de rodapé.
+% ---------------------------------------------------------------------------
+\newcommand{\tcc@blocoautor}[4]{%
+  \begingroup
+    \raggedleft
+    \setlength{\parskip}{0pt}%
+    \setstretch{1}%
+    \MakeUppercase{#2}\par
+    #3\par
+    \ifstrempty{#1}{}{Orcid: #1\par}%
+    \ifstrempty{#4}{}{\mbox{\underline{\href{mailto:#4}{#4}}}\par}%
+  \endgroup
+  \vspace{6pt}%
+}
+
+\newcommand{\imprimircabecalho}{%
+  \begingroup
+    \setlength{\parskip}{0pt}%
+    \setstretch{1}%
+    \centering\fontsize{14}{16.1}\selectfont\bfseries
+    \MakeUppercase{\tcc@titulo}\par
+    \vspace{14pt}%
+    \ifdefempty{\tcc@tituloingles}{}{\itshape\MakeUppercase{\tcc@tituloingles}\par}%
+  \endgroup
+  \vspace{18pt}%
+  \tcc@autores
+  \tcc@orientador
+}
+
+% ---------------------------------------------------------------------------
+% Resumo e Abstract (palavras-chave vêm de config/metadata.tex)
+% Títulos sem numeração: centralizados (Guia p. 10)
+% ---------------------------------------------------------------------------
+\titleformat{name=\section,numberless}[block]{\normalfont\bfseries\centering}{}{0pt}{\MakeUppercase}
+
+\newcommand{\tcc@palavras}[2]{%
+  \ifdefempty{#2}{}{\par\textbf{#1:} #2\par}%
+}
+
+\newenvironment{resumo}
+  {\section*{Resumo}}
+  {\tcc@palavras{Palavras-chave}{\tcc@palavraschave}}
+
+\renewenvironment{abstract}
+  {\section*{Abstract}\itshape}
+  {\par\textbf{Keywords:} \tcc@keywords\par}
+
+% ---------------------------------------------------------------------------
+% Figuras
+% \figura[largura]{arquivo}{Título}{Fonte}{rótulo}
+% ---------------------------------------------------------------------------
+\newcommand{\fonte}[1]{%
+  \par\vspace{\espacofonte}%
+  {\raggedright\fontedez Fonte: #1\par}%
+}
+
+\newcommand{\figura}[5][\largurapadraofigura]{%
+  \begin{figure}
+    \caption{#3}\label{#5}
+    \centering
+    \includegraphics[width=#1,height=\alturamaximafigura,keepaspectratio]{#2}%
+    \par
+    \fonte{#4}
+  \end{figure}%
+}
+
+% ---------------------------------------------------------------------------
+% Citação direta longa (mais de três linhas): Arial 10, recuo de 4 cm
+% ---------------------------------------------------------------------------
+\newenvironment{citacao}
+  {\par\begingroup
+   \setlength{\leftskip}{\recuocitacao}%
+   \setlength{\parskip}{0pt}%
+   \fontedez}
+  {\par\endgroup}
+
+% ---------------------------------------------------------------------------
+% Lista de alíneas: a), b), c)
+% ---------------------------------------------------------------------------
+\newlist{alineas}{enumerate}{1}
+\setlist[alineas]{label=\alph*)}
+
+% ---------------------------------------------------------------------------
+% Marcadores de pendência (aparecem em vermelho no PDF; remova antes da entrega)
+% \preencher{o que falta}   informação a ser fornecida pelos autores
+% \verificar{o que conferir} referência ou dado a conferir no original
+% ---------------------------------------------------------------------------
+\newcommand{\preencher}[1]{\textcolor{red}{[A PREENCHER: #1]}}
+\newcommand{\verificar}[1]{\textcolor{red}{[VERIFICAR: #1]}}
+\newcommand{\definir}[1]{\textcolor{red}{[DEFINIR: #1]}}
+
+% Algoritmos em pseudocódigo: flutuante próprio, numerado à parte dos quadros
+\DeclareCaptionType[fileext=loa,placement=htbp]{algoritmo}[Algoritmo][Lista de algoritmos]
+
+% ---------------------------------------------------------------------------
+% Referências bibliográficas
+% ---------------------------------------------------------------------------
+\bibliographystyle{abntex2-alf}
+
+\renewcommand{\refname}{Referências}
+\AfterTheBibliography{%
+  \fontedozesimples
+  \raggedright
+  \setlength{\parskip}{0pt}%
+  \setlength{\parsep}{0pt}%
+  \setlength{\itemsep}{\espacoentrereferencias}%
+}
+
+\newcommand{\imprimirreferencias}{%
+  \bibliography{references/referencias}%
+}
+
+% Apêndices (após as referências): título centralizado, sem numeração progressiva
+\newcounter{apendice}
+\renewcommand{\theapendice}{\Alph{apendice}}
+\newcommand{\apendice}[2]{\FloatBarrier\refstepcounter{apendice}\section*{Apêndice \theapendice\ - #1}\label{#2}}
+
+% ---------------------------------------------------------------------------
+% Metadados do PDF
+% ---------------------------------------------------------------------------
+\AtBeginDocument{%
+  \hypersetup{
+    pdftitle={\tcc@titulo},
+    pdfauthor={\tcc@nomesautores},
+    pdfsubject={\tcc@curso\ -- \tcc@instituicao},
+    pdfkeywords={\tcc@palavraschave},
+  }%
+}
+
+\makeatother

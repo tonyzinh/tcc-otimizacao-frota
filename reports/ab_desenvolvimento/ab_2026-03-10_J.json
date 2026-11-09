@@ -1,0 +1,74 @@
+{
+ "alvo": "2026-03-10",
+ "cenario": "J",
+ "natureza": "desenvolvimento (treino/validação de março); não é teste final",
+ "parametros_sim": {
+  "radius_km": 4.5,
+  "speed_kmh": 16.079,
+  "road_factor": 1.3012,
+  "patience_s": 180.0,
+  "post_accept_cancel": false
+ },
+ "guloso": {
+  "parametros": {
+   "alpha": 0.2,
+   "rho_km": 2.5,
+   "max_km": 3.0
+  },
+  "origem": "tcc_frota/algoritmos/busca_local.py::ARTICLE_GREEDY (parâmetros do artigo; não calibrados em V1 Viagens)",
+  "sha256_arquivo_de_origem": "5b05ba5e4c432d312b59a2e359bdb66b4c08140d138e03ff9cfca092ff17465f",
+  "ajustados_com_dados_de_outubro": false
+ },
+ "planejamento": {
+  "dia_corte": "2026-03-09",
+  "corte_h": 20.0,
+  "atraso_base_s": 120.0,
+  "hipotese_escala": "escala_persistente (janela de presença de D repetida em D+1; HIPÓTESE DE PREVISÃO, não escala confirmada)",
+  "campos_usados": "feed ES de D: cd_motorista, latitude, longitude, event_time, com event_time <= corte - atraso_base; jornada registrada NÃO é usada pelo planejador",
+  "motoristas": 49,
+  "descartados_posicao_velha": 63,
+  "idade_posicao_mediana_s": 239.99499999999534,
+  "treino_dias": 31,
+  "kappa": 0.6475840272875208,
+  "demanda_prevista_total": 1273.0,
+  "zonas": 162,
+  "ultimo_dia_usado": "2026-03-08"
+ },
+ "movimentos_recomendados": 15,
+ "motoristas_no_mundo": 132,
+ "ab": {
+  "assinatura_entrada": "00f39de0caa9a5d8d9ea4b1717752d07721bd2b3860ce5ed3e36d00506477438",
+  "A_espera": {
+   "pedidos": 1279,
+   "atendidos": 1034,
+   "pickup_km": 2499.383669935826,
+   "reposicionamento_km": 0.0,
+   "km_vazio_total": 2499.383669935826,
+   "movimentos_planejados": 0,
+   "movimentos_executados": 0,
+   "espera_mediana_s": 495.70182579938097,
+   "espera_p90_s": 1121.755109322135
+  },
+  "B_guloso": {
+   "pedidos": 1279,
+   "atendidos": 1036,
+   "pickup_km": 2507.0719850186265,
+   "reposicionamento_km": 7.201479079802102,
+   "km_vazio_total": 2514.2734640984286,
+   "movimentos_planejados": 15,
+   "movimentos_executados": 3,
+   "espera_mediana_s": 508.93565150572846,
+   "espera_p90_s": 1126.7287401013402
+  },
+  "desfechos_B": {
+   "absent": 5,
+   "limit": 7,
+   "executed": 3
+  }
+ },
+ "delta": {
+  "km_vazio_total": 14.89,
+  "atendidos": 2
+ },
+ "aviso": "redução de km vazio só vale se o atendimento não cair (ver delta.atendidos)"
+}

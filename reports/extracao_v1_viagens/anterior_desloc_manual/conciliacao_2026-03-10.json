@@ -1,0 +1,276 @@
+{
+ "dia": "2026-03-10",
+ "solicitacoes_v1": 1325,
+ "corridas_encerradas": 738,
+ "corridas_com_placa_na_ponte": 738,
+ "placas_corridas": 114,
+ "placas_cobli": 113,
+ "placas_em_ambos": 103,
+ "teste_relogio_cobli": {
+  "0": {
+   "pct_por_classe": {
+    "alta": 0.0,
+    "provavel": 18.29,
+    "ambiguo": 21.0,
+    "sem_correspondencia": 60.7
+   },
+   "pct_km_v1": 21.58
+  },
+  "-10800": {
+   "pct_por_classe": {
+    "alta": 21.82,
+    "provavel": 48.78,
+    "ambiguo": 7.59,
+    "sem_correspondencia": 21.82
+   },
+   "pct_km_v1": 58.99
+  },
+  "10800": {
+   "pct_por_classe": {
+    "alta": 0.0,
+    "provavel": 11.38,
+    "ambiguo": 13.96,
+    "sem_correspondencia": 74.66
+   },
+   "pct_km_v1": 14.34
+  }
+ },
+ "desloc_cobli_s_usado": -10800,
+ "resumo": {
+  "corridas": 738,
+  "pct_por_classe": {
+   "alta": 21.82,
+   "provavel": 48.78,
+   "ambiguo": 7.59,
+   "sem_correspondencia": 21.82
+  },
+  "n_por_classe": {
+   "alta": 161,
+   "provavel": 360,
+   "ambiguo": 56,
+   "sem_correspondencia": 161
+  },
+  "trechos": 1523,
+  "pct_trechos_por_categoria": {
+   "finalidade_desconhecida": 63.3,
+   "v1_alta_provavel": 27.97,
+   "v1_ambiguo": 7.49,
+   "outro_produto": 1.25
+  },
+  "km_trechos_total": 13660.1,
+  "km_por_categoria": {
+   "finalidade_desconhecida": 3976.9,
+   "outro_produto": 133.9,
+   "v1_alta_provavel": 8057.7,
+   "v1_ambiguo": 1491.6
+  },
+  "pct_km_por_categoria": {
+   "finalidade_desconhecida": 29.11,
+   "outro_produto": 0.98,
+   "v1_alta_provavel": 58.99,
+   "v1_ambiguo": 10.92
+  },
+  "corridas_com_varios_trechos": 77,
+  "trechos_com_varias_corridas": 102,
+  "dif_inicio_s_quantis": {
+   "p5": -5251.8,
+   "p25": -1781.2,
+   "p50": -720.4,
+   "p75": -180.2,
+   "p95": 44.3
+  },
+  "dif_fim_s_quantis": {
+   "p5": 41.3,
+   "p25": 258.7,
+   "p50": 734.5,
+   "p75": 1678.2,
+   "p95": 5010.4
+  },
+  "dist_destino_m_quantis": {
+   "p5": 11.1,
+   "p25": 33.2,
+   "p50": 56.7,
+   "p75": 122.7,
+   "p95": 334.1
+  }
+ },
+ "componentes_km": [
+  {
+   "componente": "cobli_v1_alta_provavel",
+   "km": 8057.7,
+   "natureza": "medido (trecho Cobli, por placa)",
+   "nota": "trecho inteiro ligado a corrida V1; pode conter busca e passageiro (fase não separada)"
+  },
+  {
+   "componente": "cobli_v1_ambiguo",
+   "km": 1491.6,
+   "natureza": "medido (trecho Cobli, por placa)",
+   "nota": "trecho compartilhado/ambíguo; não atribuível"
+  },
+  {
+   "componente": "cobli_outro_produto",
+   "km": 133.9,
+   "natureza": "medido (trecho Cobli, por placa)",
+   "nota": "sobreposto a compromisso externo (Prime/outro serviço/outra região)"
+  },
+  {
+   "componente": "cobli_finalidade_desconhecida",
+   "km": 3976.9,
+   "natureza": "medido (trecho Cobli, por placa)",
+   "nota": "quilometragem não conciliada: pode ser circulação, retorno, busca não vinculada ou outro uso"
+  },
+  {
+   "componente": "app_passageiro_reportado",
+   "km": 8303.1,
+   "natureza": "reportado pelo app (fonte distinta da Cobli; não somar nem subtrair)",
+   "nota": "NU_DISTPERCORRIDA, trecho com passageiro"
+  },
+  {
+   "componente": "app_aproximacao_reportada",
+   "km": 3246.1,
+   "natureza": "reportado pelo app; cobre só corridas com aceite→chegada",
+   "nota": "0 de 738 nulos"
+  },
+  {
+   "componente": "km_morto_total",
+   "km": NaN,
+   "natureza": "não identificável só com estas fontes",
+   "nota": ""
+  },
+  {
+   "componente": "reposicionamento_planejado",
+   "km": NaN,
+   "natureza": "depende do simulador",
+   "nota": ""
+  },
+  {
+   "componente": "circulacao_retorno",
+   "km": NaN,
+   "natureza": "só inferível por telemetria sem vínculo; não medido",
+   "nota": ""
+  }
+ ],
+ "cobertura_por_hora_pct_vinculada": {
+  "4": 25.0,
+  "5": 68.8,
+  "6": 65.9,
+  "7": 72.7,
+  "8": 77.6,
+  "9": 77.8,
+  "10": 78.9,
+  "11": 73.2,
+  "12": 82.2,
+  "13": 90.2,
+  "14": 86.8,
+  "15": 85.2,
+  "16": 83.3,
+  "17": 87.5,
+  "18": 86.5,
+  "19": 85.7,
+  "20": 81.5,
+  "21": 90.9,
+  "22": 76.2,
+  "23": 72.7
+ },
+ "cobertura_por_veiculo_pct": {
+  "placas": 114,
+  "sem_nenhum_vinculo": 17,
+  "mediana": 80.0
+ },
+ "ponte_vs_es": {
+  "corridas_comparaveis": 598,
+  "concordam": 598
+ },
+ "sensibilidade": [
+  {
+   "deslocamento_cobli_s": -10800,
+   "folga_s": 60,
+   "dist_provavel_m": 200,
+   "pct_alta": 14.77,
+   "pct_provavel": 54.74,
+   "pct_ambiguo": 8.67,
+   "pct_sem": 21.82,
+   "pct_km_v1": 57.92
+  },
+  {
+   "deslocamento_cobli_s": -10800,
+   "folga_s": 60,
+   "dist_provavel_m": 500,
+   "pct_alta": 15.04,
+   "pct_provavel": 54.88,
+   "pct_ambiguo": 8.27,
+   "pct_sem": 21.82,
+   "pct_km_v1": 58.14
+  },
+  {
+   "deslocamento_cobli_s": -10800,
+   "folga_s": 60,
+   "dist_provavel_m": 1000,
+   "pct_alta": 15.04,
+   "pct_provavel": 54.88,
+   "pct_ambiguo": 8.27,
+   "pct_sem": 21.82,
+   "pct_km_v1": 58.14
+  },
+  {
+   "deslocamento_cobli_s": -10800,
+   "folga_s": 180,
+   "dist_provavel_m": 200,
+   "pct_alta": 19.11,
+   "pct_provavel": 47.15,
+   "pct_ambiguo": 11.92,
+   "pct_sem": 21.82,
+   "pct_km_v1": 56.89
+  },
+  {
+   "deslocamento_cobli_s": -10800,
+   "folga_s": 180,
+   "dist_provavel_m": 500,
+   "pct_alta": 21.54,
+   "pct_provavel": 48.1,
+   "pct_ambiguo": 8.54,
+   "pct_sem": 21.82,
+   "pct_km_v1": 58.59
+  },
+  {
+   "deslocamento_cobli_s": -10800,
+   "folga_s": 180,
+   "dist_provavel_m": 1000,
+   "pct_alta": 21.82,
+   "pct_provavel": 48.78,
+   "pct_ambiguo": 7.59,
+   "pct_sem": 21.82,
+   "pct_km_v1": 58.99
+  },
+  {
+   "deslocamento_cobli_s": -10800,
+   "folga_s": 300,
+   "dist_provavel_m": 200,
+   "pct_alta": 18.56,
+   "pct_provavel": 44.44,
+   "pct_ambiguo": 15.18,
+   "pct_sem": 21.82,
+   "pct_km_v1": 58.4
+  },
+  {
+   "deslocamento_cobli_s": -10800,
+   "folga_s": 300,
+   "dist_provavel_m": 500,
+   "pct_alta": 22.22,
+   "pct_provavel": 47.7,
+   "pct_ambiguo": 8.27,
+   "pct_sem": 21.82,
+   "pct_km_v1": 61.65
+  },
+  {
+   "deslocamento_cobli_s": -10800,
+   "folga_s": 300,
+   "dist_provavel_m": 1000,
+   "pct_alta": 22.49,
+   "pct_provavel": 51.36,
+   "pct_ambiguo": 4.34,
+   "pct_sem": 21.82,
+   "pct_km_v1": 64.29
+  }
+ ]
+}

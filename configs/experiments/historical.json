@@ -1,0 +1,15 @@
+{
+  "nota": "Configuração congelada da avaliação histórica (docs/CONGELAMENTO_ATRIBUICAO_60S.md). Dados privados: só processamento local e agregado.",
+  "periodos": {
+    "replicacao": {"datas": "2026-09-16 a 2026-09-30", "dias_elegiveis": 15, "regra_de_elegibilidade": "entidades do dia presentes; >=300 instantes de posição; >=200 pedidos em tempo real"},
+    "final": {"datas": "2026-10-01 a 2026-10-25", "dias_elegiveis": 25, "regra_de_elegibilidade": "mesma regra"}
+  },
+  "simulador": {"raio_despacho_km_em_linha_reta": 4.5, "velocidade_kmh": 16.079, "fator_rua_reta": 1.3012, "paciencia_s": 180, "janela_dia_s": [0, 86400],
+                 "origem_dos_parametros": "calibração de março/2026 (herdados, não reajustados)"},
+  "mundo": "cenário J (jornada realizada), condição inicial primeira_posicao_observada, compromissos externos com deslocamento",
+  "criterios_de_servico": {"E1": "nenhuma violação de compromisso causada pela política", "E2": "atendidos(política) >= atendidos(referência) no período", "E3": "P90 agregado da espera <= o da referência"},
+  "estatistica": {"unidade": "dia", "intervalo": "IC95% bootstrap de blocos móveis de 7 dias", "reamostragens": 10000, "semente": 20261108},
+  "espera": "calculada só entre os pedidos atendidos",
+  "resultados_congelados": "reports/atribuicao_final/",
+  "comando": "tcc-frota analyze-historical --out reports/final/historico"
+}

@@ -1,0 +1,97 @@
+{
+ "semente": 20261108,
+ "dias": [
+  "2026-03-07",
+  "2026-03-10",
+  "2026-03-13",
+  "2026-03-17"
+ ],
+ "n_por_estrato_max": 12,
+ "universo_corridas": 2749,
+ "universo_por_classe": {
+  "provavel": 1477,
+  "alta": 580,
+  "sem_correspondencia": 498,
+  "ambiguo": 194
+ },
+ "amostra_total": 125,
+ "estratos": [
+  {
+   "classe": "alta",
+   "contexto": "geral",
+   "n": 12,
+   "erros": 0
+  },
+  {
+   "classe": "alta",
+   "contexto": "perto_da_meia_noite",
+   "n": 12,
+   "erros": 0
+  },
+  {
+   "classe": "alta",
+   "contexto": "veiculo_compartilhado",
+   "n": 12,
+   "erros": 0
+  },
+  {
+   "classe": "ambiguo",
+   "contexto": "geral",
+   "n": 12,
+   "erros": 0
+  },
+  {
+   "classe": "ambiguo",
+   "contexto": "perto_da_meia_noite",
+   "n": 4,
+   "erros": 0
+  },
+  {
+   "classe": "ambiguo",
+   "contexto": "veiculo_compartilhado",
+   "n": 12,
+   "erros": 0
+  },
+  {
+   "classe": "provavel",
+   "contexto": "geral",
+   "n": 12,
+   "erros": 0
+  },
+  {
+   "classe": "provavel",
+   "contexto": "perto_da_meia_noite",
+   "n": 12,
+   "erros": 0
+  },
+  {
+   "classe": "provavel",
+   "contexto": "veiculo_compartilhado",
+   "n": 12,
+   "erros": 0
+  },
+  {
+   "classe": "sem_correspondencia",
+   "contexto": "geral",
+   "n": 12,
+   "erros": 0
+  },
+  {
+   "classe": "sem_correspondencia",
+   "contexto": "perto_da_meia_noite",
+   "n": 12,
+   "erros": 0
+  },
+  {
+   "classe": "sem_correspondencia",
+   "contexto": "veiculo_compartilhado",
+   "n": 1,
+   "erros": 0
+  }
+ ],
+ "erros_por_tipo": {},
+ "criterio_de_erro": "alta: cobertura bruta <0.5 ou borda do destino >1000 m; provavel: cobertura bruta <0.3; sem_correspondencia: cobertura bruta >=0.6",
+ "limite": "verifica consistência entre registros; não prova que o trecho Cobli seja a mesma operação. Conhecimento operacional não é verificável aqui.",
+ "dias_distintos_na_amostra": 4,
+ "placas_distintas_na_amostra": 78
+}

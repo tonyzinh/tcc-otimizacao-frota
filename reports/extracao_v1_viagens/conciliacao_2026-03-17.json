@@ -1,0 +1,272 @@
+{
+ "dia": "2026-03-17",
+ "solicitacoes_v1": 1374,
+ "corridas_encerradas": 689,
+ "corridas_com_placa_na_ponte": 689,
+ "placas_corridas": 112,
+ "placas_cobli": 117,
+ "placas_em_ambos": 104,
+ "teste_relogio_cobli": {
+  "0": {
+   "pct_por_classe": {
+    "alta": 27.14,
+    "provavel": 51.09,
+    "ambiguo": 8.56,
+    "sem_correspondencia": 13.21
+   },
+   "pct_km_v1": 56.99
+  },
+  "-10800": {
+   "pct_por_classe": {
+    "alta": 0.15,
+    "provavel": 20.32,
+    "ambiguo": 25.69,
+    "sem_correspondencia": 53.85
+   },
+   "pct_km_v1": 22.88
+  },
+  "10800": {
+   "pct_por_classe": {
+    "alta": 0.0,
+    "provavel": 23.08,
+    "ambiguo": 23.22,
+    "sem_correspondencia": 53.7
+   },
+   "pct_km_v1": 24.21
+  }
+ },
+ "desloc_cobli_s_usado": 0,
+ "resumo": {
+  "corridas": 689,
+  "pct_por_classe": {
+   "alta": 27.14,
+   "provavel": 51.09,
+   "ambiguo": 8.56,
+   "sem_correspondencia": 13.21
+  },
+  "n_por_classe": {
+   "alta": 187,
+   "provavel": 352,
+   "ambiguo": 59,
+   "sem_correspondencia": 91
+  },
+  "trechos": 1549,
+  "pct_trechos_por_categoria": {
+   "finalidade_desconhecida": 65.01,
+   "v1_alta_provavel": 28.15,
+   "v1_ambiguo": 6.84
+  },
+  "km_trechos_total": 15742.6,
+  "km_por_categoria": {
+   "finalidade_desconhecida": 5039.1,
+   "v1_alta_provavel": 8971.0,
+   "v1_ambiguo": 1732.5
+  },
+  "pct_km_por_categoria": {
+   "finalidade_desconhecida": 32.01,
+   "v1_alta_provavel": 56.99,
+   "v1_ambiguo": 11.01
+  },
+  "corridas_com_varios_trechos": 77,
+  "trechos_com_varias_corridas": 117,
+  "dif_inicio_s_quantis": {
+   "p5": -4945.8,
+   "p25": -1908.2,
+   "p50": -713.8,
+   "p75": -133.6,
+   "p95": 40.8
+  },
+  "dif_fim_s_quantis": {
+   "p5": 16.1,
+   "p25": 237.4,
+   "p50": 762.3,
+   "p75": 1955.0,
+   "p95": 5033.4
+  },
+  "dist_destino_m_quantis": {
+   "p5": 10.4,
+   "p25": 33.2,
+   "p50": 59.4,
+   "p75": 126.1,
+   "p95": 336.2
+  }
+ },
+ "componentes_km": [
+  {
+   "componente": "cobli_v1_alta_provavel",
+   "km": 8971.0,
+   "natureza": "medido (trecho Cobli, por placa)",
+   "nota": "trecho inteiro ligado a corrida V1; pode conter busca e passageiro (fase não separada)"
+  },
+  {
+   "componente": "cobli_v1_ambiguo",
+   "km": 1732.5,
+   "natureza": "medido (trecho Cobli, por placa)",
+   "nota": "trecho compartilhado/ambíguo; não atribuível"
+  },
+  {
+   "componente": "cobli_outro_produto",
+   "km": 0.0,
+   "natureza": "medido (trecho Cobli, por placa)",
+   "nota": "sobreposto a compromisso externo (Prime/outro serviço/outra região)"
+  },
+  {
+   "componente": "cobli_finalidade_desconhecida",
+   "km": 5039.1,
+   "natureza": "medido (trecho Cobli, por placa)",
+   "nota": "quilometragem não conciliada: pode ser circulação, retorno, busca não vinculada ou outro uso"
+  },
+  {
+   "componente": "app_passageiro_reportado",
+   "km": 8605.6,
+   "natureza": "reportado pelo app (fonte distinta da Cobli; não somar nem subtrair)",
+   "nota": "NU_DISTPERCORRIDA, trecho com passageiro"
+  },
+  {
+   "componente": "app_aproximacao_reportada",
+   "km": 3544.5,
+   "natureza": "reportado pelo app; cobre só corridas com aceite→chegada",
+   "nota": "0 de 689 nulos"
+  },
+  {
+   "componente": "km_morto_total",
+   "km": NaN,
+   "natureza": "não identificável só com estas fontes",
+   "nota": ""
+  },
+  {
+   "componente": "reposicionamento_planejado",
+   "km": NaN,
+   "natureza": "depende do simulador",
+   "nota": ""
+  },
+  {
+   "componente": "circulacao_retorno",
+   "km": NaN,
+   "natureza": "só inferível por telemetria sem vínculo; não medido",
+   "nota": ""
+  }
+ ],
+ "cobertura_por_hora_pct_vinculada": {
+  "4": 88.2,
+  "5": 76.2,
+  "6": 71.1,
+  "7": 77.4,
+  "8": 74.5,
+  "9": 84.2,
+  "10": 84.2,
+  "11": 89.7,
+  "12": 89.4,
+  "13": 95.3,
+  "14": 88.4,
+  "15": 95.0,
+  "16": 96.3,
+  "17": 95.1,
+  "18": 86.7,
+  "19": 83.9,
+  "20": 92.3,
+  "21": 94.1,
+  "22": 93.3
+ },
+ "cobertura_por_veiculo_pct": {
+  "placas": 112,
+  "sem_nenhum_vinculo": 13,
+  "mediana": 88.9
+ },
+ "ponte_vs_es": {
+  "corridas_comparaveis": 615,
+  "concordam": 615
+ },
+ "sensibilidade": [
+  {
+   "deslocamento_cobli_s": 0,
+   "folga_s": 60,
+   "dist_provavel_m": 200,
+   "pct_alta": 19.01,
+   "pct_provavel": 58.78,
+   "pct_ambiguo": 9.0,
+   "pct_sem": 13.21,
+   "pct_km_v1": 55.1
+  },
+  {
+   "deslocamento_cobli_s": 0,
+   "folga_s": 60,
+   "dist_provavel_m": 500,
+   "pct_alta": 19.3,
+   "pct_provavel": 58.93,
+   "pct_ambiguo": 8.56,
+   "pct_sem": 13.21,
+   "pct_km_v1": 55.55
+  },
+  {
+   "deslocamento_cobli_s": 0,
+   "folga_s": 60,
+   "dist_provavel_m": 1000,
+   "pct_alta": 19.3,
+   "pct_provavel": 58.93,
+   "pct_ambiguo": 8.56,
+   "pct_sem": 13.21,
+   "pct_km_v1": 55.55
+  },
+  {
+   "deslocamento_cobli_s": 0,
+   "folga_s": 180,
+   "dist_provavel_m": 200,
+   "pct_alta": 24.09,
+   "pct_provavel": 49.06,
+   "pct_ambiguo": 13.64,
+   "pct_sem": 13.21,
+   "pct_km_v1": 55.19
+  },
+  {
+   "deslocamento_cobli_s": 0,
+   "folga_s": 180,
+   "dist_provavel_m": 500,
+   "pct_alta": 27.14,
+   "pct_provavel": 50.51,
+   "pct_ambiguo": 9.14,
+   "pct_sem": 13.21,
+   "pct_km_v1": 56.8
+  },
+  {
+   "deslocamento_cobli_s": 0,
+   "folga_s": 180,
+   "dist_provavel_m": 1000,
+   "pct_alta": 27.14,
+   "pct_provavel": 51.09,
+   "pct_ambiguo": 8.56,
+   "pct_sem": 13.21,
+   "pct_km_v1": 56.99
+  },
+  {
+   "deslocamento_cobli_s": 0,
+   "folga_s": 300,
+   "dist_provavel_m": 200,
+   "pct_alta": 22.06,
+   "pct_provavel": 47.9,
+   "pct_ambiguo": 16.84,
+   "pct_sem": 13.21,
+   "pct_km_v1": 56.51
+  },
+  {
+   "deslocamento_cobli_s": 0,
+   "folga_s": 300,
+   "dist_provavel_m": 500,
+   "pct_alta": 26.12,
+   "pct_provavel": 50.94,
+   "pct_ambiguo": 9.72,
+   "pct_sem": 13.21,
+   "pct_km_v1": 59.73
+  },
+  {
+   "deslocamento_cobli_s": 0,
+   "folga_s": 300,
+   "dist_provavel_m": 1000,
+   "pct_alta": 27.29,
+   "pct_provavel": 54.28,
+   "pct_ambiguo": 5.22,
+   "pct_sem": 13.21,
+   "pct_km_v1": 61.35
+  }
+ ]
+}

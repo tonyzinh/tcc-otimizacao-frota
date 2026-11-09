@@ -1,0 +1,45 @@
+[
+ {
+  "dia": "2026-03-10",
+  "horizonte_h": 24,
+  "unidade_das_somas": "horas-MOTORISTA (cada intervalo pertence a um motorista); horas-veículo calculadas à parte",
+  "entidades": {
+   "motoristas": 132,
+   "placas": 121,
+   "snapshots": 712
+  },
+  "por_estado": {
+   "desconhecido": {
+    "horas_motorista_soma": 264.8,
+    "horas_motorista_uniao": 264.8,
+    "sobreposicao_h": 0.0,
+    "intervalos": 635
+   },
+   "ocupado_com_evidencia": {
+    "horas_motorista_soma": 683.2,
+    "horas_motorista_uniao": 683.2,
+    "sobreposicao_h": -0.0,
+    "intervalos": 650
+   },
+   "presente_sem_viagem_es": {
+    "horas_motorista_soma": 587.7,
+    "horas_motorista_uniao": 587.7,
+    "sobreposicao_h": 0.0,
+    "intervalos": 775
+   }
+  },
+  "sobreposicao_entre_estados_do_mesmo_motorista_h": 0.045,
+  "presenca_total": {
+   "horas_motorista_uniao": 1270.8,
+   "horas_veiculo_uniao_por_placa": 1270.8
+  },
+  "duplicidade_snapshot_motorista": 0,
+  "vinculos": {
+   "motoristas_com_mais_de_uma_placa_no_dia": 16,
+   "placas_com_mais_de_um_motorista_no_dia": 27,
+   "placa_nula_linhas": 0
+  },
+  "mesma_placa_em_dois_registros_no_mesmo_snapshot": 0,
+  "limite": "horas de presença/estado observadas; NÃO são capacidade disponível: status 3 inclui deslocamento ao passageiro, e o enum de status é inferido"
+ }
+]

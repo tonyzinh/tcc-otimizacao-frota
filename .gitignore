@@ -45,7 +45,7 @@ dist/
 .databricks
 
 # Parâmetros financeiros sigilosos (Fase D do guloso seletivo)
-config/custos_privado.yaml
+configs/private/
 
 # Ferramentas de qualidade e build
 .ruff_cache/
@@ -57,3 +57,15 @@ build/
 dist/
 .idea/
 *.py[cod]
+
+# Reorganização (09/11/2026): cópias de trabalho e build do artigo
+.reorg_old/
+article/build/
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.xdv

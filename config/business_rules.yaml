@@ -1,6 +1,0 @@
-source: docs/REGRAS_NEGOCIO_TCC.md
-academic_km_definition: provisional_pickup_plus_repositioning
-return_to_base: disabled_without_validation
-observed_distance_requires_validated_field: true
-allow_future_data_for_d1: false
-operational_policy_confirmed: false

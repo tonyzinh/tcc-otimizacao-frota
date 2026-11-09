@@ -1,0 +1,302 @@
+{
+ "replicacao": {
+  "absolutos": [
+   {
+    "politica": "A · mais próximo livre, despacho imediato",
+    "dias": 15,
+    "pedidos_elegiveis": 16918,
+    "atendidos": 11125,
+    "nao_atendidos": 5793,
+    "atendimento_pct": 65.7583638727982,
+    "km_vazio_total": 29628.2705275952,
+    "km_vazio_por_atendido": 2.663215328323164,
+    "espera_media_s": 616.3960764581683,
+    "espera_p90_s": 1183.1770793063822,
+    "violacoes_compromisso_por_politica": 0,
+    "compromissos_entrada_inconsistente": 19,
+    "tempo_computacional_total_s": 0.96076230017934,
+    "tempo_computacional_por_dia_s": 0.064050820011956
+   },
+   {
+    "politica": "B · mais próximo livre, lotes de 60 s",
+    "dias": 15,
+    "pedidos_elegiveis": 16918,
+    "atendidos": 10950,
+    "nao_atendidos": 5968,
+    "atendimento_pct": 64.72396264333845,
+    "km_vazio_total": 28644.910093208848,
+    "km_vazio_por_atendido": 2.615973524493959,
+    "espera_media_s": 630.6042015323532,
+    "espera_p90_s": 1195.7549314626522,
+    "violacoes_compromisso_por_politica": 0,
+    "compromissos_entrada_inconsistente": 19,
+    "tempo_computacional_total_s": 1.3668304001330398,
+    "tempo_computacional_por_dia_s": 0.09112202667553598
+   },
+   {
+    "politica": "C · atribuição conjunta (húngaro), lotes de 60 s",
+    "dias": 15,
+    "pedidos_elegiveis": 16918,
+    "atendidos": 11141,
+    "nao_atendidos": 5777,
+    "atendimento_pct": 65.85293769949166,
+    "km_vazio_total": 27861.13864812494,
+    "km_vazio_por_atendido": 2.5007753925253513,
+    "espera_media_s": 600.7458814884405,
+    "espera_p90_s": 1171.5504107803954,
+    "violacoes_compromisso_por_politica": 0,
+    "compromissos_entrada_inconsistente": 19,
+    "tempo_computacional_total_s": 1.8697063999716192,
+    "tempo_computacional_por_dia_s": 0.12464709333144128
+   }
+  ],
+  "contrastes": [
+   {
+    "contraste": "C × A",
+    "papel": "PRINCIPAL",
+    "dias": 15,
+    "km_vazio_C": 27861.13864812494,
+    "km_vazio_A": 29628.2705275952,
+    "variacao_km_vazio_km (negativo = reducao)": -1767.1318794702602,
+    "variacao_km_vazio_pct (negativo = reducao)": -5.964343675829434,
+    "diferenca_media_diaria_km": -117.80879196468398,
+    "ic95_diferenca_media_diaria_km": [
+     -132.96993678887173,
+     -102.86149834871635
+    ],
+    "dias_com_melhora": 14,
+    "dias_com_piora": 1,
+    "dias_iguais": 0,
+    "diferenca_atendidos": 16,
+    "diferenca_atendimento_pontos_percentuais": 0.09457382669346258,
+    "ic95_diferenca_media_diaria_atendidos": [
+     -6.2,
+     8.001666666666642
+    ],
+    "diferenca_nao_atendidos": -16,
+    "diferenca_espera_media_s": -15.65019496972775,
+    "diferenca_espera_p90_s": -11.626668525986815,
+    "E1_sem_violacoes": true,
+    "E2_atendimento_preservado": true,
+    "E3_p90_nao_piorou": true,
+    "servico_preservado": true,
+    "classe": "reducao_com_servico_preservado",
+    "km_vazio_B": NaN
+   },
+   {
+    "contraste": "C × B",
+    "papel": "complementar",
+    "dias": 15,
+    "km_vazio_C": 27861.13864812494,
+    "km_vazio_A": NaN,
+    "variacao_km_vazio_km (negativo = reducao)": -783.7714450839085,
+    "variacao_km_vazio_pct (negativo = reducao)": -2.736163047932643,
+    "diferenca_media_diaria_km": -52.25142967226027,
+    "ic95_diferenca_media_diaria_km": [
+     -61.191124029990675,
+     -43.100015986648394
+    ],
+    "dias_com_melhora": 14,
+    "dias_com_piora": 1,
+    "dias_iguais": 0,
+    "diferenca_atendidos": 191,
+    "diferenca_atendimento_pontos_percentuais": 1.1289750561532097,
+    "ic95_diferenca_media_diaria_atendidos": [
+     6.8,
+     18.333333333333332
+    ],
+    "diferenca_nao_atendidos": -191,
+    "diferenca_espera_media_s": -29.858320043912613,
+    "diferenca_espera_p90_s": -24.20452068225677,
+    "E1_sem_violacoes": true,
+    "E2_atendimento_preservado": true,
+    "E3_p90_nao_piorou": true,
+    "servico_preservado": true,
+    "classe": "reducao_com_servico_preservado",
+    "km_vazio_B": 28644.910093208848
+   },
+   {
+    "contraste": "B × A",
+    "papel": "complementar",
+    "dias": 15,
+    "km_vazio_C": NaN,
+    "km_vazio_A": 29628.2705275952,
+    "variacao_km_vazio_km (negativo = reducao)": -983.3604343863517,
+    "variacao_km_vazio_pct (negativo = reducao)": -3.318993707278556,
+    "diferenca_media_diaria_km": -65.55736229242372,
+    "ic95_diferenca_media_diaria_km": [
+     -76.1316438463389,
+     -54.79015309373024
+    ],
+    "dias_com_melhora": 14,
+    "dias_com_piora": 1,
+    "dias_iguais": 0,
+    "diferenca_atendidos": -175,
+    "diferenca_atendimento_pontos_percentuais": -1.034401229459747,
+    "ic95_diferenca_media_diaria_atendidos": [
+     -16.933333333333334,
+     -6.533333333333333
+    ],
+    "diferenca_nao_atendidos": 175,
+    "diferenca_espera_media_s": 14.208125074184863,
+    "diferenca_espera_p90_s": 12.577852156269955,
+    "E1_sem_violacoes": true,
+    "E2_atendimento_preservado": false,
+    "E3_p90_nao_piorou": false,
+    "servico_preservado": false,
+    "classe": "reducao_sem_servico_preservado",
+    "km_vazio_B": 28644.910093208848
+   }
+  ]
+ },
+ "final": {
+  "absolutos": [
+   {
+    "politica": "A · mais próximo livre, despacho imediato",
+    "dias": 25,
+    "pedidos_elegiveis": 23523,
+    "atendidos": 14551,
+    "nao_atendidos": 8972,
+    "atendimento_pct": 61.85860647026315,
+    "km_vazio_total": 39205.00646645807,
+    "km_vazio_por_atendido": 2.6943169862179968,
+    "espera_media_s": 620.982535792448,
+    "espera_p90_s": 1189.6822146382005,
+    "violacoes_compromisso_por_politica": 0,
+    "compromissos_entrada_inconsistente": 17,
+    "tempo_computacional_total_s": 1.2658758001052774,
+    "tempo_computacional_por_dia_s": 0.0506350320042111
+   },
+   {
+    "politica": "B · mais próximo livre, lotes de 60 s",
+    "dias": 25,
+    "pedidos_elegiveis": 23523,
+    "atendidos": 14317,
+    "nao_atendidos": 9206,
+    "atendimento_pct": 60.86383539514518,
+    "km_vazio_total": 37756.73598172489,
+    "km_vazio_por_atendido": 2.6371960593507637,
+    "espera_media_s": 633.3801623059153,
+    "espera_p90_s": 1201.4499010101408,
+    "violacoes_compromisso_por_politica": 0,
+    "compromissos_entrada_inconsistente": 17,
+    "tempo_computacional_total_s": 2.002758599992376,
+    "tempo_computacional_por_dia_s": 0.08011034399969504
+   },
+   {
+    "politica": "C · atribuição conjunta (húngaro), lotes de 60 s",
+    "dias": 25,
+    "pedidos_elegiveis": 23523,
+    "atendidos": 14466,
+    "nao_atendidos": 9057,
+    "atendimento_pct": 61.497258002805765,
+    "km_vazio_total": 37228.715917629896,
+    "km_vazio_por_atendido": 2.5735321386444006,
+    "espera_media_s": 615.8131275755973,
+    "espera_p90_s": 1181.7009283159146,
+    "violacoes_compromisso_por_politica": 0,
+    "compromissos_entrada_inconsistente": 17,
+    "tempo_computacional_total_s": 2.5690027000382543,
+    "tempo_computacional_por_dia_s": 0.10276010800153017
+   }
+  ],
+  "contrastes": [
+   {
+    "contraste": "C × A",
+    "papel": "PRINCIPAL",
+    "dias": 25,
+    "km_vazio_C": 37228.715917629896,
+    "km_vazio_A": 39205.00646645807,
+    "variacao_km_vazio_km (negativo = reducao)": -1976.2905488281758,
+    "variacao_km_vazio_pct (negativo = reducao)": -5.040913717279949,
+    "diferenca_media_diaria_km": -79.05162195312718,
+    "ic95_diferenca_media_diaria_km": [
+     -97.30100260676896,
+     -62.79091180723529
+    ],
+    "dias_com_melhora": 25,
+    "dias_com_piora": 0,
+    "dias_iguais": 0,
+    "diferenca_atendidos": -85,
+    "diferenca_atendimento_pontos_percentuais": -0.36134846745738214,
+    "ic95_diferenca_media_diaria_atendidos": [
+     -7.84,
+     0.88
+    ],
+    "diferenca_nao_atendidos": 85,
+    "diferenca_espera_media_s": -5.169408216850684,
+    "diferenca_espera_p90_s": -7.981286322285996,
+    "E1_sem_violacoes": true,
+    "E2_atendimento_preservado": false,
+    "E3_p90_nao_piorou": true,
+    "servico_preservado": false,
+    "classe": "reducao_sem_servico_preservado",
+    "km_vazio_B": NaN
+   },
+   {
+    "contraste": "C × B",
+    "papel": "complementar",
+    "dias": 25,
+    "km_vazio_C": 37228.715917629896,
+    "km_vazio_A": NaN,
+    "variacao_km_vazio_km (negativo = reducao)": -528.0200640949915,
+    "variacao_km_vazio_pct (negativo = reducao)": -1.3984791067494955,
+    "diferenca_media_diaria_km": -21.12080256379998,
+    "ic95_diferenca_media_diaria_km": [
+     -31.0543309649563,
+     -11.500066420186442
+    ],
+    "dias_com_melhora": 16,
+    "dias_com_piora": 9,
+    "dias_iguais": 0,
+    "diferenca_atendidos": 149,
+    "diferenca_atendimento_pontos_percentuais": 0.6334226076605876,
+    "ic95_diferenca_media_diaria_atendidos": [
+     1.519000000000001,
+     10.4
+    ],
+    "diferenca_nao_atendidos": -149,
+    "diferenca_espera_media_s": -17.567034730318028,
+    "diferenca_espera_p90_s": -19.748972694226268,
+    "E1_sem_violacoes": true,
+    "E2_atendimento_preservado": true,
+    "E3_p90_nao_piorou": true,
+    "servico_preservado": true,
+    "classe": "reducao_com_servico_preservado",
+    "km_vazio_B": 37756.73598172489
+   },
+   {
+    "contraste": "B × A",
+    "papel": "complementar",
+    "dias": 25,
+    "km_vazio_C": NaN,
+    "km_vazio_A": 39205.00646645807,
+    "variacao_km_vazio_km (negativo = reducao)": -1448.2704847331843,
+    "variacao_km_vazio_pct (negativo = reducao)": -3.6940957680296655,
+    "diferenca_media_diaria_km": -57.930819389327205,
+    "ic95_diferenca_media_diaria_km": [
+     -76.98967563092884,
+     -42.030255889574434
+    ],
+    "dias_com_melhora": 25,
+    "dias_com_piora": 0,
+    "dias_iguais": 0,
+    "diferenca_atendidos": -234,
+    "diferenca_atendimento_pontos_percentuais": -0.9947710751179697,
+    "ic95_diferenca_media_diaria_atendidos": [
+     -13.04,
+     -5.88
+    ],
+    "diferenca_nao_atendidos": 234,
+    "diferenca_espera_media_s": 12.397626513467344,
+    "diferenca_espera_p90_s": 11.767686371940272,
+    "E1_sem_violacoes": true,
+    "E2_atendimento_preservado": false,
+    "E3_p90_nao_piorou": false,
+    "servico_preservado": false,
+    "classe": "reducao_sem_servico_preservado",
+    "km_vazio_B": 37756.73598172489
+   }
+  ]
+ }
+}

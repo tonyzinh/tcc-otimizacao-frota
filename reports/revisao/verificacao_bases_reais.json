@@ -1,0 +1,598 @@
+{
+ "entidades": {
+  "ods/compromissos_externos": {
+   "particoes": 99,
+   "linhas_total": 6901,
+   "esquemas_distintos": 1,
+   "colunas": [
+    "cd_solicitacao",
+    "cd_veiculo",
+    "dt_fim_realizada",
+    "dt_inicio_realizada",
+    "dt_registro",
+    "event_time",
+    "extraido_em",
+    "known_at",
+    "tx_categoria",
+    "tx_destinoreal_lat",
+    "tx_destinoreal_lng",
+    "tx_origem_lat",
+    "tx_origem_lng",
+    "tx_status"
+   ],
+   "cobertura": {
+    "treino_01fev_15mar": {
+     "dias_periodo": 43,
+     "dias_com_dado": 43,
+     "primeiro": "2026-02-01",
+     "ultimo": "2026-03-15"
+    },
+    "validacao_16_31mar": {
+     "dias_periodo": 16,
+     "dias_com_dado": 16,
+     "primeiro": "2026-03-16",
+     "ultimo": "2026-03-31"
+    },
+    "replicacao_16_30set": {
+     "dias_periodo": 15,
+     "dias_com_dado": 15,
+     "primeiro": "2026-09-16",
+     "ultimo": "2026-09-30"
+    },
+    "final_01_25out": {
+     "dias_periodo": 25,
+     "dias_com_dado": 25,
+     "primeiro": "2026-10-01",
+     "ultimo": "2026-10-25"
+    }
+   }
+  },
+  "ods/jornada_motorista": {
+   "particoes": 99,
+   "linhas_total": 11267,
+   "esquemas_distintos": 1,
+   "colunas": [
+    "cd_condutor",
+    "cd_grupo_turno",
+    "cd_jornada_motorista",
+    "cd_local_fim_turno",
+    "cd_turno_trabalho",
+    "dt_fim_estimado",
+    "dt_fim_realizado",
+    "dt_inicio_estimado",
+    "dt_inicio_realizado",
+    "dt_registro",
+    "event_time",
+    "extraido_em",
+    "known_at"
+   ],
+   "cobertura": {
+    "treino_01fev_15mar": {
+     "dias_periodo": 43,
+     "dias_com_dado": 43,
+     "primeiro": "2026-02-01",
+     "ultimo": "2026-03-15"
+    },
+    "validacao_16_31mar": {
+     "dias_periodo": 16,
+     "dias_com_dado": 16,
+     "primeiro": "2026-03-16",
+     "ultimo": "2026-03-31"
+    },
+    "replicacao_16_30set": {
+     "dias_periodo": 15,
+     "dias_com_dado": 15,
+     "primeiro": "2026-09-16",
+     "ultimo": "2026-09-30"
+    },
+    "final_01_25out": {
+     "dias_periodo": 25,
+     "dias_com_dado": 25,
+     "primeiro": "2026-10-01",
+     "ultimo": "2026-10-25"
+    }
+   }
+  },
+  "ods/log_status_motorista": {
+   "particoes": 99,
+   "linhas_total": 64091,
+   "esquemas_distintos": 1,
+   "colunas": [
+    "bl_login",
+    "cd_log_status_motorista",
+    "cd_motivo",
+    "cd_motorista",
+    "cd_veiculo",
+    "cd_veiculo_condutor",
+    "dt_registro",
+    "event_time",
+    "extraido_em",
+    "known_at",
+    "tx_status"
+   ],
+   "cobertura": {
+    "treino_01fev_15mar": {
+     "dias_periodo": 43,
+     "dias_com_dado": 43,
+     "primeiro": "2026-02-01",
+     "ultimo": "2026-03-15"
+    },
+    "validacao_16_31mar": {
+     "dias_periodo": 16,
+     "dias_com_dado": 16,
+     "primeiro": "2026-03-16",
+     "ultimo": "2026-03-31"
+    },
+    "replicacao_16_30set": {
+     "dias_periodo": 15,
+     "dias_com_dado": 15,
+     "primeiro": "2026-09-16",
+     "ultimo": "2026-09-30"
+    },
+    "final_01_25out": {
+     "dias_periodo": 25,
+     "dias_com_dado": 25,
+     "primeiro": "2026-10-01",
+     "ultimo": "2026-10-25"
+    }
+   }
+  },
+  "ods/reposicionamento": {
+   "particoes": 99,
+   "linhas_total": 20694,
+   "esquemas_distintos": 1,
+   "colunas": [
+    "cd_motorista",
+    "cd_reposicionamento_motorista",
+    "dt_aceite",
+    "dt_fim",
+    "dt_recusa",
+    "dt_registro",
+    "event_time",
+    "extraido_em",
+    "known_at",
+    "nu_metros_percorridos",
+    "tx_destino_h3index",
+    "tx_destino_lat",
+    "tx_destino_lng",
+    "tx_destino_real_lat",
+    "tx_destino_real_lng",
+    "tx_origem_lat",
+    "tx_origem_lng",
+    "tx_origem_real_lat",
+    "tx_origem_real_lng"
+   ],
+   "cobertura": {
+    "treino_01fev_15mar": {
+     "dias_periodo": 43,
+     "dias_com_dado": 43,
+     "primeiro": "2026-02-01",
+     "ultimo": "2026-03-15"
+    },
+    "validacao_16_31mar": {
+     "dias_periodo": 16,
+     "dias_com_dado": 16,
+     "primeiro": "2026-03-16",
+     "ultimo": "2026-03-31"
+    },
+    "replicacao_16_30set": {
+     "dias_periodo": 15,
+     "dias_com_dado": 15,
+     "primeiro": "2026-09-16",
+     "ultimo": "2026-09-30"
+    },
+    "final_01_25out": {
+     "dias_periodo": 25,
+     "dias_com_dado": 25,
+     "primeiro": "2026-10-01",
+     "ultimo": "2026-10-25"
+    }
+   }
+  },
+  "ods/solicitacao": {
+   "particoes": 211,
+   "linhas_total": 234978,
+   "esquemas_distintos": 1,
+   "colunas": [
+    "cd_agendamento",
+    "cd_motorista",
+    "cd_passageiro",
+    "cd_regiao",
+    "cd_solicitacao",
+    "cd_solicitacao_retracamento",
+    "cd_tipo_servico",
+    "cd_veiculo",
+    "de_tempo_espera_passageiro",
+    "dt_fim_realizada",
+    "dt_inicio_realizada",
+    "dt_registro",
+    "dt_registro_atualizacao",
+    "em_fim_turno",
+    "event_time",
+    "extraido_em",
+    "known_at",
+    "legado",
+    "nu_distancia_aceite_cheguei",
+    "nu_distpercorrida",
+    "nu_dr_real",
+    "nu_tempoparado",
+    "tx_destino_lat",
+    "tx_destino_lng",
+    "tx_destinoreal_lat",
+    "tx_destinoreal_lng",
+    "tx_h3index_destino",
+    "tx_h3index_destino_real",
+    "tx_h3index_origem",
+    "tx_h3index_reposicionamento_real",
+    "tx_modelo_solicitacao",
+    "tx_origem_lat",
+    "tx_origem_lng",
+    "tx_status",
+    "tx_tipo_prime",
+    "tx_tp_solicitacao"
+   ],
+   "cobertura": {
+    "treino_01fev_15mar": {
+     "dias_periodo": 43,
+     "dias_com_dado": 43,
+     "primeiro": "2026-02-01",
+     "ultimo": "2026-03-15"
+    },
+    "validacao_16_31mar": {
+     "dias_periodo": 16,
+     "dias_com_dado": 16,
+     "primeiro": "2026-03-16",
+     "ultimo": "2026-03-31"
+    },
+    "replicacao_16_30set": {
+     "dias_periodo": 15,
+     "dias_com_dado": 15,
+     "primeiro": "2026-09-16",
+     "ultimo": "2026-09-30"
+    },
+    "final_01_25out": {
+     "dias_periodo": 25,
+     "dias_com_dado": 25,
+     "primeiro": "2026-10-01",
+     "ultimo": "2026-10-25"
+    }
+   }
+  },
+  "ods/status_solicitacao": {
+   "particoes": 211,
+   "linhas_total": 842761,
+   "esquemas_distintos": 1,
+   "colunas": [
+    "cd_log_status_solicitacao",
+    "cd_motorista",
+    "cd_solicitacao",
+    "dt_registro",
+    "dt_solicitacao",
+    "event_time",
+    "extraido_em",
+    "known_at",
+    "legado",
+    "tx_status"
+   ],
+   "cobertura": {
+    "treino_01fev_15mar": {
+     "dias_periodo": 43,
+     "dias_com_dado": 43,
+     "primeiro": "2026-02-01",
+     "ultimo": "2026-03-15"
+    },
+    "validacao_16_31mar": {
+     "dias_periodo": 16,
+     "dias_com_dado": 16,
+     "primeiro": "2026-03-16",
+     "ultimo": "2026-03-31"
+    },
+    "replicacao_16_30set": {
+     "dias_periodo": 15,
+     "dias_com_dado": 15,
+     "primeiro": "2026-09-16",
+     "ultimo": "2026-09-30"
+    },
+    "final_01_25out": {
+     "dias_periodo": 25,
+     "dias_com_dado": 25,
+     "primeiro": "2026-10-01",
+     "ultimo": "2026-10-25"
+    }
+   }
+  },
+  "ods/telemetria_cobli": {
+   "particoes": 59,
+   "linhas_total": 160501,
+   "esquemas_distintos": 1,
+   "colunas": [
+    "device_id",
+    "distance_in_meters",
+    "driver_id",
+    "duration_in_milliseconds",
+    "end_address_datetime",
+    "end_address_latitude",
+    "end_address_longitude",
+    "event_time",
+    "extraido_em",
+    "idle_time_duration_in_milliseconds",
+    "known_at",
+    "license_plate",
+    "start_address_datetime",
+    "start_address_latitude",
+    "start_address_longitude",
+    "type",
+    "vehicle_group",
+    "vehicle_id"
+   ],
+   "cobertura": {
+    "treino_01fev_15mar": {
+     "dias_periodo": 43,
+     "dias_com_dado": 43,
+     "primeiro": "2026-02-01",
+     "ultimo": "2026-03-15"
+    },
+    "validacao_16_31mar": {
+     "dias_periodo": 16,
+     "dias_com_dado": 16,
+     "primeiro": "2026-03-16",
+     "ultimo": "2026-03-31"
+    },
+    "replicacao_16_30set": {
+     "dias_periodo": 15,
+     "dias_com_dado": 0,
+     "primeiro": null,
+     "ultimo": null
+    },
+    "final_01_25out": {
+     "dias_periodo": 25,
+     "dias_com_dado": 0,
+     "primeiro": null,
+     "ultimo": null
+    }
+   }
+  },
+  "ods/veiculo": {
+   "particoes": 1,
+   "linhas_total": 9598,
+   "esquemas_distintos": 1,
+   "colunas": [
+    "bl_em_operacao",
+    "cd_modelo_veiculo",
+    "cd_regiao",
+    "cd_tipo_frota",
+    "cd_veiculo",
+    "dt_desativacao",
+    "dt_registro",
+    "dt_registro_atualizacao",
+    "dt_ultima_atualizacao",
+    "event_time",
+    "extraido_em",
+    "known_at",
+    "tx_placa",
+    "tx_setor",
+    "tx_status",
+    "tx_tipo_estoque"
+   ],
+   "cobertura": {
+    "treino_01fev_15mar": {
+     "dias_periodo": 43,
+     "dias_com_dado": 0,
+     "primeiro": null,
+     "ultimo": null
+    },
+    "validacao_16_31mar": {
+     "dias_periodo": 16,
+     "dias_com_dado": 0,
+     "primeiro": null,
+     "ultimo": null
+    },
+    "replicacao_16_30set": {
+     "dias_periodo": 15,
+     "dias_com_dado": 0,
+     "primeiro": null,
+     "ultimo": null
+    },
+    "final_01_25out": {
+     "dias_periodo": 25,
+     "dias_com_dado": 0,
+     "primeiro": null,
+     "ultimo": null
+    }
+   }
+  },
+  "ods/veiculo_condutor": {
+   "particoes": 99,
+   "linhas_total": 12940,
+   "esquemas_distintos": 1,
+   "colunas": [
+    "cd_condutor",
+    "cd_veiculo",
+    "cd_veiculo_condutor",
+    "dt_criacao",
+    "dt_fim",
+    "event_time",
+    "extraido_em",
+    "known_at"
+   ],
+   "cobertura": {
+    "treino_01fev_15mar": {
+     "dias_periodo": 43,
+     "dias_com_dado": 43,
+     "primeiro": "2026-02-01",
+     "ultimo": "2026-03-15"
+    },
+    "validacao_16_31mar": {
+     "dias_periodo": 16,
+     "dias_com_dado": 16,
+     "primeiro": "2026-03-16",
+     "ultimo": "2026-03-31"
+    },
+    "replicacao_16_30set": {
+     "dias_periodo": 15,
+     "dias_com_dado": 15,
+     "primeiro": "2026-09-16",
+     "ultimo": "2026-09-30"
+    },
+    "final_01_25out": {
+     "dias_periodo": 25,
+     "dias_com_dado": 25,
+     "primeiro": "2026-10-01",
+     "ultimo": "2026-10-25"
+    }
+   }
+  },
+  "es/posicao_ofertas": {
+   "particoes": 183,
+   "linhas_total": 5091999,
+   "esquemas_distintos": 1,
+   "colunas": [
+    "accuracy",
+    "cd_motorista",
+    "cd_veiculo_pseudo",
+    "codigo_proxima_solicitacao",
+    "codigo_regiao",
+    "codigo_solicitacao",
+    "distancia_restante",
+    "doc_codigo",
+    "event_time",
+    "extraido_em",
+    "gps_observado_em",
+    "h3_index",
+    "known_at",
+    "latitude",
+    "longitude",
+    "passageiro_embarcado",
+    "servicos",
+    "status",
+    "tempo_segundos_viagem_restante",
+    "ultima_atualizacao_em"
+   ],
+   "cobertura": {
+    "treino_01fev_15mar": {
+     "dias_periodo": 43,
+     "dias_com_dado": 43,
+     "primeiro": "2026-02-01",
+     "ultimo": "2026-03-15"
+    },
+    "validacao_16_31mar": {
+     "dias_periodo": 16,
+     "dias_com_dado": 16,
+     "primeiro": "2026-03-16",
+     "ultimo": "2026-03-31"
+    },
+    "replicacao_16_30set": {
+     "dias_periodo": 15,
+     "dias_com_dado": 15,
+     "primeiro": "2026-09-16",
+     "ultimo": "2026-09-30"
+    },
+    "final_01_25out": {
+     "dias_periodo": 25,
+     "dias_com_dado": 25,
+     "primeiro": "2026-10-01",
+     "ultimo": "2026-10-25"
+    }
+   }
+  },
+  "es/reposicionamento_sugerido": {
+   "particoes": 99,
+   "linhas_total": 479463,
+   "esquemas_distintos": 1,
+   "colunas": [
+    "codigo_solicitacao",
+    "descricao_motivo",
+    "distancia",
+    "doc_codigo",
+    "event_time",
+    "extraido_em",
+    "h3",
+    "id_motivo",
+    "known_at",
+    "mode",
+    "origem_lat",
+    "origem_lng",
+    "regiao_id",
+    "reposicionamento_desligado",
+    "user_id"
+   ],
+   "cobertura": {
+    "treino_01fev_15mar": {
+     "dias_periodo": 43,
+     "dias_com_dado": 43,
+     "primeiro": "2026-02-01",
+     "ultimo": "2026-03-15"
+    },
+    "validacao_16_31mar": {
+     "dias_periodo": 16,
+     "dias_com_dado": 16,
+     "primeiro": "2026-03-16",
+     "ultimo": "2026-03-31"
+    },
+    "replicacao_16_30set": {
+     "dias_periodo": 15,
+     "dias_com_dado": 15,
+     "primeiro": "2026-09-16",
+     "ultimo": "2026-09-30"
+    },
+    "final_01_25out": {
+     "dias_periodo": 25,
+     "dias_com_dado": 25,
+     "primeiro": "2026-10-01",
+     "ultimo": "2026-10-25"
+    }
+   }
+  },
+  "es/sumario_ofertas": {
+   "particoes": 99,
+   "linhas_total": 71267,
+   "esquemas_distintos": 1,
+   "colunas": [
+    "codigo_regiao",
+    "doc_codigo",
+    "event_time",
+    "extraido_em",
+    "known_at",
+    "qtd_a_caminho",
+    "qtd_aproveitamento",
+    "qtd_com_passageiro",
+    "qtd_indisponivel",
+    "qtd_offline",
+    "qtd_online",
+    "qtd_selecionado"
+   ],
+   "cobertura": {
+    "treino_01fev_15mar": {
+     "dias_periodo": 43,
+     "dias_com_dado": 43,
+     "primeiro": "2026-02-01",
+     "ultimo": "2026-03-15"
+    },
+    "validacao_16_31mar": {
+     "dias_periodo": 16,
+     "dias_com_dado": 16,
+     "primeiro": "2026-03-16",
+     "ultimo": "2026-03-31"
+    },
+    "replicacao_16_30set": {
+     "dias_periodo": 15,
+     "dias_com_dado": 15,
+     "primeiro": "2026-09-16",
+     "ultimo": "2026-09-30"
+    },
+    "final_01_25out": {
+     "dias_periodo": 25,
+     "dias_com_dado": 25,
+     "primeiro": "2026-10-01",
+     "ultimo": "2026-10-25"
+    }
+   }
+  }
+ },
+ "problemas": [],
+ "pseudonimizacao": {
+  "esquema": "hmac-sha256-v1",
+  "chave_id": "02f6c9316eb0",
+  "hex": 20
+ }
+}

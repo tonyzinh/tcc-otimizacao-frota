@@ -1,0 +1,762 @@
+--- a/scripts/validar_simulador.py
++++ b/scripts/validar_simulador.py
+@@ -163,8 +163,16 @@
+         for hour in sorted(a["hora"]):
+             n, s, o = a["hora"][hour]
+             hours.append(
+-                {"periodo": period, "hora": hour, "pedidos": n, "atendidas_simulado": s, "aceitas_observado": o,
+-                 "taxa_simulado_pct": 100 * s / n, "taxa_observado_pct": 100 * o / n, "diferenca_pp": 100 * (s - o) / n}
++                {
++                    "periodo": period,
++                    "hora": hour,
++                    "pedidos": n,
++                    "atendidas_simulado": s,
++                    "aceitas_observado": o,
++                    "taxa_simulado_pct": 100 * s / n,
++                    "taxa_observado_pct": 100 * o / n,
++                    "diferenca_pp": 100 * (s - o) / n,
++                }
+             )
+         for medida, vals in (
+             ("fator: reta real x fator / registrada", a["c_fator"]),
+@@ -174,12 +182,21 @@
+         ):
+             ratios.append({"periodo": period, "medida": medida, **describe(vals)})
+         reg, simk, fat = a["soma"]
+-        p = next(x for x in ref["principal"] if x["periodo"] == period and x["janela"] == WINDOW and x["regime"] == "B" and x["cenario"] == REFERENCE)
++        p = next(
++            x
++            for x in ref["principal"]
++            if x["periodo"] == period and x["janela"] == WINDOW and x["regime"] == "B" and x["cenario"] == REFERENCE
++        )
+         base_ride = p["soma_base_empty_km"] / p["soma_base_served"]
+         inc_ride = p["soma_prop_empty_km"] / p["soma_prop_served"] - base_ride
+         scale = simk / reg if reg else float("nan")
+         summary["periodos"][period] = {
+-            "parametros_simulador": {"raio_km": sim.radius_km, "velocidade_kmh": sim.speed_kmh, "fator_rua_reta": sim.road_factor, "paciencia_s": sim.patience_s},
++            "parametros_simulador": {
++                "raio_km": sim.radius_km,
++                "velocidade_kmh": sim.speed_kmh,
++                "fator_rua_reta": sim.road_factor,
++                "paciencia_s": sim.patience_s,
++            },
+             "dias_com_assinatura_conferida": a["dias_conferidos"],
+             "contagens_c": a["contagem"],
+             "ks_tempo_max_dif": ks,
+--- a/src/tcc_frota/extracao/entidades.py
++++ b/src/tcc_frota/extracao/entidades.py
+@@ -113,106 +113,218 @@
+ 
+ def entidades_sql(f: FiltroV1) -> dict[str, EntidadeSql]:
+     solic_cols = {
+-        "cd_solicitacao": "int64", "cd_passageiro": "string", "cd_motorista": "string", "cd_veiculo": "string",
+-        "cd_tipo_servico": "int64", "cd_regiao": "int64", "tx_status": "string",
+-        "dt_registro": "timestamp", "dt_inicio_realizada": "timestamp", "dt_fim_realizada": "timestamp",
+-        "tx_origem_lat": "float64", "tx_origem_lng": "float64", "tx_destino_lat": "float64", "tx_destino_lng": "float64",
+-        "tx_destinoreal_lat": "float64", "tx_destinoreal_lng": "float64",
+-        "tx_h3index_origem": "string", "tx_h3index_destino": "string", "tx_h3index_destino_real": "string",
++        "cd_solicitacao": "int64",
++        "cd_passageiro": "string",
++        "cd_motorista": "string",
++        "cd_veiculo": "string",
++        "cd_tipo_servico": "int64",
++        "cd_regiao": "int64",
++        "tx_status": "string",
++        "dt_registro": "timestamp",
++        "dt_inicio_realizada": "timestamp",
++        "dt_fim_realizada": "timestamp",
++        "tx_origem_lat": "float64",
++        "tx_origem_lng": "float64",
++        "tx_destino_lat": "float64",
++        "tx_destino_lng": "float64",
++        "tx_destinoreal_lat": "float64",
++        "tx_destinoreal_lng": "float64",
++        "tx_h3index_origem": "string",
++        "tx_h3index_destino": "string",
++        "tx_h3index_destino_real": "string",
+         "tx_h3index_reposicionamento_real": "string",
+-        "nu_distpercorrida": "int64", "nu_dr_real": "int64", "nu_distancia_aceite_cheguei": "int64",
+-        "nu_tempoparado": "int64", "de_tempo_espera_passageiro": "float64",
+-        "cd_solicitacao_retracamento": "int64", "cd_agendamento": "int64", "tx_tp_solicitacao": "string",
+-        "tx_modelo_solicitacao": "string", "tx_tipo_prime": "string", "em_fim_turno": "bool", "legado": "bool",
++        "nu_distpercorrida": "int64",
++        "nu_dr_real": "int64",
++        "nu_distancia_aceite_cheguei": "int64",
++        "nu_tempoparado": "int64",
++        "de_tempo_espera_passageiro": "float64",
++        "cd_solicitacao_retracamento": "int64",
++        "cd_agendamento": "int64",
++        "tx_tp_solicitacao": "string",
++        "tx_modelo_solicitacao": "string",
++        "tx_tipo_prime": "string",
++        "em_fim_turno": "bool",
++        "legado": "bool",
+         "dt_registro_atualizacao": "timestamp",
+     }
+     solic_cols = {k.lower(): v for k, v in solic_cols.items()}
+     out: dict[str, EntidadeSql] = {}
+     out["solicitacao"] = EntidadeSql(
+-        "solicitacao", "ODS", sql_solicitacao(f), {**_CAB, **solic_cols}, ("cd_solicitacao",), "dt_registro", "dt_registro_atualizacao",
++        "solicitacao",
++        "ODS",
++        sql_solicitacao(f),
++        {**_CAB, **solic_cols},
++        ("cd_solicitacao",),
++        "dt_registro",
++        "dt_registro_atualizacao",
+         pseudo=("cd_passageiro", "cd_motorista", "cd_veiculo"),
+         coords=("tx_origem_lat", "tx_origem_lng", "tx_destino_lat", "tx_destino_lng", "tx_destinoreal_lat", "tx_destinoreal_lng"),
+         limites="dt_registro é proxy da criação; uma linha por solicitação no ODS (estado final, sem a cadeia de status); "
+         "NU_DR_REAL/NU_DISTPERCORRIDA conforme RN; valores monetários não extraídos.",
+     )
+     out["status_solicitacao"] = EntidadeSql(
+-        "status_solicitacao", "ODS",
++        "status_solicitacao",
++        "ODS",
+         "SELECT l.CD_LOG_STATUS_SOLICITACAO, l.CD_SOLICITACAO, l.DT_REGISTRO, l.TX_STATUS, l.CD_MOTORISTA, l.LEGADO "
+         "FROM dbo.APP_LOG_STATUS_SOLICITACAO l JOIN dbo.APP_SOLICITACAO_HIST s ON s.CD_SOLICITACAO = l.CD_SOLICITACAO "
+         f"WHERE s.CD_REGIAO = ? AND s.CD_TIPO_SERVICO IN ({_servicos(f)}) AND {SEM_PRIME.format(a='s')} AND s.DT_REGISTRO >= ? AND s.DT_REGISTRO < ?",
+-        {**_CAB, "cd_log_status_solicitacao": "int64", "cd_solicitacao": "int64", "dt_registro": "timestamp",
+-         "tx_status": "string", "cd_motorista": "string", "legado": "bool"},
+-        ("cd_log_status_solicitacao",), "dt_registro", None, pseudo=("cd_motorista",),
++        {
++            **_CAB,
++            "cd_log_status_solicitacao": "int64",
++            "cd_solicitacao": "int64",
++            "dt_registro": "timestamp",
++            "tx_status": "string",
++            "cd_motorista": "string",
++            "legado": "bool",
++        },
++        ("cd_log_status_solicitacao",),
++        "dt_registro",
++        None,
++        pseudo=("cd_motorista",),
+         limites="Lote por data de criação da solicitação (não do evento); eventos de uma solicitação podem cair no dia seguinte.",
+     )
+     out["jornada_motorista"] = EntidadeSql(
+-        "jornada_motorista", "ODS",
++        "jornada_motorista",
++        "ODS",
+         "SELECT j.CD_JORNADA_MOTORISTA, j.CD_MOTORISTA AS CD_CONDUTOR, j.DT_REGISTRO, j.DT_INICIO_ESTIMADO, j.DT_FIM_ESTIMADO, "
+         "j.DT_INICIO_REALIZADO, j.DT_FIM_REALIZADO, j.CD_TURNO_TRABALHO, j.CD_GRUPO_TURNO, j.CD_LOCAL_FIM_TURNO "
+         "FROM dbo.APP_JORNADA_MOTORISTA j WHERE " + _coorte_condutor(f, "j") + " "
+         "AND COALESCE(j.DT_INICIO_REALIZADO, j.DT_INICIO_ESTIMADO, j.DT_REGISTRO) >= ? "
+         "AND COALESCE(j.DT_INICIO_REALIZADO, j.DT_INICIO_ESTIMADO, j.DT_REGISTRO) < ?",
+-        {**_CAB, "cd_jornada_motorista": "int64", "cd_condutor": "string", "dt_registro": "timestamp",
+-         "dt_inicio_estimado": "timestamp", "dt_fim_estimado": "timestamp", "dt_inicio_realizado": "timestamp",
+-         "dt_fim_realizado": "timestamp", "cd_turno_trabalho": "int64", "cd_grupo_turno": "int64", "cd_local_fim_turno": "int64"},
+-        ("cd_jornada_motorista",), "dt_registro", None, pseudo=("cd_condutor",),
++        {
++            **_CAB,
++            "cd_jornada_motorista": "int64",
++            "cd_condutor": "string",
++            "dt_registro": "timestamp",
++            "dt_inicio_estimado": "timestamp",
++            "dt_fim_estimado": "timestamp",
++            "dt_inicio_realizado": "timestamp",
++            "dt_fim_realizado": "timestamp",
++            "cd_turno_trabalho": "int64",
++            "cd_grupo_turno": "int64",
++            "cd_local_fim_turno": "int64",
++        },
++        ("cd_jornada_motorista",),
++        "dt_registro",
++        None,
++        pseudo=("cd_condutor",),
+         limites="Jornada é por CONDUTOR (CD_CONDUTOR), família de ID distinta do motorista das solicitações; coorte = condutores vinculados "
+         "(APP_VEICULO_CONDUTOR) a veículos com solicitação V1 em ±7 dias. Condutor de veículo compartilhado com outro produto não é separável. "
+         "Jornada registrada ≠ presença efetiva ≠ disponibilidade (DT_*_REALIZADO é janela de atividade registrada, não escala).",
+     )
+     out["log_status_motorista"] = EntidadeSql(
+-        "log_status_motorista", "ODS",
++        "log_status_motorista",
++        "ODS",
+         "SELECT l.CD_LOG_STATUS_MOTORISTA, l.CD_MOTORISTA, l.CD_MOTIVO, l.TX_STATUS, l.BL_LOGIN, l.DT_REGISTRO, l.CD_VEICULO, l.CD_VEICULO_CONDUTOR "
+         "FROM dbo.APP_LOG_STATUS_MOTORISTA l WHERE " + _coorte(f, "l") + " AND l.DT_REGISTRO >= ? AND l.DT_REGISTRO < ?",
+-        {**_CAB, "cd_log_status_motorista": "int64", "cd_motorista": "string", "cd_motivo": "int64", "tx_status": "string",
+-         "bl_login": "bool", "dt_registro": "timestamp", "cd_veiculo": "string", "cd_veiculo_condutor": "string"},
+-        ("cd_log_status_motorista",), "dt_registro", None, pseudo=("cd_motorista", "cd_veiculo", "cd_veiculo_condutor"),
++        {
++            **_CAB,
++            "cd_log_status_motorista": "int64",
++            "cd_motorista": "string",
++            "cd_motivo": "int64",
++            "tx_status": "string",
++            "bl_login": "bool",
++            "dt_registro": "timestamp",
++            "cd_veiculo": "string",
++            "cd_veiculo_condutor": "string",
++        },
++        ("cd_log_status_motorista",),
++        "dt_registro",
++        None,
++        pseudo=("cd_motorista", "cd_veiculo", "cd_veiculo_condutor"),
+         limites=_LIM_COORTE + " Semântica dos códigos de status é enum inferido (não confirmado).",
+     )
+     out["reposicionamento"] = EntidadeSql(
+-        "reposicionamento", "ODS",
++        "reposicionamento",
++        "ODS",
+         "SELECT r.CD_REPOSICIONAMENTO_MOTORISTA, r.DT_REGISTRO, r.CD_MOTORISTA, r.TX_ORIGEM_LAT, r.TX_ORIGEM_LNG, "
+         "r.TX_DESTINO_LAT, r.TX_DESTINO_LNG, r.TX_DESTINO_H3INDEX, r.TX_ORIGEM_REAL_LAT, r.TX_ORIGEM_REAL_LNG, "
+         "r.TX_DESTINO_REAL_LAT, r.TX_DESTINO_REAL_LNG, r.DT_ACEITE, r.DT_RECUSA, r.DT_FIM, r.NU_METROS_PERCORRIDOS "
+         "FROM dbo.APP_REPOSICIONAMENTO_MOTORISTA r WHERE " + _coorte(f, "r") + " AND r.DT_REGISTRO >= ? AND r.DT_REGISTRO < ?",
+-        {**_CAB, "cd_reposicionamento_motorista": "int64", "dt_registro": "timestamp", "cd_motorista": "string",
+-         "tx_origem_lat": "float64", "tx_origem_lng": "float64", "tx_destino_lat": "float64", "tx_destino_lng": "float64",
+-         "tx_destino_h3index": "string", "tx_origem_real_lat": "float64", "tx_origem_real_lng": "float64",
+-         "tx_destino_real_lat": "float64", "tx_destino_real_lng": "float64", "dt_aceite": "timestamp",
+-         "dt_recusa": "timestamp", "dt_fim": "timestamp", "nu_metros_percorridos": "int64"},
+-        ("cd_reposicionamento_motorista",), "dt_registro", None, pseudo=("cd_motorista",),
++        {
++            **_CAB,
++            "cd_reposicionamento_motorista": "int64",
++            "dt_registro": "timestamp",
++            "cd_motorista": "string",
++            "tx_origem_lat": "float64",
++            "tx_origem_lng": "float64",
++            "tx_destino_lat": "float64",
++            "tx_destino_lng": "float64",
++            "tx_destino_h3index": "string",
++            "tx_origem_real_lat": "float64",
++            "tx_origem_real_lng": "float64",
++            "tx_destino_real_lat": "float64",
++            "tx_destino_real_lng": "float64",
++            "dt_aceite": "timestamp",
++            "dt_recusa": "timestamp",
++            "dt_fim": "timestamp",
++            "nu_metros_percorridos": "int64",
++        },
++        ("cd_reposicionamento_motorista",),
++        "dt_registro",
++        None,
++        pseudo=("cd_motorista",),
+         limites=_LIM_COORTE + " Posições são de motorista (não de passageiro): mantidas sem arredondamento.",
+     )
+     out["veiculo"] = EntidadeSql(
+-        "veiculo", "ODS",
++        "veiculo",
++        "ODS",
+         "SELECT CD_VEICULO, CD_MODELO_VEICULO, CD_REGIAO, CD_TIPO_FROTA, DT_REGISTRO, DT_DESATIVACAO, TX_STATUS, "
+         "BL_EM_OPERACAO, DT_ULTIMA_ATUALIZACAO, DT_REGISTRO_ATUALIZACAO, TX_SETOR, TX_TIPO_ESTOQUE, "
+         "TX_PLACA "
+         "FROM dbo.APP_VEICULO WHERE CD_REGIAO = ?",
+-        {**_CAB, "cd_veiculo": "string", "cd_modelo_veiculo": "int64", "cd_regiao": "int64", "cd_tipo_frota": "int64",
+-         "dt_registro": "timestamp", "dt_desativacao": "timestamp", "tx_status": "string", "bl_em_operacao": "bool",
+-         "dt_ultima_atualizacao": "timestamp", "dt_registro_atualizacao": "timestamp", "tx_setor": "string",
+-         "tx_tipo_estoque": "string", "tx_placa": "string"},
+-        ("cd_veiculo",), "dt_registro", "dt_registro_atualizacao",
+-        pseudo=("cd_veiculo", "tx_placa"), snapshot=True,
++        {
++            **_CAB,
++            "cd_veiculo": "string",
++            "cd_modelo_veiculo": "int64",
++            "cd_regiao": "int64",
++            "cd_tipo_frota": "int64",
++            "dt_registro": "timestamp",
++            "dt_desativacao": "timestamp",
++            "tx_status": "string",
++            "bl_em_operacao": "bool",
++            "dt_ultima_atualizacao": "timestamp",
++            "dt_registro_atualizacao": "timestamp",
++            "tx_setor": "string",
++            "tx_tipo_estoque": "string",
++            "tx_placa": "string",
++        },
++        ("cd_veiculo",),
++        "dt_registro",
++        "dt_registro_atualizacao",
++        pseudo=("cd_veiculo", "tx_placa"),
++        snapshot=True,
+         limites="Foto do estado na extração (sem histórico); TX_STATUS/DT_DESATIVACAO são posteriores à janela: "
+         "não usar como informação disponível no corte D+1. Placa só como pseudônimo (ponte ODS↔ES↔Cobli: 117 de 117 placas Cobli de 10/03/2026 casam com TX_PLACA); IDs de integração Cobli não casam (0) e não foram extraídos; chassi não extraído.",
+     )
+     out["veiculo_condutor"] = EntidadeSql(
+-        "veiculo_condutor", "ODS",
++        "veiculo_condutor",
++        "ODS",
+         "SELECT vc.CD_VEICULO_CONDUTOR, vc.CD_VEICULO, vc.CD_CONDUTOR, vc.DT_CRIACAO, vc.DT_FIM FROM dbo.APP_VEICULO_CONDUTOR vc "
+         "WHERE EXISTS (SELECT 1 FROM dbo.APP_SOLICITACAO_HIST s WHERE s.CD_VEICULO = vc.CD_VEICULO AND s.CD_REGIAO = ? "
+         f"AND s.CD_TIPO_SERVICO IN ({_servicos(f)}) AND {SEM_PRIME.format(a='s')} "
+         "AND s.DT_REGISTRO >= DATEADD(day, -7, ?) AND s.DT_REGISTRO < DATEADD(day, 7, ?)) "
+         "AND vc.DT_CRIACAO < ? AND (vc.DT_FIM IS NULL OR vc.DT_FIM >= ?)",
+-        {**_CAB, "cd_veiculo_condutor": "string", "cd_veiculo": "string", "cd_condutor": "string", "dt_criacao": "timestamp", "dt_fim": "timestamp"},
+-        ("cd_veiculo_condutor",), "dt_criacao", "dt_criacao", pseudo=("cd_veiculo_condutor", "cd_veiculo", "cd_condutor"), janela_livre=True,
++        {
++            **_CAB,
++            "cd_veiculo_condutor": "string",
++            "cd_veiculo": "string",
++            "cd_condutor": "string",
++            "dt_criacao": "timestamp",
++            "dt_fim": "timestamp",
++        },
++        ("cd_veiculo_condutor",),
++        "dt_criacao",
++        "dt_criacao",
++        pseudo=("cd_veiculo_condutor", "cd_veiculo", "cd_condutor"),
++        janela_livre=True,
+         plano_params=("regiao", "ini", "fim", "fim", "ini"),
+         limites="Vínculo veículo-condutor com vigência (DT_CRIACAO..DT_FIM) válido em algum instante da janela, para veículos com solicitação V1 em ±7 dias. "
+         "Ponte entre a família do motorista (log de status, via CD_VEICULO_CONDUTOR) e a do condutor (jornada). Vigência não prova quem dirigiu.",
+     )
+     out["compromissos_externos"] = EntidadeSql(
+-        "compromissos_externos", "ODS",
++        "compromissos_externos",
++        "ODS",
+         "WITH v AS (SELECT DISTINCT x.CD_VEICULO FROM dbo.APP_SOLICITACAO_HIST x WHERE x.CD_REGIAO = ? "
+         f"AND x.CD_TIPO_SERVICO IN ({_servicos(f)}) AND {SEM_PRIME.format(a='x')} AND x.CD_VEICULO IS NOT NULL "
+         "AND x.DT_REGISTRO >= DATEADD(day, -7, ?) AND x.DT_REGISTRO < DATEADD(day, 7, ?)) "
+@@ -223,10 +335,24 @@
+         f"WHERE NOT (s.CD_REGIAO = ? AND s.CD_TIPO_SERVICO IN ({_servicos(f)}) AND {SEM_PRIME.format(a='s')}) "
+         "AND s.DT_REGISTRO >= DATEADD(day, -7, ?) AND s.DT_REGISTRO < ? "
+         "AND s.DT_INICIO_REALIZADA IS NOT NULL AND s.DT_INICIO_REALIZADA >= ? AND s.DT_INICIO_REALIZADA < ?",
+-        {**_CAB, "cd_solicitacao": "int64", "cd_veiculo": "string", "tx_categoria": "string", "tx_status": "string",
+-         "dt_registro": "timestamp", "dt_inicio_realizada": "timestamp", "dt_fim_realizada": "timestamp",
+-         "tx_origem_lat": "float64", "tx_origem_lng": "float64", "tx_destinoreal_lat": "float64", "tx_destinoreal_lng": "float64"},
+-        ("cd_solicitacao",), "dt_inicio_realizada", "dt_registro", pseudo=("cd_veiculo",),
++        {
++            **_CAB,
++            "cd_solicitacao": "int64",
++            "cd_veiculo": "string",
++            "tx_categoria": "string",
++            "tx_status": "string",
++            "dt_registro": "timestamp",
++            "dt_inicio_realizada": "timestamp",
++            "dt_fim_realizada": "timestamp",
++            "tx_origem_lat": "float64",
++            "tx_origem_lng": "float64",
++            "tx_destinoreal_lat": "float64",
++            "tx_destinoreal_lng": "float64",
++        },
++        ("cd_solicitacao",),
++        "dt_inicio_realizada",
++        "dt_registro",
++        pseudo=("cd_veiculo",),
+         coords=("tx_origem_lat", "tx_origem_lng", "tx_destinoreal_lat", "tx_destinoreal_lng"),
+         plano_params=("regiao", "ini", "fim", "regiao", "regiao", "ini", "fim", "ini", "fim"),
+         limites="COMPROMISSO EXTERNO (condição de disponibilidade, NÃO demanda-alvo): corridas realizadas, de veículos que atenderam V1 Viagens "
+@@ -238,19 +364,39 @@
+         "outros usos do veículo (Aluguel, manutenção) NÃO estão aqui.",
+     )
+     out["telemetria_cobli"] = EntidadeSql(
+-        "telemetria_cobli", "ODS",
++        "telemetria_cobli",
++        "ODS",
+         "SELECT VEHICLE_GROUP, DEVICE_ID, VEHICLE_ID, TYPE, DRIVER_ID, LICENSE_PLATE, START_ADDRESS_LATITUDE, START_ADDRESS_LONGITUDE, "
+         "START_ADDRESS_DATETIME, END_ADDRESS_LATITUDE, END_ADDRESS_LONGITUDE, END_ADDRESS_DATETIME, DISTANCE_IN_METERS, "
+         "DURATION_IN_MILLISECONDS, IDLE_TIME_DURATION_IN_MILLISECONDS "
+         "FROM dbo.COBLI_TELEMETRIA_VIAGENS WHERE START_ADDRESS_DATETIME >= ? AND START_ADDRESS_DATETIME < ? AND VEHICLE_GROUP IN (?, ?)",
+-        {**_CAB, "vehicle_group": "string", "device_id": "string", "vehicle_id": "string", "type": "string", "driver_id": "string", "license_plate": "string",
+-         "start_address_latitude": "float64", "start_address_longitude": "float64", "start_address_datetime": "timestamp",
+-         "end_address_latitude": "float64", "end_address_longitude": "float64", "end_address_datetime": "timestamp",
+-         "distance_in_meters": "float64", "duration_in_milliseconds": "float64", "idle_time_duration_in_milliseconds": "float64"},
+-        ("device_id", "type", "start_address_datetime"), "start_address_datetime", "end_address_datetime",
++        {
++            **_CAB,
++            "vehicle_group": "string",
++            "device_id": "string",
++            "vehicle_id": "string",
++            "type": "string",
++            "driver_id": "string",
++            "license_plate": "string",
++            "start_address_latitude": "float64",
++            "start_address_longitude": "float64",
++            "start_address_datetime": "timestamp",
++            "end_address_latitude": "float64",
++            "end_address_longitude": "float64",
++            "end_address_datetime": "timestamp",
++            "distance_in_meters": "float64",
++            "duration_in_milliseconds": "float64",
++            "idle_time_duration_in_milliseconds": "float64",
++        },
++        ("device_id", "type", "start_address_datetime"),
++        "start_address_datetime",
++        "end_address_datetime",
+         pseudo=("device_id", "vehicle_id", "driver_id", "license_plate"),
+         coords=("start_address_latitude", "start_address_longitude", "end_address_latitude", "end_address_longitude"),
+-        casas=4, extra_params=("Operação", "Operação V1 VIX CAM"), deslocamento_janela_h=3, janela_livre=True,
++        casas=4,
++        extra_params=("Operação", "Operação V1 VIX CAM"),
++        deslocamento_janela_h=3,
++        janela_livre=True,
+         limites="Filtro por VEHICLE_GROUP IN ('Operação', 'Operação V1 VIX CAM') (sem campo de região; o segundo entra para ser INVESTIGADO, a coluna vehicle_group permite separá-lo; não prova que todo o grupo pertence ao estudo): validado em 10/03/2026 (106 de 113 placas com corrida V1 da região 1); "
+         "o grupo 'Operação Prime' (14 de 16 placas com corrida V1 região 1) e 'Operação V1 VIX CAM' (4 de 4) ficam FORA, pendentes de decisão. "
+         "Registra só início/fim de viagens e paradas (type trips/stops), não a trajetória ponto a ponto. available_at = fim do trecho. RELÓGIO: evidência de 10/03/2026 indica UTC (conciliação por placa melhora de 39% para 73% de corridas com par ao subtrair 3 h; mediana de 61 m entre fim do trecho e destino): event_time/available_at ficam NA HORA DA FONTE (UTC), e o dia do lote é o dia LOCAL (janela deslocada em +3 h). "
+@@ -262,30 +408,74 @@
+ def entidades_es() -> dict[str, EntidadeEs]:
+     return {
+         "posicao_ofertas": EntidadeEs(
+-            "posicao_ofertas", "indexofertamotoristaelasticmodel-{aaaamm}", "dataHora",
+-            {**_CAB, "doc_codigo": "string", "evento_dataHora": "timestamp", "cd_motorista": "string", "cd_veiculo_pseudo": "string",
+-             "status": "int64", "latitude": "float64", "longitude": "float64", "h3_index": "string", "accuracy": "float64",
+-             "passageiro_embarcado": "bool", "data_posicao_gps": "timestamp", "data_atualizacao": "timestamp",
+-             "codigo_proxima_solicitacao": "int64", "codigo_solicitacao": "int64", "distancia_restante": "int64",
+-             "tempo_segundos_viagem_restante": "int64", "servicos": "string", "codigo_regiao": "int64"},
++            "posicao_ofertas",
++            "indexofertamotoristaelasticmodel-{aaaamm}",
++            "dataHora",
++            {
++                **_CAB,
++                "doc_codigo": "string",
++                "evento_dataHora": "timestamp",
++                "cd_motorista": "string",
++                "cd_veiculo_pseudo": "string",
++                "status": "int64",
++                "latitude": "float64",
++                "longitude": "float64",
++                "h3_index": "string",
++                "accuracy": "float64",
++                "passageiro_embarcado": "bool",
++                "data_posicao_gps": "timestamp",
++                "data_atualizacao": "timestamp",
++                "codigo_proxima_solicitacao": "int64",
++                "codigo_solicitacao": "int64",
++                "distancia_restante": "int64",
++                "tempo_segundos_viagem_restante": "int64",
++                "servicos": "string",
++                "codigo_regiao": "int64",
++            },
+             ("doc_codigo", "cd_motorista"),
+             limites="Foto do app a cada ~2 min por região; lista de veículos ofertados (não todos os online); status é enum inferido. "
+             "Nome, telefone, login, playerId, placa em claro e foto não extraídos.",
+         ),
+         "sumario_ofertas": EntidadeEs(
+-            "sumario_ofertas", "indexsumarioofertamotorista-{aaaamm}", "dataHora",
+-            {**_CAB, "doc_codigo": "string", "codigo_regiao": "int64", "qtd_a_caminho": "int64", "qtd_aproveitamento": "int64",
+-             "qtd_com_passageiro": "int64", "qtd_indisponivel": "int64", "qtd_offline": "int64", "qtd_online": "int64",
+-             "qtd_selecionado": "int64"},
++            "sumario_ofertas",
++            "indexsumarioofertamotorista-{aaaamm}",
++            "dataHora",
++            {
++                **_CAB,
++                "doc_codigo": "string",
++                "codigo_regiao": "int64",
++                "qtd_a_caminho": "int64",
++                "qtd_aproveitamento": "int64",
++                "qtd_com_passageiro": "int64",
++                "qtd_indisponivel": "int64",
++                "qtd_offline": "int64",
++                "qtd_online": "int64",
++                "qtd_selecionado": "int64",
++            },
+             ("doc_codigo",),
+             limites="Contagem agregada por região, sem separar serviço: pode incluir motoristas de serviços não V1 na região 1.",
+         ),
+         "reposicionamento_sugerido": EntidadeEs(
+-            "reposicionamento_sugerido", "indexdriversfuture", "dataRegistro",
+-            {**_CAB, "doc_codigo": "string", "regiao_id": "int64", "user_id": "string", "h3": "string", "mode": "string",
+-             "id_motivo": "int64", "descricao_motivo": "string", "origem_lat": "float64", "origem_lng": "float64",
+-             "codigo_solicitacao": "int64", "reposicionamento_desligado": "bool", "distancia": "int64"},
+-            ("doc_codigo",), pseudo=("user_id",),
++            "reposicionamento_sugerido",
++            "indexdriversfuture",
++            "dataRegistro",
++            {
++                **_CAB,
++                "doc_codigo": "string",
++                "regiao_id": "int64",
++                "user_id": "string",
++                "h3": "string",
++                "mode": "string",
++                "id_motivo": "int64",
++                "descricao_motivo": "string",
++                "origem_lat": "float64",
++                "origem_lng": "float64",
++                "codigo_solicitacao": "int64",
++                "reposicionamento_desligado": "bool",
++                "distancia": "int64",
++            },
++            ("doc_codigo",),
++            pseudo=("user_id",),
+             limites="Semântica de mode/idMotivo não confirmada; é sugestão/registro do sistema, não deslocamento executado.",
+         ),
+     }
+--- a/src/tcc_frota/extracao/executor.py
++++ b/src/tcc_frota/extracao/executor.py
+@@ -56,7 +56,12 @@
+             motivo = "chave_duplicada"
+         elif r["event_time"] is None:
+             motivo = "event_time_nulo"
+-        elif not ent.snapshot and not ent.janela_livre and not (ini <= str(r["event_time"])[:10] < fim) and ent.nome not in {"status_solicitacao"}:
++        elif (
++            not ent.snapshot
++            and not ent.janela_livre
++            and not (ini <= str(r["event_time"])[:10] < fim)
++            and ent.nome not in {"status_solicitacao"}
++        ):
+             motivo = "fora_da_janela"
+         if motivo:
+             rej.append({"motivo": motivo, **{k: str(r.get(k)) for k in ent.chave}})
+@@ -66,7 +71,9 @@
+     return ok, rej
+ 
+ 
+-def extrair_sql(entidade: str, inicio: str, fim: str, *, filtro: FiltroV1 | None = None, raiz: Path = RAIZ_PADRAO, forcar: bool = False) -> list[dict]:
++def extrair_sql(
++    entidade: str, inicio: str, fim: str, *, filtro: FiltroV1 | None = None, raiz: Path = RAIZ_PADRAO, forcar: bool = False
++) -> list[dict]:
+     from tcc_frota.leitura import SqlServerReader
+ 
+     f = filtro or FiltroV1()
+@@ -79,7 +86,17 @@
+         for dia in lotes:
+             ini = dia if not ent.snapshot else inicio
+             fi = (date.fromisoformat(dia) + timedelta(days=1)).isoformat() if not ent.snapshot else fim
+-            assinatura = hash_json({"f": f.descricao(), "sql": ent.sql, "ini": ini, "fim": fi, "col": ent.colunas, "dh": ent.deslocamento_janela_h, "pz": pz.descricao(segredo)})
++            assinatura = hash_json(
++                {
++                    "f": f.descricao(),
++                    "sql": ent.sql,
++                    "ini": ini,
++                    "fim": fi,
++                    "col": ent.colunas,
++                    "dh": ent.deslocamento_janela_h,
++                    "pz": pz.descricao(segredo),
++                }
++            )
+             pasta = caminho_lote(raiz, "ods", entidade, dia)
+             if not forcar and lote_pronto(pasta, assinatura):
+                 resultados.append({"lote": dia, "estado": "ja_pronto"})
+@@ -91,9 +108,19 @@
+             bruto = leitor.iter_query(ent.sql, ent.parametros(f, q_ini, q_fim))
+             ok, rej = _tratar_sql(ent, bruto, dia, ini, fi, segredo)
+             meta = {
+-                "fonte": ent.banco, "sistema": "SQL Server", "entidade": entidade, "lote": dia, "janela": [ini, fi], "janela_consulta_na_hora_da_fonte": [q_ini, q_fim],
+-                "filtro": f.descricao(), "assinatura": assinatura, "fuso": "sem deslocamento na fonte; coincide com -03:00 (America/Sao_Paulo) em 14 de 14 solicitações comparadas com o ES em 10/03/2026 (evidência amostral; RN024 segue pendente)",
+-                "limites": ent.limites, "chave": list(ent.chave), "somente_leitura": True, "pseudonimizacao": pz.descricao(segredo),
++                "fonte": ent.banco,
++                "sistema": "SQL Server",
++                "entidade": entidade,
++                "lote": dia,
++                "janela": [ini, fi],
++                "janela_consulta_na_hora_da_fonte": [q_ini, q_fim],
++                "filtro": f.descricao(),
++                "assinatura": assinatura,
++                "fuso": "sem deslocamento na fonte; coincide com -03:00 (America/Sao_Paulo) em 14 de 14 solicitações comparadas com o ES em 10/03/2026 (evidência amostral; RN024 segue pendente)",
++                "limites": ent.limites,
++                "chave": list(ent.chave),
++                "somente_leitura": True,
++                "pseudonimizacao": pz.descricao(segredo),
+             }
+             man = gravar_lote(pasta, ok, rej, meta=meta, colunas=ent.colunas)
+             resultados.append({"lote": dia, "estado": "gravado", "linhas": man["linhas"], "rejeitadas": man["rejeitadas"]})
+@@ -121,38 +148,72 @@
+                 if it.get("codigo") is None:
+                     rej.append({"motivo": "chave_nula", "doc": hid})
+                     continue
+-                ok.append({
+-                    **base, "event_time": s["dataHora"], "available_at": it.get("dataAtualizacao") or s["dataHora"],
+-                    "evento_dataHora": s["dataHora"], "cd_motorista": pz.pseudonimo("motorista", it["codigo"], segredo),
+-                    "cd_veiculo_pseudo": pz.pseudonimo("placa", it.get("placa"), segredo), "status": it.get("status"),
+-                    "latitude": it.get("latitude"), "longitude": it.get("longitude"), "h3_index": it.get("h3Index"),
+-                    "accuracy": it.get("accuracy"), "passageiro_embarcado": it.get("passageiroEmbarcado"),
+-                    "data_posicao_gps": it.get("dataPosicaoGPS"), "data_atualizacao": it.get("dataAtualizacao"),
+-                    "codigo_proxima_solicitacao": it.get("codigoProximaSolicitacao"), "codigo_solicitacao": it.get("codigoSolicitacao"),
+-                    "distancia_restante": it.get("distanciaRestante"),
+-                    "tempo_segundos_viagem_restante": it.get("tempoSegundosViagemRestante"),
+-                    "servicos": ",".join(str(x) for x in servs), "codigo_regiao": it.get("codigoRegiao"),
+-                })
++                ok.append(
++                    {
++                        **base,
++                        "event_time": s["dataHora"],
++                        "available_at": it.get("dataAtualizacao") or s["dataHora"],
++                        "evento_dataHora": s["dataHora"],
++                        "cd_motorista": pz.pseudonimo("motorista", it["codigo"], segredo),
++                        "cd_veiculo_pseudo": pz.pseudonimo("placa", it.get("placa"), segredo),
++                        "status": it.get("status"),
++                        "latitude": it.get("latitude"),
++                        "longitude": it.get("longitude"),
++                        "h3_index": it.get("h3Index"),
++                        "accuracy": it.get("accuracy"),
++                        "passageiro_embarcado": it.get("passageiroEmbarcado"),
++                        "data_posicao_gps": it.get("dataPosicaoGPS"),
++                        "data_atualizacao": it.get("dataAtualizacao"),
++                        "codigo_proxima_solicitacao": it.get("codigoProximaSolicitacao"),
++                        "codigo_solicitacao": it.get("codigoSolicitacao"),
++                        "distancia_restante": it.get("distanciaRestante"),
++                        "tempo_segundos_viagem_restante": it.get("tempoSegundosViagemRestante"),
++                        "servicos": ",".join(str(x) for x in servs),
++                        "codigo_regiao": it.get("codigoRegiao"),
++                    }
++                )
+         elif ent.nome == "sumario_ofertas":
+-            ok.append({
+-                **base, "event_time": s["dataHora"], "available_at": s["dataHora"], "codigo_regiao": s.get("codigoRegiao"),
+-                "qtd_a_caminho": s.get("qtdACaminho"), "qtd_aproveitamento": s.get("qtdAproveitamento"),
+-                "qtd_com_passageiro": s.get("qtdComPassageiro"), "qtd_indisponivel": s.get("qtdIndisponivel"),
+-                "qtd_offline": s.get("qtdOffline"), "qtd_online": s.get("qtdOnline"), "qtd_selecionado": s.get("qtdSelecionado"),
+-            })
++            ok.append(
++                {
++                    **base,
++                    "event_time": s["dataHora"],
++                    "available_at": s["dataHora"],
++                    "codigo_regiao": s.get("codigoRegiao"),
++                    "qtd_a_caminho": s.get("qtdACaminho"),
++                    "qtd_aproveitamento": s.get("qtdAproveitamento"),
++                    "qtd_com_passageiro": s.get("qtdComPassageiro"),
++                    "qtd_indisponivel": s.get("qtdIndisponivel"),
++                    "qtd_offline": s.get("qtdOffline"),
++                    "qtd_online": s.get("qtdOnline"),
++                    "qtd_selecionado": s.get("qtdSelecionado"),
++                }
++            )
+         else:  # reposicionamento_sugerido
+             o = s.get("origem") or {}
+-            ok.append({
+-                **base, "event_time": s.get("dataRegistro"), "available_at": s.get("dataRegistro"), "regiao_id": s.get("regiaoId"),
+-                "user_id": pz.pseudonimo("motorista", s.get("userId"), segredo), "h3": s.get("h3"), "mode": s.get("mode"),
+-                "id_motivo": s.get("idMotivo"), "descricao_motivo": s.get("descricaoMotivo"), "origem_lat": o.get("lat"),
+-                "origem_lng": o.get("lng"), "codigo_solicitacao": s.get("codigoSolicitacao"),
+-                "reposicionamento_desligado": s.get("reposicionamentoDesligado"), "distancia": s.get("distancia"),
+-            })
++            ok.append(
++                {
++                    **base,
++                    "event_time": s.get("dataRegistro"),
++                    "available_at": s.get("dataRegistro"),
++                    "regiao_id": s.get("regiaoId"),
++                    "user_id": pz.pseudonimo("motorista", s.get("userId"), segredo),
++                    "h3": s.get("h3"),
++                    "mode": s.get("mode"),
++                    "id_motivo": s.get("idMotivo"),
++                    "descricao_motivo": s.get("descricaoMotivo"),
++                    "origem_lat": o.get("lat"),
++                    "origem_lng": o.get("lng"),
++                    "codigo_solicitacao": s.get("codigoSolicitacao"),
++                    "reposicionamento_desligado": s.get("reposicionamentoDesligado"),
++                    "distancia": s.get("distancia"),
++                }
++            )
+     return ok, rej
+ 
+ 
+-def extrair_es(entidade: str, inicio: str, fim: str, *, filtro: FiltroV1 | None = None, raiz: Path = RAIZ_PADRAO, forcar: bool = False) -> list[dict]:
++def extrair_es(
++    entidade: str, inicio: str, fim: str, *, filtro: FiltroV1 | None = None, raiz: Path = RAIZ_PADRAO, forcar: bool = False
++) -> list[dict]:
+     from tcc_frota.leitura import ElasticReader
+ 
+     f = filtro or FiltroV1()
+@@ -165,7 +226,9 @@
+         proximo = (date.fromisoformat(dia) + timedelta(days=1)).isoformat()
+         ini_iso, fim_iso = f"{dia}T00:00:00{FUSO_FONTE}", f"{proximo}T00:00:00{FUSO_FONTE}"
+         indice = ent.indice.format(aaaamm=dia[:4] + "-" + dia[5:7])
+-        regiao_campo = {"posicao_ofertas": "codigoRegiao", "sumario_ofertas": "codigoRegiao", "reposicionamento_sugerido": "regiaoId"}[entidade]
++        regiao_campo = {"posicao_ofertas": "codigoRegiao", "sumario_ofertas": "codigoRegiao", "reposicionamento_sugerido": "regiaoId"}[
++            entidade
++        ]
+         consulta = {"bool": {"filter": [{"term": {regiao_campo: f.regiao}}, {"range": {ent.campo_tempo: {"gte": ini_iso, "lt": fim_iso}}}]}}
+         assinatura = hash_json({"f": f.descricao(), "idx": indice, "q": consulta, "col": ent.colunas, "pz": pz.descricao(segredo)})
+         pasta = caminho_lote(raiz, "es", entidade, dia)
+@@ -176,9 +239,19 @@
+         hits = leitor.iter_search_pit(indice, consulta, sort_field=ent.campo_tempo)
+         ok, rej = _linhas_es(ent, hits, f, segredo, ingestao)
+         meta = {
+-            "fonte": "Elasticsearch", "sistema": "Elasticsearch", "entidade": entidade, "lote": dia, "janela": [ini_iso, fim_iso],
+-            "indice": indice, "filtro": f.descricao(), "assinatura": assinatura, "fuso": f"valores com deslocamento explícito (-03:00 observado); dia = {FUSO_FONTE}",
+-            "paginacao": "PIT + search_after", "limites": ent.limites, "chave": list(ent.chave), "somente_leitura": True,
++            "fonte": "Elasticsearch",
++            "sistema": "Elasticsearch",
++            "entidade": entidade,
++            "lote": dia,
++            "janela": [ini_iso, fim_iso],
++            "indice": indice,
++            "filtro": f.descricao(),
++            "assinatura": assinatura,
++            "fuso": f"valores com deslocamento explícito (-03:00 observado); dia = {FUSO_FONTE}",
++            "paginacao": "PIT + search_after",
++            "limites": ent.limites,
++            "chave": list(ent.chave),
++            "somente_leitura": True,
+             "pseudonimizacao": pz.descricao(segredo),
+         }
+         man = gravar_lote(pasta, ok, rej, meta=meta, colunas=ent.colunas)
+--- a/src/tcc_frota/extracao/qualidade.py
++++ b/src/tcc_frota/extracao/qualidade.py
+@@ -46,7 +46,17 @@
+             "status": _vc(sol["tx_status"]),
+             "servicos": _vc(sol["cd_tipo_servico"]),
+             "regioes": _vc(sol["cd_regiao"]),
+-            "nulos_pct": {c: round(float(sol[c].isna().mean() * 100), 1) for c in ("cd_motorista", "cd_veiculo", "dt_fim_realizada", "nu_dr_real", "nu_distancia_aceite_cheguei", "nu_distpercorrida")},
++            "nulos_pct": {
++                c: round(float(sol[c].isna().mean() * 100), 1)
++                for c in (
++                    "cd_motorista",
++                    "cd_veiculo",
++                    "dt_fim_realizada",
++                    "nu_dr_real",
++                    "nu_distancia_aceite_cheguei",
++                    "nu_distpercorrida",
++                )
++            },
+             "tx_tipo_prime": _vc(sol["tx_tipo_prime"].fillna("(nulo)")),
+             "tx_modelo_solicitacao": _vc(sol["tx_modelo_solicitacao"].fillna("(nulo)")),
+             "chave_unica": bool(sol["cd_solicitacao"].is_unique),
+@@ -60,11 +70,18 @@
+             "inicio_antes_do_fim_pct": None if ordem_ok is None else round(float(ordem_ok) * 100, 1),
+         }
+     if len(st) and len(sol):
+-        r["status_solicitacao"] = {"linhas": len(st), "orfas_sem_solicitacao": int((~st["cd_solicitacao"].isin(sol["cd_solicitacao"])).sum()), "status": _vc(st["tx_status"])}
++        r["status_solicitacao"] = {
++            "linhas": len(st),
++            "orfas_sem_solicitacao": int((~st["cd_solicitacao"].isin(sol["cd_solicitacao"])).sum()),
++            "status": _vc(st["tx_status"]),
++        }
+     if len(cob):
+         t = cob[cob["type"] == "trips"]
+         r["cobli"] = {
+-            "linhas": len(cob), "trips": len(t), "stops": int((cob["type"] == "stops").sum()), "placas": int(cob["license_plate"].nunique()),
++            "linhas": len(cob),
++            "trips": len(t),
++            "stops": int((cob["type"] == "stops").sum()),
++            "placas": int(cob["license_plate"].nunique()),
+             "km_trips": round(float(t["distance_in_meters"].sum()) / 1000, 1),
+             "trips_sem_motorista_pct": round(float(t["driver_id"].isna().mean() * 100), 1),
+             "distancia_nula_ou_zero_pct": round(float((t["distance_in_meters"].fillna(0) <= 0).mean() * 100), 1),
+@@ -80,7 +97,9 @@
+             }
+     if len(pos):
+         r["posicao_ofertas"] = {
+-            "linhas": len(pos), "motoristas": int(pos["cd_motorista"].nunique()), "snapshots": int(pos["doc_codigo"].nunique()),
++            "linhas": len(pos),
++            "motoristas": int(pos["cd_motorista"].nunique()),
++            "snapshots": int(pos["doc_codigo"].nunique()),
+             "status": _vc(pos["status"]),
+             "sem_gps_pct": round(float(pos["latitude"].isna().mean() * 100), 1),
+             "defasagem_gps_mediana_s": float((pos["event_time"] - pos["data_posicao_gps"]).dt.total_seconds().median()),
+--- a/src/tcc_frota/leitura/es.py
++++ b/src/tcc_frota/leitura/es.py
+@@ -126,7 +126,9 @@
+         authorize("real", "local")
+         return int(self._request("POST", f"/{index}/_count", {"query": query or {"match_all": {}}})["count"])
+ 
+-    def search(self, index: str, query: dict | None = None, *, size: int = 100, source: list[str] | None = None, sort: list | None = None) -> list[dict]:
++    def search(
++        self, index: str, query: dict | None = None, *, size: int = 100, source: list[str] | None = None, sort: list | None = None
++    ) -> list[dict]:
+         authorize("real", "local")
+         body: dict[str, Any] = {"query": query or {"match_all": {}}, "size": size}
+         if source is not None:
+--- a/tests/unit/test_extracao.py
++++ b/tests/unit/test_extracao.py
+@@ -27,8 +27,15 @@
+ 
+ def test_tratar_sql_pseudonimiza_arredonda_e_rejeita_duplicada():
+     ent = entidades_sql(FiltroV1())["solicitacao"]
+-    base = {"CD_SOLICITACAO": 1, "CD_PASSAGEIRO": 7, "CD_MOTORISTA": 9, "CD_VEICULO": 3, "TX_ORIGEM_LAT": "-20.123456",
+-            "DT_REGISTRO": datetime(2026, 3, 10, 8, 0), "DT_REGISTRO_ATUALIZACAO": None}
++    base = {
++        "CD_SOLICITACAO": 1,
++        "CD_PASSAGEIRO": 7,
++        "CD_MOTORISTA": 9,
++        "CD_VEICULO": 3,
++        "TX_ORIGEM_LAT": "-20.123456",
++        "DT_REGISTRO": datetime(2026, 3, 10, 8, 0),
++        "DT_REGISTRO_ATUALIZACAO": None,
++    }
+     ok, rej = _tratar_sql(ent, [base, dict(base)], "2026-03-10", "2026-03-10", "2026-03-11", SAL)
+     assert len(ok) == 1 and rej[0]["motivo"] == "chave_duplicada"
+     assert ok[0]["tx_origem_lat"] == -20.123 and ok[0]["cd_passageiro"] != "7" and len(ok[0]["cd_passageiro"]) == 20

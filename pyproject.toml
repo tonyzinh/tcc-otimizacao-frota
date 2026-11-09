@@ -4,29 +4,29 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tcc-frota"
-version = "0.1.0"
-description = "Experimento acadêmico de frota e diagnóstico de disponibilidade D+1"
+version = "0.2.0"
+description = "Atribuição conjunta (algoritmo Húngaro) em lotes de 60 s para reduzir o km vazio de uma frota de transporte urbano: simulação e avaliação"
+readme = "README.md"
 requires-python = "==3.12.*"
-dependencies = []
+dependencies = [
+    "numpy>=2.1",
+    "pandas>=2.2",
+    "pyarrow>=18",
+    "scipy>=1.15",  # grafo viário e Dijkstra no cenário sintético; linear_sum_assignment apenas como oráculo nos testes
+    "h3>=4.1",  # zonas (resolução 7) e pontos (resolução 8) do cenário sintético
+    "matplotlib>=3.8",
+    "tzdata",
+]
 
 [project.optional-dependencies]
-excel = ["openpyxl>=3.1"]
-test = ["pytest>=8"]
-parquet = ["pyarrow>=18"]
-# Leitura somente leitura do SQL Server (requer um driver ODBC do SQL Server instalado); Elasticsearch usa só a biblioteca padrão.
+# Leitura somente leitura do SQL Server (exige driver ODBC); Elasticsearch usa só a biblioteca padrão.
 fontes = ["pyodbc>=5.1"]
-# Rodada v2 (final-run): H3 para zonas, NumPy para a regressão de Poisson, Matplotlib para figuras.
-v2 = ["h3>=4.1", "numpy>=1.26", "matplotlib>=3.8", "pyarrow>=18", "tzdata", "scikit-learn>=1.6"]
-# Bateria de algoritmos (scipy: linprog, milp, linear_sum_assignment) e extensão v2 do TCC, pacote `v3`
-# (statsmodels: Holm; arch: bootstrap de blocos). Antes ficavam sem declaração e vinham só do ambiente.
-algoritmos = ["tcc-frota[v2]", "scipy>=1.15"]
-extensao = ["tcc-frota[algoritmos]", "statsmodels>=0.14", "arch>=7"]
-# Ferramentas de qualidade (uso local): `ruff check .`, `ruff format --check .`, cobertura.
-qualidade = ["ruff>=0.6", "pytest-cov>=5"]
+test = ["pytest>=8", "pytest-cov>=5"]
+quality = ["ruff==0.17.3"]
+notebooks = ["jupyter_client>=8", "ipykernel>=6", "nbformat>=5", "nbclient>=0.10", "folium>=0.17"]
 
 [project.scripts]
-tcc-frota = "tcc_frota.cli:main"
-tcc-frota-disponibilidade = "tcc_frota.availability.cli:main"
+tcc-frota = "tcc_frota.cli.main:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -34,7 +34,7 @@ where = ["src"]
 [tool.ruff]
 target-version = "py312"
 line-length = 140
-extend-exclude = ["tcc-artigo-latex", ".audit-deps", ".ui-deps"]
+extend-exclude = ["article"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM", "C4", "RUF"]
@@ -43,9 +43,9 @@ ignore = [
     "RUF001", "RUF002", "RUF003",  # ×, −, ≤, σ, κ e acentos são notação do manuscrito (docstrings em português)
     "E501",      # linhas longas restantes são URLs, tabelas e fórmulas em docstring; o formatador já quebra o código
     "B905",      # zip(strict=True) lançaria erro onde hoje trunca: muda comportamento
-    "B023",      # fechamentos sobre variável de laço no simulador/avaliador: revisão científica separada, não estilo
+    "B023",      # fechamentos sobre variável de laço no simulador: revisão científica separada, não estilo
     "B007", "B008", "C408", "C416", "E731", "E741", "RUF005", "RUF007", "RUF015", "RUF046", "RUF059",
-    "SIM105", "SIM115", "UP042", "E402",  # preferências de estilo/ordem que mexeriam em expressões numéricas ou na ordem de importação
+    "SIM105", "SIM115", "UP042", "E402",
 ]
 
 [tool.ruff.lint.per-file-ignores]

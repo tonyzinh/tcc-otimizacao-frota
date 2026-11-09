@@ -1,0 +1,56 @@
+[
+ {
+  "variante": "v1: todos os tipos, lacuna 1200 s (execução parcial anterior)",
+  "pedidos_denominador": 1325,
+  "atendidos": 1084,
+  "pct": 81.8,
+  "motoristas": 132,
+  "horas_motorista": 1272.4,
+  "pickup_km": 2663.9
+ },
+ {
+  "variante": "v2: só TempoReal, lacuna 1200 s (muda o UNIVERSO)",
+  "pedidos_denominador": 1279,
+  "atendidos": 1077,
+  "pct": 84.2,
+  "motoristas": 132,
+  "horas_motorista": 1272.4,
+  "pickup_km": 2587.3
+ },
+ {
+  "variante": "v3: só TempoReal, lacuna 360 s (muda a REGRA de sessão) = execução E atual",
+  "pedidos_denominador": 1279,
+  "atendidos": 1072,
+  "pct": 83.8,
+  "motoristas": 132,
+  "horas_motorista": 1271.9,
+  "pickup_km": 2602.1
+ },
+ {
+  "variante": "v4 (sensibilidade): lacuna 240 s",
+  "pedidos_denominador": 1279,
+  "atendidos": 1054,
+  "pct": 82.4,
+  "motoristas": 132,
+  "horas_motorista": 1267.0,
+  "pickup_km": 2453.8
+ },
+ {
+  "variante": "v5 (sensibilidade): lacuna 600 s",
+  "pedidos_denominador": 1279,
+  "atendidos": 1077,
+  "pct": 84.2,
+  "motoristas": 132,
+  "horas_motorista": 1272.3,
+  "pickup_km": 2587.3
+ },
+ {
+  "variante": "v6 (sensibilidade): dedup. de novas tentativas, lacuna 360 s",
+  "pedidos_denominador": 968,
+  "atendidos": 845,
+  "pct": 87.3,
+  "motoristas": 132,
+  "horas_motorista": 1271.9,
+  "pickup_km": 1812.7
+ }
+]

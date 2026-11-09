@@ -1,0 +1,106 @@
+{
+ "alvo": "2026-02-13",
+ "cenario": "J",
+ "natureza": "desenvolvimento; não é teste final",
+ "condicao_inicial": "primeira_posicao_observada (comum a A e B)",
+ "modelo_compromissos": "deslocamento explícito até a origem (sim v2 + commit_origins)",
+ "guloso": {
+  "parametros": {
+   "alpha": 0.2,
+   "rho_km": 2.5,
+   "max_km": 3.0
+  },
+  "origem": "tcc_frota/algoritmos/busca_local.py::ARTICLE_GREEDY (parâmetros do artigo; não calibrados em V1 Viagens)",
+  "sha256_arquivo_de_origem": "5b05ba5e4c432d312b59a2e359bdb66b4c08140d138e03ff9cfca092ff17465f",
+  "ajustados_com_dados_de_outubro": false
+ },
+ "planejamento": {
+  "dia_corte": "2026-02-12",
+  "corte_h": 20.0,
+  "atraso_base_s": 120.0,
+  "hipotese_escala": "escala_persistente (janela de presença de D repetida em D+1; HIPÓTESE DE PREVISÃO, não escala confirmada)",
+  "campos_usados": "feed ES de D: cd_motorista, latitude, longitude, event_time, com event_time <= corte - atraso_base; jornada registrada NÃO é usada pelo planejador",
+  "motoristas": 55,
+  "descartados_posicao_velha": 65,
+  "idade_posicao_mediana_s": 239.99700000000303,
+  "treino_dias": 56,
+  "kappa": 0.618500948468904,
+  "demanda_prevista_total": 1058.625,
+  "zonas": 205,
+  "ultimo_dia_usado": "2026-02-11"
+ },
+ "persistencia_da_escala": {
+  "frota_planejada_no_corte": 55,
+  "presentes_no_mundo_de_D+1": 50,
+  "motoristas_no_mundo_de_D+1": 130
+ },
+ "mundo": {
+  "motoristas_simulados": 130,
+  "compromissos_atribuidos": 39,
+  "compromissos_nao_atribuidos_por_placa": 17
+ },
+ "ab": {
+  "assinatura_entrada": "75b1a80a7f75c7a18b79fd0d32bc474e88860d14cc9e24e843d4fe1003faa1ae",
+  "A_espera": {
+   "pedidos": 1197,
+   "atendidos": 932,
+   "pickup_km": 2103.2455374890114,
+   "reposicionamento_km": 0.0,
+   "km_vazio_total": 2103.2455374890114,
+   "movimentos_planejados": 0,
+   "movimentos_executados": 0,
+   "espera_mediana_s": 456.99546061315135,
+   "espera_p90_s": 1063.9577989847287
+  },
+  "B_guloso": {
+   "pedidos": 1197,
+   "atendidos": 936,
+   "pickup_km": 2042.126302173225,
+   "reposicionamento_km": 5.845048514952383,
+   "km_vazio_total": 2047.9713506881774,
+   "movimentos_planejados": 20,
+   "movimentos_executados": 3,
+   "espera_mediana_s": 440.0931914005306,
+   "espera_p90_s": 1049.1927771289104
+  },
+  "desfechos_B": {
+   "absent": 2,
+   "limit": 15,
+   "executed": 3
+  },
+  "atendidos_por_ambas": 922,
+  "atendidos_so_por_A": 10,
+  "atendidos_so_por_B": 14,
+  "compromissos_A": {
+   "avaliados": 39,
+   "por_classe": {
+    "viavel": 38,
+    "insuficiente_por_entrada": 1
+   },
+   "A_entrada_inconsistente": 1,
+   "B_causada_pela_politica": 0,
+   "C_incerta_origem_ou_posicao_desconhecida": 0,
+   "deficit_total_classe_A_s": 297.4,
+   "aproximacao_a_compromissos_km (fora do KM vazio comparado)": 347.53
+  },
+  "compromissos_B": {
+   "avaliados": 39,
+   "por_classe": {
+    "viavel": 38,
+    "insuficiente_por_entrada": 1
+   },
+   "A_entrada_inconsistente": 1,
+   "B_causada_pela_politica": 0,
+   "C_incerta_origem_ou_posicao_desconhecida": 0,
+   "deficit_total_classe_A_s": 297.4,
+   "aproximacao_a_compromissos_km (fora do KM vazio comparado)": 333.52
+  }
+ },
+ "delta_B_menos_A": {
+  "km_vazio_total": -55.274,
+  "pickup_km": -61.119,
+  "reposicionamento_km": 5.845,
+  "atendidos": 4,
+  "espera_mediana_s": -16.9
+ }
+}

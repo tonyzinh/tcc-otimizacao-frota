@@ -1,0 +1,243 @@
+{
+ "fase": "validacao",
+ "equivalencia_A0_B0": {
+  "verificada": true,
+  "A0_igual_B0": true
+ },
+ "por_metodo": [
+  {
+   "config": "B_lote60s_hungaro",
+   "sementes": 1,
+   "elegivel": true,
+   "km_vazio_total_media": 34359.60542257955,
+   "km_vazio_total_min": 34359.60542257955,
+   "km_vazio_total_max": 34359.60542257955,
+   "reducao_agregada_pct_media": -4.763406406843929,
+   "dif_atendidos_min": 111,
+   "p90_pior_semente_s": 1135.5243733907166,
+   "evidencia_de_reducao_todas": true,
+   "tempo_plano_total_s_media": 3.1251696999534033,
+   "movimentos_executados_media": 0.0,
+   "movimentos_planejados_media": 0.0
+  },
+  {
+   "config": "B_lote60s_fluxo",
+   "sementes": 1,
+   "elegivel": true,
+   "km_vazio_total_media": 34386.351383328656,
+   "km_vazio_total_min": 34386.351383328656,
+   "km_vazio_total_max": 34386.351383328656,
+   "reducao_agregada_pct_media": -4.689273012039371,
+   "dif_atendidos_min": 65,
+   "p90_pior_semente_s": 1141.3517731521263,
+   "evidencia_de_reducao_todas": true,
+   "tempo_plano_total_s_media": 23.736691700003576,
+   "movimentos_executados_media": 0.0,
+   "movimentos_planejados_media": 0.0
+  },
+  {
+   "config": "B_lote30s_fluxo",
+   "sementes": 1,
+   "elegivel": true,
+   "km_vazio_total_media": 34681.466789794285,
+   "km_vazio_total_min": 34681.466789794285,
+   "km_vazio_total_max": 34681.466789794285,
+   "reducao_agregada_pct_media": -3.87128381562746,
+   "dif_atendidos_min": 129,
+   "p90_pior_semente_s": 1125.8689512756666,
+   "evidencia_de_reducao_todas": true,
+   "tempo_plano_total_s_media": 28.58916189998854,
+   "movimentos_executados_media": 0.0,
+   "movimentos_planejados_media": 0.0
+  },
+  {
+   "config": "B_lote30s_hungaro",
+   "sementes": 1,
+   "elegivel": true,
+   "km_vazio_total_media": 34719.688633379075,
+   "km_vazio_total_min": 34719.688633379075,
+   "km_vazio_total_max": 34719.688633379075,
+   "reducao_agregada_pct_media": -3.7653420232495507,
+   "dif_atendidos_min": 118,
+   "p90_pior_semente_s": 1127.6003470331927,
+   "evidencia_de_reducao_todas": true,
+   "tempo_plano_total_s_media": 3.7074187000398524,
+   "movimentos_executados_media": 0.0,
+   "movimentos_planejados_media": 0.0
+  },
+  {
+   "config": "B_lote60s_guloso_fifo",
+   "sementes": 1,
+   "elegivel": false,
+   "km_vazio_total_media": 34988.685685143224,
+   "km_vazio_total_min": 34988.685685143224,
+   "km_vazio_total_max": 34988.685685143224,
+   "reducao_agregada_pct_media": -3.0197466480539967,
+   "dif_atendidos_min": -97,
+   "p90_pior_semente_s": 1152.0453190484454,
+   "evidencia_de_reducao_todas": true,
+   "tempo_plano_total_s_media": 2.4835831000236794,
+   "movimentos_executados_media": 0.0,
+   "movimentos_planejados_media": 0.0
+  },
+  {
+   "config": "B_lote30s_guloso_fifo",
+   "sementes": 1,
+   "elegivel": true,
+   "km_vazio_total_media": 35705.579252440664,
+   "km_vazio_total_min": 35705.579252440664,
+   "km_vazio_total_max": 35705.579252440664,
+   "reducao_agregada_pct_media": -1.0326894488060874,
+   "dif_atendidos_min": 84,
+   "p90_pior_semente_s": 1149.7722404610918,
+   "evidencia_de_reducao_todas": true,
+   "tempo_plano_total_s_media": 3.1215879999217577,
+   "movimentos_executados_media": 0.0,
+   "movimentos_planejados_media": 0.0
+  },
+  {
+   "config": "A3_guloso_busca_local",
+   "sementes": 3,
+   "elegivel": true,
+   "km_vazio_total_media": 36078.15454777954,
+   "km_vazio_total_min": 36078.15454777954,
+   "km_vazio_total_max": 36078.15454777954,
+   "reducao_agregada_pct_media": 0.0,
+   "dif_atendidos_min": 0,
+   "p90_pior_semente_s": 1150.606369330525,
+   "evidencia_de_reducao_todas": false,
+   "tempo_plano_total_s_media": 300.0615087333329,
+   "movimentos_executados_media": 0.0,
+   "movimentos_planejados_media": 0.0
+  },
+  {
+   "config": "A5a_recozimento_t0.005",
+   "sementes": 3,
+   "elegivel": false,
+   "km_vazio_total_media": 36083.69695696962,
+   "km_vazio_total_min": 36078.15454777954,
+   "km_vazio_total_max": 36094.7817753498,
+   "reducao_agregada_pct_media": 0.015362230301298572,
+   "dif_atendidos_min": -11,
+   "p90_pior_semente_s": 1152.736373432261,
+   "evidencia_de_reducao_todas": false,
+   "tempo_plano_total_s_media": 293.71978270000545,
+   "movimentos_executados_media": 4.0,
+   "movimentos_planejados_media": 11.666666666666666
+  },
+  {
+   "config": "A1_guloso_atual",
+   "sementes": 1,
+   "elegivel": true,
+   "km_vazio_total_media": 36093.314178650224,
+   "km_vazio_total_min": 36093.314178650224,
+   "km_vazio_total_max": 36093.314178650224,
+   "reducao_agregada_pct_media": 0.04201886449211323,
+   "dif_atendidos_min": 21,
+   "p90_pior_semente_s": 1146.8802405196207,
+   "evidencia_de_reducao_todas": false,
+   "tempo_plano_total_s_media": 0.43588750006165355,
+   "movimentos_executados_media": 48.0,
+   "movimentos_planejados_media": 214.0
+  },
+  {
+   "config": "A7_hungaro_vagas",
+   "sementes": 1,
+   "elegivel": true,
+   "km_vazio_total_media": 36132.08725190138,
+   "km_vazio_total_min": 36132.08725190138,
+   "km_vazio_total_max": 36132.08725190138,
+   "reducao_agregada_pct_media": 0.1494885334293282,
+   "dif_atendidos_min": 43,
+   "p90_pior_semente_s": 1145.8208205490016,
+   "evidencia_de_reducao_todas": false,
+   "tempo_plano_total_s_media": 0.2652601001318544,
+   "movimentos_executados_media": 115.0,
+   "movimentos_planejados_media": 185.0
+  },
+  {
+   "config": "A4_busca_tabu",
+   "sementes": 3,
+   "elegivel": false,
+   "km_vazio_total_media": 36156.137535878916,
+   "km_vazio_total_min": 36078.15454777954,
+   "km_vazio_total_max": 36248.690645491646,
+   "reducao_agregada_pct_media": 0.2161501581132784,
+   "dif_atendidos_min": -5,
+   "p90_pior_semente_s": 1153.577528322917,
+   "evidencia_de_reducao_todas": false,
+   "tempo_plano_total_s_media": 335.4432430331556,
+   "movimentos_executados_media": 16.666666666666668,
+   "movimentos_planejados_media": 31.666666666666668
+  },
+  {
+   "config": "A6_fluxo_custo_minimo_zonas",
+   "sementes": 1,
+   "elegivel": false,
+   "km_vazio_total_media": 36239.4655562734,
+   "km_vazio_total_min": 36239.4655562734,
+   "km_vazio_total_max": 36239.4655562734,
+   "reducao_agregada_pct_media": 0.4471154650669012,
+   "dif_atendidos_min": 45,
+   "p90_pior_semente_s": 1152.5988642527948,
+   "evidencia_de_reducao_todas": false,
+   "tempo_plano_total_s_media": 0.44969270017463714,
+   "movimentos_executados_media": 69.0,
+   "movimentos_planejados_media": 109.0
+  },
+  {
+   "config": "A2_guloso_posicao_corrigida",
+   "sementes": 1,
+   "elegivel": true,
+   "km_vazio_total_media": 36430.65860095166,
+   "km_vazio_total_min": 36430.65860095166,
+   "km_vazio_total_max": 36430.65860095166,
+   "reducao_agregada_pct_media": 0.9770567746343318,
+   "dif_atendidos_min": 99,
+   "p90_pior_semente_s": 1143.566408250747,
+   "evidencia_de_reducao_todas": false,
+   "tempo_plano_total_s_media": 0.7680998000432737,
+   "movimentos_executados_media": 281.0,
+   "movimentos_planejados_media": 495.0
+  }
+ ],
+ "decisao_grupo_A": {
+  "vencedor": "referencia",
+  "motivo": "nenhum elegível tem evidência suficiente de redução (IC95% bloco-bootstrap com limite superior < 0 em todas as sementes): referência mantida como melhor política observada"
+ },
+ "decisao_grupo_B": {
+  "vencedor": "B_lote60s_hungaro",
+  "candidatos_com_evidencia": [
+   "B_lote60s_hungaro",
+   "B_lote60s_fluxo",
+   "B_lote30s_fluxo",
+   "B_lote30s_hungaro",
+   "B_lote30s_guloso_fifo"
+  ],
+  "observacao": "conferir empates por simplicidade com diferença pareada entre candidatos",
+  "desempate_simplicidade": {
+   "escolhido": "B_lote60s_hungaro",
+   "melhor_km": "B_lote60s_hungaro",
+   "comparacoes_de_simplicidade": [
+    {
+     "mais_simples": "B_lote30s_guloso_fifo",
+     "vs": "B_lote60s_hungaro",
+     "dif_media_diaria_km": 84.12336436631934,
+     "ic95": [
+      58.355398692813296,
+      107.02285949399237
+     ]
+    },
+    {
+     "mais_simples": "B_lote30s_hungaro",
+     "vs": "B_lote60s_hungaro",
+     "dif_media_diaria_km": 22.505200674970453,
+     "ic95": [
+      1.7937885857754594,
+      41.32443719617332
+     ]
+    }
+   ]
+  }
+ }
+}

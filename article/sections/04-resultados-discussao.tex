@@ -1,0 +1,93 @@
+\section{Resultados e discussão}
+
+\subsection{Linha A: simulação com entradas históricas}
+
+A Tabela~\ref{tab:abs} traz os valores absolutos nas duas avaliações reservadas, e a Tabela~\ref{tab:contr}, os contrastes. Todos os números vêm de \texttt{reports/atribuicao\_final/}; as diferenças são simuladas e não representam economia observada. Nos 40 dias, houve 0 falhas técnicas, 0 violações de compromisso causadas por qualquer política e entradas idênticas (assinatura SHA-256) nas três políticas.
+
+\begin{table}[!t]
+\caption{Valores absolutos por política e período (linha A)}\label{tab:abs}
+\centering\fontetabela
+\begin{tabular}{@{}llrrrrr@{}}
+\toprule
+Período & Política & Atendidos (\%) & Km vazio & Km/atend. & Espera média (s) & P90 (s) \\
+\midrule
+\multirow{3}{*}{\shortstack[l]{Setembro\\(15 dias;\\16.918 pedidos)}} & A & 11.125 (65,76) & 29.628,3 & 2,66 & 616,4 & 1.183,2 \\
+ & B & 10.950 (64,72) & 28.644,9 & 2,62 & 630,6 & 1.195,8 \\
+ & C & 11.141 (65,85) & 27.861,1 & 2,50 & 600,8 & 1.171,6 \\
+\midrule
+\multirow{3}{*}{\shortstack[l]{Outubro\\(25 dias;\\23.523 pedidos)}} & A & 14.551 (61,86) & 39.205,0 & 2,69 & 621,0 & 1.189,7 \\
+ & B & 14.317 (60,86) & 37.756,7 & 2,64 & 633,4 & 1.201,5 \\
+ & C & 14.466 (61,50) & 37.228,7 & 2,57 & 615,8 & 1.181,7 \\
+\bottomrule
+\end{tabular}
+\fonte{\texttt{reports/atribuicao\_final/analise/*\_absolutos.csv}. A: mais próximo imediato; B: mais próximo em lotes de 60 s; C: Húngaro em lotes de 60 s. Espera e P90 calculados \textbf{apenas entre os atendidos} de cada política; os conjuntos de atendidos diferem entre políticas.}
+\end{table}
+
+\begin{table}[!htb]
+\caption{Contrastes (variação de km vazio: negativo = redução)}\label{tab:contr}
+\centering\fontetabela
+\begin{tabular}{@{}llrrcrrl@{}}
+\toprule
+Período & Contraste & $\Delta K$ (km) & $\Delta\%$ & \shortstack{IC95\% da média\\diária (km)} & \shortstack{Dias\\melh./pior} & $\Delta N$ & Serviço \\
+\midrule
+Set. & C×A & −1.767,1 & −5,96 & (−133,0; −102,9) & 14/1 & +16 & preservado \\
+Set. & C×B & −783,8 & −2,74 & (−61,2; −43,1) & 14/1 & +191 & preservado \\
+Set. & B×A & −983,4 & −3,32 & (−76,1; −54,8) & 14/1 & −175 & não (E2, E3) \\
+Out. & C×A & −1.976,3 & −5,04 & (−97,3; −62,8) & 25/0 & −85 & \textbf{E2 não cumprido} \\
+Out. & C×B & −528,0 & −1,40 & (−31,1; −11,5) & 16/9 & +149 & preservado \\
+Out. & B×A & −1.448,3 & −3,69 & (−77,0; −42,0) & 25/0 & −234 & não (E2, E3) \\
+\bottomrule
+\end{tabular}
+\fonte{\texttt{reports/atribuicao\_final/analise/*\_contrastes.json}. IC95\% por \textit{bootstrap} de blocos móveis de 7 dias sobre a diferença média diária.}
+\end{table}
+
+\figura[0.95\linewidth]{figures/km_atendimento.pdf}{Variação de km vazio e de atendimento por contraste e período (linha A)}{construída pelos autores a partir de \texttt{reports/atribuicao\_final/analise/resumo.json}. Painel (a): $\Delta\%$ de km vazio (negativo = redução); painel (b): diferença de atendimento em pontos percentuais.}{fig:km}
+
+\textbf{Km vazio.} A atribuição conjunta (C) teve menos km vazio que o despacho imediato (A) e que o despacho em lotes pelo mais próximo (B) nos dois períodos, com limite superior do IC95\% abaixo de zero em todos os contrastes com C (Figura~\ref{fig:km}). Em C×A, a redução foi de 1.767,1 km (5,96\%) em setembro, com melhora em 14 de 15 dias, e de 1.976,3 km (5,04\%) em outubro, com melhora em 25 de 25 dias. A redução de C×A é coerente com os períodos de seleção (treino: −5,02\%; validação: −4,76\%), mas esses dois períodos não são evidência independente (Seção 3.5).
+
+\textbf{Atendimento.} Em setembro, C atendeu 16 pedidos a mais que A (+0,09 p.p.; IC95\% da diferença média diária de atendidos: −6,2 a +8,0) e o critério foi preservado. Em outubro, C atendeu \textbf{85 pedidos a menos} que A: 14.466 contra 14.551, de 23.523 pedidos elegíveis, ou 61,50\% contra 61,86\%. Duas medidas distintas descrevem essa diferença e não devem ser confundidas: a taxa de atendimento sobre o universo elegível caiu 0,36 ponto percentual ($85/23.523$), e o número de atendidos ficou 0,58\% abaixo do de A ($85/14.551$, variação relativa aos atendidos de A). O IC95\% da diferença média diária de atendidos (−7,8 a +0,9) inclui zero, e C atendeu mais em 9 dias, menos em 15 e igual em 1; um intervalo que inclui zero indica que os dados não distinguem a diferença de zero, e \textbf{não} demonstra equivalência entre as políticas. Em setembro, C atendeu mais em 9 dias e menos em 6. Em outubro, o critério E2 falhou em C×A, e não há base para tratar a perda como irrelevante. Ainda assim, o critério E2, definido antes dos resultados, \textbf{não foi cumprido}, e a classe de C×A em outubro é \enquote{redução sem serviço preservado}. Esse resultado desfavorável permanece nas conclusões.
+
+Como C atendeu menos corridas em outubro, parte da redução do km total pode vir de menos atendimentos. O km por atendido também caiu (2,69 para 2,57 km, −4,5\%), o que indica efeito além do volume. Em um cálculo descritivo, \emph{não simulado}, supor que cada um dos 85 atendimentos faltantes custasse 2,69 km (a média de A) acrescentaria cerca de 229 km a C, e a redução ficaria em torno de 1.748 km (4,5\%). Essa estimativa não decompõe o efeito e serve apenas para dimensionar a ordem de grandeza.
+
+\textbf{Lote e atribuição.} O despacho em lotes pelo mais próximo (B) reduz o km em relação a A (−3,32\% e −3,69\%), mas à custa de atendimento e espera: menos atendidos, P90 maior e E2 e E3 reprovados nos dois períodos. O ganho adicional de C sobre B (−2,74\% e −1,40\%) vem com mais atendidos (+191 e +149) e menor espera, e preserva o serviço nos dois períodos. A atribuição conjunta explica, portanto, a parte do resultado que não vem do simples atraso do lote, e o efeito do lote isolado é piorar o serviço. Em outubro, o ganho de C sobre B é menor e menos regular (melhora em 16 dias e piora em 9).
+
+\textbf{Espera.} A espera média e o P90 de C foram menores que os de A nos dois períodos (setembro: −15,7 s e −11,6 s; outubro: −5,2 s e −8,0 s), embora os lotes acrescentem em média cerca de 40 s de espera até o fechamento (verificado em quatro dias de desenvolvimento: B, 45 s; C, 40 s). Esses valores são calculados só entre os pedidos atendidos de cada política, e os conjuntos diferem: se C atende pedidos que A deixa expirar, e a espera desses pedidos é diferente da dos demais, a média muda por seleção, e não necessariamente por melhor serviço. Não se fez pareamento por pedido; os valores devem ser lidos como descrição, não como melhora garantida.
+
+\textbf{Custo computacional.} A medida é o tempo de relógio de parede da chamada do simulador para um dia inteiro de cada política (elegibilidade, distâncias, laço de lotes e, em C, o Húngaro), sem a construção do mundo nem a leitura dos dados, em um único processo sequencial, em Python 3.12.14, no Windows 11, em um processador AMD64 (família 25), na execução congelada. Por dia, a média foi de 0,05 a 0,06 s em A, 0,08 a 0,09 s em B e 0,10 a 0,12 s em C (setembro e outubro), de modo que o Húngaro acrescenta 0,02 a 0,03 s por dia sobre B; \emph{não} é o tempo isolado do solver. Em 2.628 lotes de quatro dias de desenvolvimento, a solução do Húngaro coincidiu com a do oráculo em número de pares e soma das distâncias (diferença máxima de 0,0015 km por arredondamento).
+
+\subsection{Linha B: cenários sintéticos}
+
+Nos 22 cenários, com 40 sementes cada, C reduziu o km vazio em relação a A em todos (mediana de −8,4\%; de −2,1\% em S1 a −14,0\% em \texttt{S2\_frota\_escassa}), com limite superior do IC95\% abaixo de zero e atendimento preservado pelo critério da linha B. Esse critério, fixado em plano anterior e não alterado depois, exige que a razão média, entre as sementes, de atendidos de C sobre A seja de pelo menos 0,995 e que a razão das médias de P90 seja de no máximo 1,05. Ele difere do E2 da linha A, que exige $N_C\ge N_{ref}$ no período, sem tolerância: o critério da linha B admite perda média de até 0,5\% dos atendidos. Nos cinco cenários principais, os 20 testes confirmatórios têm $p=0{,}002$ após Holm (o menor valor possível com 10.000 reamostragens e 20 testes). Em relação a B na mesma janela, a redução mediana foi de 7,0\% (de 1,1\% a 13,8\%), também com serviço preservado nos 22 cenários. O despacho em lotes pelo mais próximo (B) reduziu o km em mediana de 1,5\% em relação a A, com serviço preservado em apenas 1 dos 22 cenários (em 16, menos km com pior atendimento). A Tabela~\ref{tab:sint} resume os cenários principais, e o Apêndice~\ref{ap:sint} traz os 22.
+
+\begin{table}[!htb]
+\caption{Cenários sintéticos principais: C contra A (40 sementes)}\label{tab:sint}
+\centering\fontetabela
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Cenário & Km vazio de A (média) & $\Delta\%$ & Razão de atendidos & Razão de P90 \\
+\midrule
+S1 & 2.300,3 & −2,15 & 0,998 & 1,000 \\
+S2 & 2.329,1 & −9,14 & 1,010 & 0,933 \\
+S3 & 2.139,2 & −7,90 & 1,019 & 0,918 \\
+S4 & 2.493,6 & −7,87 & 1,015 & 0,945 \\
+S5 & 2.442,9 & −8,41 & 1,013 & 0,941 \\
+\bottomrule
+\end{tabular}
+\fonte{\texttt{reports/sintetico\_v2/metodos\_avaliacao\_D/analise/resumo\_contrastes.csv}. Razões = C/A. Todos com $p=0{,}002$ após Holm.}
+\end{table}
+
+\figura[0.95\linewidth]{figures/sintetico.pdf}{Variação do km vazio contra A nos 22 cenários sintéticos (média de 40 sementes)}{construída pelos autores a partir de \texttt{resumo\_contrastes.csv}. Negativo = redução.}{fig:sint}
+
+Três ressalvas limitam a leitura de \enquote{22 de 22}. Primeiro, os cenários \textbf{compartilham estrutura} e não são 22 experimentos independentes: muitos diferem apenas em parâmetros de previsão ou de zoneamento que não afetam um despacho que usa só pedidos já chegados, e a mesma rede, frota e geração de pedidos estão presentes em todos. Segundo, as 40 sementes finais foram \textbf{examinadas antes} da decisão de adotar o método. Terceiro, o critério de serviço da linha B é mais tolerante que o E2: em 2 dos 22 cenários (S1, com razão de atendidos 0,998, e \texttt{S2\_frota\_abundante}, com 0,996) C atendeu em média menos que A e ainda assim cumpriu o critério da linha B; sob uma regra do tipo E2 (razão $\ge 1$), esses dois cenários não cumpririam. Por isso, a linha B é evidência exploratória e complementar: mostra o comportamento do método em cenários controlados, e a conclusão principal repousa na linha A.
+
+\subsection{Discussão}
+
+\textbf{Mecanismo.} O resultado é coerente com o mecanismo descrito na Seção 2: com poucos veículos livres e pedidos simultâneos, o despacho sequencial consome o veículo mais próximo de um pedido para atender outro que teria alternativa quase igual. O ganho de C sobre B (mesma janela) isola a contribuição da atribuição conjunta; o ganho de B sobre A, que acompanha perda de serviço, mostra o custo de esperar pelo lote. Não se pode atribuir toda a redução de C×A à atribuição: parte vem do lote e vem com perda de atendimento, que o contraste C×B separa. Também não se pode atribuí-la só à perda de atendimento, pelo cálculo de sensibilidade acima, embora esse cálculo seja apenas descritivo.
+
+\textbf{Ótimo local e ótimo diário.} O ótimo de cada lote não é ótimo do dia. Os resultados mostram que, nos dados e no simulador usados, a soma das decisões ótimas por lote teve menos km vazio que a regra sequencial, mas não demonstram que haja ganho em outras operações, nem que um planejamento que visse o dia inteiro fosse pior ou melhor.
+
+\textbf{Atendimento e km.} Em setembro, menos km e mais atendimentos; em outubro, menos km com 85 atendimentos a menos (0,36 p.p. do universo elegível; 0,58\% dos atendidos de A), cujo intervalo no nível diário inclui zero, o que não demonstra equivalência, e que o critério fixado trata como falha. A razão para a diferença entre os meses não foi investigada. Setembro e outubro diferem em volume (16.918 pedidos em 15 dias contra 23.523 em 25) e em motoristas por dia (média de 86,7 contra 74,3), e qualquer explicação causal exigiria análise adicional.
+
+\textbf{Concordância histórica e sintética.} As duas linhas apontam para menos km vazio com C, em ordem de grandeza semelhante (5 a 6\% no histórico; mediana de 8,4\% no sintético), mas não se somam nem se validam mutuamente: a linha sintética usa demanda hipotética e distâncias por via, e a histórica usa linha reta com fator constante.
+
+\textbf{Limites.} (i) A disponibilidade é reconstruída retrospectivamente e a jornada realizada é conhecida pelo avaliador, não pela política; (ii) a distância é estimada, com velocidade e fator rua/reta constantes e sem tráfego; (iii) o raio de 4,5 km em linha reta ignora barreiras geográficas; (iv) o atendimento simulado (62 a 66\%) é resultado do simulador calibrado, sem modelagem de aceite, cancelamentos pós-atribuição ou tentativas repetidas; (v) o cadastro de veículos é uma fotografia única; (vi) os dados são de uma empresa e região, em quatro períodos; (vii) o despacho de referência não foi validado contra a operação manual, de modo que o ganho real depende de quanto o despacho atual já faz atribuição conjunta; e (viii) não houve implantação nem medição em produção.

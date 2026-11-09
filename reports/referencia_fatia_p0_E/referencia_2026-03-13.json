@@ -1,0 +1,127 @@
+{
+ "rotulo": "p0_completa",
+ "cenario": "E",
+ "dia": "2026-03-13",
+ "estado": "executado",
+ "entrada": {
+  "dia": "2026-03-13",
+  "tipo": "simulacao",
+  "validado_empiricamente": false,
+  "pedidos_excluidos_por_tipo": {
+   "Agendamento": 45
+  },
+  "pedidos": 1622,
+  "pedidos_sem_coordenada_descartados": 0,
+  "pedidos_com_desfecho": {
+   "CorridaEncerrada": 810,
+   "NaoAtendida": 399,
+   "CorridaCanceladaSolicitante": 119,
+   "CorridaCanceladaSolicitantePosAceite": 105,
+   "CorridaCanceladaMotoristaPosAceite": 57,
+   "LimiteEsperaAtingido": 56,
+   "PagamentoRejeitado": 34,
+   "Retracamento": 34,
+   "CorridaCanceladaOperador": 8
+  },
+  "definicao_universo": "todas as solicitações V1 com origem no dia, tipos TempoReal; sem excluir canceladas/não atendidas",
+  "snapshots_es_sem_horario_descartados": 873,
+  "unicidade_de_recursos": {
+   "placa_troca_de_motorista": 5,
+   "motorista_troca_de_placa": 4,
+   "mais_de_2km": 0,
+   "mais_de_2km_e_ate_30min": 0,
+   "resolucao": {
+    "conflitos_placa": 0,
+    "conflitos_motorista": 0,
+    "horas_excluidas": 0.0
+   }
+  },
+  "inicializacao_viagens_em_andamento": {
+   "janelas": 160,
+   "janelas_iniciadas_com_evidencia_de_ocupacao": 29,
+   "horas_aparadas_no_inicio": 34.67,
+   "aproximacao": "entra ao fim da viagem histórica em andamento (duração observada; comum a todas as políticas)"
+  },
+  "cenario_disponibilidade": "E",
+  "evidencias": {
+   "linhas": 2082,
+   "horas_por_estado_e_fonte": {
+    "desconhecido|lacuna_no_feed": 351.8,
+    "ocupado_com_evidencia|es.posicao_ofertas": 726.9,
+    "presente_sem_viagem_es|es.posicao_ofertas": 451.2
+   },
+   "motoristas": 125
+  },
+  "condicao_inicial": {
+   "condicao": "primeira_posicao_observada",
+   "max_idade_s": 1800.0,
+   "jornadas": 160,
+   "por_estado": {
+    "conhecida_no_inicio": 160
+   },
+   "segundos_jornada_total": 4248240.719,
+   "segundos_desconhecidos": 0.0,
+   "pct_jornada_desconhecida": 0.0,
+   "tratamento_do_desconhecido": "motorista indisponível ao despacho até a 1ª observação; jornada sem observação é excluída (contada)",
+   "conhecida_pelo_planejador_vespera": false
+  },
+  "motoristas_online_es": 125,
+  "compromissos_que_sao_pedidos_v1_simulados (deve ser 0)": 0,
+  "compromissos_atribuidos": 47,
+  "compromissos_nao_atribuidos_por_placa": 36,
+  "motoristas_simulados": 125,
+  "hipoteses": {
+   "gap_sessao_s": 360.0,
+   "max_idade_s": 1800.0,
+   "online": "presente em posicao_ofertas (status/enum não usado como livre)",
+   "pedido": "dt_registro como proxy da criação (RN024 pendente)",
+   "compromissos": "conhecidos pelo despacho do simulador desde o início (hipótese; known_at desconhecido)"
+  }
+ },
+ "manifesto": {
+  "tipo": "simulacao",
+  "validado_empiricamente": false,
+  "hipoteses": {
+   "posicao_inicial": "primeira_posicao_observada",
+   "permanencia": "fica_no_destino",
+   "matriz": null,
+   "rotulo": "baseline_simplificado_calibrado_espera_no_destino"
+  },
+  "parametros_sim": {
+   "radius_km": 4.5,
+   "speed_kmh": 16.0793020421524,
+   "road_factor": 1.3012454652253007,
+   "patience_s": 180.0,
+   "post_accept_cancel": false
+  },
+  "janela_s": [
+   0.0,
+   86400.0
+  ],
+  "assinatura_entrada": "c44638c9f62abb63cd5a9ad3898571b0b5d97b0be58e8520f3e8f17cc18e097e",
+  "km_vazio_estimado": {
+   "pickup_km": 3037.328702291283,
+   "reposicionamento_km": 0.0,
+   "total": 3037.328702291283
+  },
+  "solicitacoes": 1622,
+  "atendidas": 1272,
+  "limite": "km estimado (Haversine x fator); velocidade constante; despacho ao mais próximo no raio; compromissos teleportam o motorista"
+ },
+ "auditoria": {
+  "ocupacao_simultanea": 0,
+  "despacho_fora_da_jornada": 0,
+  "despacho_antes_do_pedido": 0,
+  "compromisso_sobreposto": 0,
+  "km_nao_conserva": 0,
+  "reposicionamento_inesperado": 0,
+  "atendimento_inconsistente": 0,
+  "ok": true
+ },
+ "auditoria_compromissos": {
+  "avaliados": 39,
+  "nao_avaliados": 8,
+  "inviaveis": 26
+ },
+ "parametros_herdados": "calibração anterior (não recalibrada para V1 Viagens)"
+}

@@ -1,0 +1,6 @@
+{
+  "descricao": "Exemplo didático hipotético (não vem de dados do estudo): custos de aproximação em km; linhas = pedidos P1..P3, colunas = veículos V1..V3",
+  "custos_km": [[2, 3, 9], [1, 8, 7], [6, 4, 5]],
+  "custo_sequencial_km": 13,
+  "custo_otimo_km": 9
+}

@@ -1,0 +1,145 @@
+{
+ "rotulo": "p0_completa",
+ "cenario": "J",
+ "dia": "2026-03-10",
+ "estado": "executado",
+ "entrada": {
+  "dia": "2026-03-10",
+  "tipo": "simulacao",
+  "validado_empiricamente": false,
+  "pedidos_excluidos_por_tipo": {
+   "Agendamento": 46
+  },
+  "pedidos": 1279,
+  "pedidos_sem_coordenada_descartados": 0,
+  "pedidos_com_desfecho": {
+   "CorridaEncerrada": 738,
+   "NaoAtendida": 250,
+   "CorridaCanceladaSolicitante": 96,
+   "CorridaCanceladaSolicitantePosAceite": 72,
+   "CorridaCanceladaMotoristaPosAceite": 61,
+   "LimiteEsperaAtingido": 24,
+   "PagamentoRejeitado": 20,
+   "Retracamento": 16,
+   "CorridaCanceladaOperador": 1,
+   "CorridaCanceladaAgendamento": 1
+  },
+  "definicao_universo": "todas as solicitações V1 com origem no dia, tipos TempoReal; sem excluir canceladas/não atendidas",
+  "snapshots_es_sem_horario_descartados": 490,
+  "unicidade_de_recursos": {
+   "placa_troca_de_motorista": 1,
+   "motorista_troca_de_placa": 1,
+   "mais_de_2km": 0,
+   "mais_de_2km_e_ate_30min": 0,
+   "resolucao": {
+    "conflitos_placa": 0,
+    "conflitos_motorista": 0,
+    "horas_excluidas": 0.0
+   }
+  },
+  "inicializacao_viagens_em_andamento": {
+   "janelas": 160,
+   "janelas_iniciadas_com_evidencia_de_ocupacao": 31,
+   "horas_aparadas_no_inicio": 49.03,
+   "aproximacao": "entra ao fim da viagem histórica em andamento (duração observada; comum a todas as políticas)"
+  },
+  "cenario_disponibilidade": "J",
+  "jornada_registrada": {
+   "disponivel": true,
+   "jornadas": 161,
+   "sem_horario": 1,
+   "sem_vinculo_vigente": 22,
+   "varios_veiculos": 0,
+   "placa_sem_motorista_no_feed": 0,
+   "placa_com_varios_motoristas": 49,
+   "usadas": 89,
+   "regra_J": {
+    "motoristas_com_jornada": 85,
+    "jornada_sem_feed": 0,
+    "motoristas_sem_jornada_mantidos_como_E": 47,
+    "horas_feed_fora_da_jornada": 65.07875472222223,
+    "horas_ponte_adicionadas": 0.009497222222222868
+   }
+  },
+  "evidencias": {
+   "linhas": 2014,
+   "horas_por_estado_e_fonte": {
+    "desconhecido|lacuna_no_feed": 266.0,
+    "ocupado_com_evidencia|es.posicao_ofertas": 634.1,
+    "presente_sem_viagem_es|es.posicao_ofertas": 587.7
+   },
+   "motoristas": 132
+  },
+  "condicao_inicial": {
+   "condicao": "primeira_posicao_observada",
+   "max_idade_s": 1800.0,
+   "jornadas": 143,
+   "por_estado": {
+    "conhecida_no_inicio": 143
+   },
+   "segundos_jornada_total": 4168180.7149999985,
+   "segundos_desconhecidos": 0.0,
+   "pct_jornada_desconhecida": 0.0,
+   "tratamento_do_desconhecido": "motorista indisponível ao despacho até a 1ª observação; jornada sem observação é excluída (contada)",
+   "conhecida_pelo_planejador_vespera": false
+  },
+  "motoristas_online_es": 132,
+  "compromissos_que_sao_pedidos_v1_simulados (deve ser 0)": 0,
+  "compromissos_atribuidos": 58,
+  "compromissos_nao_atribuidos_por_placa": 31,
+  "motoristas_simulados": 132,
+  "hipoteses": {
+   "gap_sessao_s": 360.0,
+   "max_idade_s": 1800.0,
+   "online": "presente em posicao_ofertas (status/enum não usado como livre)",
+   "pedido": "dt_registro como proxy da criação (RN024 pendente)",
+   "compromissos": "conhecidos pelo despacho do simulador desde o início (hipótese; known_at desconhecido)"
+  }
+ },
+ "manifesto": {
+  "tipo": "simulacao",
+  "validado_empiricamente": false,
+  "hipoteses": {
+   "posicao_inicial": "primeira_posicao_observada",
+   "permanencia": "fica_no_destino",
+   "matriz": null,
+   "rotulo": "baseline_simplificado_calibrado_espera_no_destino"
+  },
+  "parametros_sim": {
+   "radius_km": 4.5,
+   "speed_kmh": 16.0793020421524,
+   "road_factor": 1.3012454652253007,
+   "patience_s": 180.0,
+   "post_accept_cancel": false
+  },
+  "janela_s": [
+   0.0,
+   86400.0
+  ],
+  "assinatura_entrada": "a15d0194a5ad8a5c7fbd1df0ed19f3cd77858c24187b504665d9814726a75e79",
+  "km_vazio_estimado": {
+   "pickup_km": 2499.4710008931456,
+   "reposicionamento_km": 0.0,
+   "total": 2499.4710008931456
+  },
+  "solicitacoes": 1279,
+  "atendidas": 1034,
+  "limite": "km estimado (Haversine x fator); velocidade constante; despacho ao mais próximo no raio; compromissos teleportam o motorista"
+ },
+ "auditoria": {
+  "ocupacao_simultanea": 0,
+  "despacho_fora_da_jornada": 0,
+  "despacho_antes_do_pedido": 0,
+  "compromisso_sobreposto": 0,
+  "km_nao_conserva": 0,
+  "reposicionamento_inesperado": 0,
+  "atendimento_inconsistente": 0,
+  "ok": true
+ },
+ "auditoria_compromissos": {
+  "avaliados": 44,
+  "nao_avaliados": 14,
+  "inviaveis": 23
+ },
+ "parametros_herdados": "calibração anterior (não recalibrada para V1 Viagens)"
+}

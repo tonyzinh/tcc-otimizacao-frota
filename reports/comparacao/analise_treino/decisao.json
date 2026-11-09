@@ -1,0 +1,257 @@
+{
+ "fase": "treino",
+ "equivalencia_A0_B0": {
+  "verificada": true,
+  "A0_igual_B0": true
+ },
+ "por_metodo": [
+  {
+   "config": "B_lote60s_fluxo",
+   "sementes": 1,
+   "elegivel": true,
+   "km_vazio_total_media": 82992.98104334851,
+   "km_vazio_total_min": 82992.98104334851,
+   "km_vazio_total_max": 82992.98104334851,
+   "reducao_agregada_pct_media": -5.435730529502905,
+   "dif_atendidos_min": 146,
+   "p90_pior_semente_s": 1142.7538249787244,
+   "evidencia_de_reducao_todas": true,
+   "tempo_plano_total_s_media": 80.22486409996054,
+   "movimentos_executados_media": 0.0,
+   "movimentos_planejados_media": 0.0
+  },
+  {
+   "config": "B_lote60s_hungaro",
+   "sementes": 1,
+   "elegivel": true,
+   "km_vazio_total_media": 83354.79673447614,
+   "km_vazio_total_min": 83354.79673447614,
+   "km_vazio_total_max": 83354.79673447614,
+   "reducao_agregada_pct_media": -5.023468720319589,
+   "dif_atendidos_min": 98,
+   "p90_pior_semente_s": 1144.283804315983,
+   "evidencia_de_reducao_todas": true,
+   "tempo_plano_total_s_media": 11.113394799962407,
+   "movimentos_executados_media": 0.0,
+   "movimentos_planejados_media": 0.0
+  },
+  {
+   "config": "B_lote30s_fluxo",
+   "sementes": 1,
+   "elegivel": true,
+   "km_vazio_total_media": 84146.32456610868,
+   "km_vazio_total_min": 84146.32456610868,
+   "km_vazio_total_max": 84146.32456610868,
+   "reducao_agregada_pct_media": -4.121582196629079,
+   "dif_atendidos_min": 238,
+   "p90_pior_semente_s": 1132.4203523261633,
+   "evidencia_de_reducao_todas": true,
+   "tempo_plano_total_s_media": 95.80599979992257,
+   "movimentos_executados_media": 0.0,
+   "movimentos_planejados_media": 0.0
+  },
+  {
+   "config": "B_lote30s_hungaro",
+   "sementes": 1,
+   "elegivel": true,
+   "km_vazio_total_media": 84232.43422990586,
+   "km_vazio_total_min": 84232.43422990586,
+   "km_vazio_total_max": 84232.43422990586,
+   "reducao_agregada_pct_media": -4.023466701210531,
+   "dif_atendidos_min": 267,
+   "p90_pior_semente_s": 1133.3678766621397,
+   "evidencia_de_reducao_todas": true,
+   "tempo_plano_total_s_media": 14.274474200035911,
+   "movimentos_executados_media": 0.0,
+   "movimentos_planejados_media": 0.0
+  },
+  {
+   "config": "B_lote60s_guloso_fifo",
+   "sementes": 1,
+   "elegivel": false,
+   "km_vazio_total_media": 85342.6824441605,
+   "km_vazio_total_min": 85342.6824441605,
+   "km_vazio_total_max": 85342.6824441605,
+   "reducao_agregada_pct_media": -2.7584222360999724,
+   "dif_atendidos_min": -221,
+   "p90_pior_semente_s": 1171.821327370908,
+   "evidencia_de_reducao_todas": true,
+   "tempo_plano_total_s_media": 8.81516510003712,
+   "movimentos_executados_media": 0.0,
+   "movimentos_planejados_media": 0.0
+  },
+  {
+   "config": "B_lote30s_guloso_fifo",
+   "sementes": 1,
+   "elegivel": false,
+   "km_vazio_total_media": 86748.24118320191,
+   "km_vazio_total_min": 86748.24118320191,
+   "km_vazio_total_max": 86748.24118320191,
+   "reducao_agregada_pct_media": -1.156893604589549,
+   "dif_atendidos_min": -171,
+   "p90_pior_semente_s": 1165.9422823833538,
+   "evidencia_de_reducao_todas": true,
+   "tempo_plano_total_s_media": 11.751689000084298,
+   "movimentos_executados_media": 0.0,
+   "movimentos_planejados_media": 0.0
+  },
+  {
+   "config": "A5a_recozimento_t0.005",
+   "sementes": 3,
+   "elegivel": false,
+   "km_vazio_total_media": 87788.81822822534,
+   "km_vazio_total_min": 87765.51477772504,
+   "km_vazio_total_max": 87813.10417801088,
+   "reducao_agregada_pct_media": 0.02876579519767332,
+   "dif_atendidos_min": 3,
+   "p90_pior_semente_s": 1160.3578558926397,
+   "evidencia_de_reducao_todas": false,
+   "tempo_plano_total_s_media": 1069.6731340000406,
+   "movimentos_executados_media": 38.333333333333336,
+   "movimentos_planejados_media": 53.0
+  },
+  {
+   "config": "A4_busca_tabu",
+   "sementes": 3,
+   "elegivel": true,
+   "km_vazio_total_media": 87811.4930588021,
+   "km_vazio_total_min": 87810.7386180561,
+   "km_vazio_total_max": 87812.91892727587,
+   "reducao_agregada_pct_media": 0.05460206185421896,
+   "dif_atendidos_min": 6,
+   "p90_pior_semente_s": 1160.2033863616364,
+   "evidencia_de_reducao_todas": false,
+   "tempo_plano_total_s_media": 1160.5324176666716,
+   "movimentos_executados_media": 40.0,
+   "movimentos_planejados_media": 63.333333333333336
+  },
+  {
+   "config": "A5b_recozimento_t0.02",
+   "sementes": 3,
+   "elegivel": false,
+   "km_vazio_total_media": 87821.2799061715,
+   "km_vazio_total_min": 87782.03959941484,
+   "km_vazio_total_max": 87869.86034582516,
+   "reducao_agregada_pct_media": 0.06575343948005265,
+   "dif_atendidos_min": -6,
+   "p90_pior_semente_s": 1160.8240962523446,
+   "evidencia_de_reducao_todas": false,
+   "tempo_plano_total_s_media": 1069.5323784999975,
+   "movimentos_executados_media": 24.333333333333332,
+   "movimentos_planejados_media": 39.333333333333336
+  },
+  {
+   "config": "A3_guloso_busca_local",
+   "sementes": 3,
+   "elegivel": false,
+   "km_vazio_total_media": 87861.82963321515,
+   "km_vazio_total_min": 87847.85431940637,
+   "km_vazio_total_max": 87872.50732653427,
+   "reducao_agregada_pct_media": 0.11195680833010131,
+   "dif_atendidos_min": 11,
+   "p90_pior_semente_s": 1161.1818988770945,
+   "evidencia_de_reducao_todas": false,
+   "tempo_plano_total_s_media": 1113.2824447999399,
+   "movimentos_executados_media": 28.666666666666668,
+   "movimentos_planejados_media": 44.0
+  },
+  {
+   "config": "A6_fluxo_custo_minimo_zonas",
+   "sementes": 1,
+   "elegivel": false,
+   "km_vazio_total_media": 87894.96515347446,
+   "km_vazio_total_min": 87894.96515347446,
+   "km_vazio_total_max": 87894.96515347446,
+   "reducao_agregada_pct_media": 0.1497122453255447,
+   "dif_atendidos_min": -49,
+   "p90_pior_semente_s": 1160.6100718721455,
+   "evidencia_de_reducao_todas": false,
+   "tempo_plano_total_s_media": 1.7132586997468024,
+   "movimentos_executados_media": 157.0,
+   "movimentos_planejados_media": 290.0
+  },
+  {
+   "config": "A1_guloso_atual",
+   "sementes": 1,
+   "elegivel": false,
+   "km_vazio_total_media": 88023.22779584675,
+   "km_vazio_total_min": 88023.22779584675,
+   "km_vazio_total_max": 88023.22779584675,
+   "reducao_agregada_pct_media": 0.2958578943166972,
+   "dif_atendidos_min": -17,
+   "p90_pior_semente_s": 1158.5270527762978,
+   "evidencia_de_reducao_todas": false,
+   "tempo_plano_total_s_media": 3.069057399960002,
+   "movimentos_executados_media": 171.0,
+   "movimentos_planejados_media": 669.0
+  },
+  {
+   "config": "A7_hungaro_vagas",
+   "sementes": 1,
+   "elegivel": false,
+   "km_vazio_total_media": 88343.14900281731,
+   "km_vazio_total_min": 88343.14900281731,
+   "km_vazio_total_max": 88343.14900281731,
+   "reducao_agregada_pct_media": 0.6603840849049086,
+   "dif_atendidos_min": 26,
+   "p90_pior_semente_s": 1161.6569523889661,
+   "evidencia_de_reducao_todas": false,
+   "tempo_plano_total_s_media": 1.081628300365992,
+   "movimentos_executados_media": 282.0,
+   "movimentos_planejados_media": 520.0
+  },
+  {
+   "config": "A2_guloso_posicao_corrigida",
+   "sementes": 1,
+   "elegivel": true,
+   "km_vazio_total_media": 88717.93786649039,
+   "km_vazio_total_min": 88717.93786649039,
+   "km_vazio_total_max": 88717.93786649039,
+   "reducao_agregada_pct_media": 1.0874278499723509,
+   "dif_atendidos_min": 114,
+   "p90_pior_semente_s": 1158.2660934373662,
+   "evidencia_de_reducao_todas": false,
+   "tempo_plano_total_s_media": 4.519786600169027,
+   "movimentos_executados_media": 730.0,
+   "movimentos_planejados_media": 1288.0
+  }
+ ],
+ "decisao_grupo_A": {
+  "vencedor": "referencia",
+  "motivo": "nenhum elegível tem evidência suficiente de redução (IC95% bloco-bootstrap com limite superior < 0 em todas as sementes): referência mantida como melhor política observada"
+ },
+ "decisao_grupo_B": {
+  "vencedor": "B_lote60s_fluxo",
+  "candidatos_com_evidencia": [
+   "B_lote60s_fluxo",
+   "B_lote60s_hungaro",
+   "B_lote30s_fluxo",
+   "B_lote30s_hungaro"
+  ],
+  "observacao": "conferir empates por simplicidade com diferença pareada entre candidatos",
+  "desempate_simplicidade": {
+   "escolhido": "B_lote60s_hungaro",
+   "melhor_km": "B_lote60s_fluxo",
+   "comparacoes_de_simplicidade": [
+    {
+     "mais_simples": "B_lote30s_hungaro",
+     "vs": "B_lote60s_fluxo",
+     "dif_media_diaria_km": 28.824492710635425,
+     "ic95": [
+      13.398354992143604,
+      49.50716162970298
+     ]
+    },
+    {
+     "mais_simples": "B_lote60s_hungaro",
+     "vs": "B_lote60s_fluxo",
+     "dif_media_diaria_km": 8.414318398316707,
+     "ic95": [
+      -0.17421745902451272,
+      17.08862907156293
+     ]
+    }
+   ]
+  }
+ }
+}

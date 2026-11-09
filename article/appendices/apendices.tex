@@ -1,0 +1,41 @@
+\apendice{Resultados sintéticos por cenário}{ap:sint}
+
+Este apêndice lista, na Tabela~\ref{tab:sint22}, os 22 cenários sintéticos da linha B (40 sementes cada, 20001--20040), para que o leitor confira a variação entre eles e não dependa apenas do resumo da Tabela~\ref{tab:sint}. Os cenários S2 e S3 têm variantes de frota (\texttt{frota\_abundante}: 4 pedidos por veículo; \texttt{frota\_escassa}: 14; padrão: 8), de zoneamento (\texttt{res6}, \texttt{res8}), de salto máximo (\texttt{salto6km}, \texttt{salto10km}) e de previsão (\texttt{erro\_previsao}, \texttt{previsao\_perfeita}), parâmetros que não afetam um despacho que usa só pedidos já chegados. A última coluna compara C com B na mesma janela. O critério de serviço da linha B (razão de atendidos $\ge 0{,}995$ e razão de P90 $\le 1{,}05$) foi cumprido por C em todos.
+
+\begin{table}[!htb]
+\caption{Km vazio simulado de C contra A em 22 cenários sintéticos}\label{tab:sint22}
+\centering\fontetabela
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Cenário & Km de A (média) & $\Delta\%$ C×A & Razão atend. & Razão P90 & $\Delta\%$ C×B \\
+\midrule
+S1 & 2.300,3 & −2,15 & 0,998 & 1,000 & −1,09 \\
+S2 & 2.329,1 & −9,14 & 1,010 & 0,933 & −7,27 \\
+S2\_erro\_previsao & 2.309,3 & −8,64 & 1,015 & 0,940 & −6,90 \\
+S2\_frota\_abundante & 1.200,2 & −3,44 & 0,996 & 0,996 & −2,00 \\
+S2\_frota\_escassa & 3.447,5 & −14,04 & 1,050 & 0,884 & −13,76 \\
+S2\_previsao\_perfeita & 2.371,9 & −9,15 & 1,013 & 0,933 & −7,83 \\
+S2\_res6 & 2.317,9 & −6,80 & 1,014 & 0,952 & −4,72 \\
+S2\_res8 & 2.353,8 & −8,97 & 1,019 & 0,925 & −7,46 \\
+S2\_salto10km & 2.325,6 & −9,03 & 1,014 & 0,935 & −7,05 \\
+S2\_salto6km & 2.362,3 & −8,26 & 1,016 & 0,942 & −7,02 \\
+S3 & 2.139,2 & −7,90 & 1,019 & 0,918 & −6,36 \\
+S3\_frota\_abundante & 1.168,6 & −4,04 & 1,001 & 0,983 & −2,52 \\
+S3\_frota\_escassa & 3.314,3 & −12,49 & 1,041 & 0,882 & −11,51 \\
+S3\_previsao\_perfeita & 2.142,6 & −7,87 & 1,021 & 0,927 & −7,94 \\
+S3\_res6 & 2.116,1 & −6,58 & 1,011 & 0,938 & −5,08 \\
+S3\_res8 & 2.159,4 & −8,31 & 1,019 & 0,920 & −7,55 \\
+S3\_salto10km & 2.106,2 & −8,41 & 1,019 & 0,920 & −7,65 \\
+S3\_salto6km & 2.151,0 & −8,44 & 1,014 & 0,926 & −7,92 \\
+S4 & 2.493,6 & −7,87 & 1,015 & 0,945 & −6,42 \\
+S4\_previsao\_perfeita & 2.510,7 & −7,99 & 1,011 & 0,948 & −6,82 \\
+S5 & 2.442,9 & −8,41 & 1,013 & 0,941 & −6,50 \\
+S5\_previsao\_perfeita & 2.462,6 & −9,12 & 1,005 & 0,944 & −7,34 \\
+\bottomrule
+\end{tabular}
+\fonte{\texttt{reports/sintetico\_v2/metodos\_avaliacao\_D/analise/resumo\_contrastes.csv}.}
+\end{table}
+
+\apendice{Verificações e reprodutibilidade}{ap:repro}
+
+Este apêndice reúne as verificações que sustentam os números do artigo. Antes de simular setembro e outubro, congelaram-se: o SHA-256 do código (151 arquivos: \texttt{src/tcc\_frota} e os \textit{scripts} da avaliação), \texttt{480a98a1\ldots e93f87}; o \textit{commit} de base \texttt{3e77cb9}; a versão do Python (3.12.14); 201 manifestos de dados com SHA-256, todos conferidos contra os arquivos Parquet; e a configuração das três políticas. Testes automáticos no congelamento (código anterior à reorganização): 535 aprovados e 1 pulado; análise estática sem erros. Verificações em quatro dias de desenvolvimento (10/02, 04/03, 17/03 e 25/03): em 2.628 lotes, o Húngaro coincidiu com o oráculo em número de pares e soma de distâncias (resolução de 1 m); todos os pedidos de cada lote já haviam chegado na decisão; decisões apenas em múltiplos de 60 s; pares únicos e elegíveis; nenhuma sobreposição de serviços por motorista; B coincide com uma reimplementação independente. Nos períodos finais: 15 de 15 e 25 de 25 dias elegíveis; 19 (setembro) e 17 (outubro) compromissos com posição de entrada inconsistente, independentes da política e iguais nas três. Após a avaliação, o código foi reorganizado em novos módulos (o hash do código atual difere do congelado, e os manifestos antigos não foram reescritos). A equivalência foi conferida por reexecução de amostras: três pares (cenário, semente) sintéticos e um dia real reproduziram os resultados congelados, e a análise regenerada dos arquivos congelados reproduziu as tabelas dos dois períodos; essas reexecuções não são novos testes científicos. Sobre a rede viária da linha B, as verificações foram estruturais (grafo conexo, distância por via não inferior à reta, razão ilha--continente comparável à interna) e não incluem validação de tempos de percurso nem conferência ponte a ponte.

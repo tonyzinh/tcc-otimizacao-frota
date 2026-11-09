@@ -1,0 +1,74 @@
+\section{Fundamentação teórica e trabalhos relacionados}
+
+\subsection{Alocação de frota, atribuição, roteamento e km vazio}
+
+Vários problemas clássicos tocam a decisão estudada, e distingui-los evita atribuir ao método mais do que ele resolve. A \textit{alocação de frota} distribui veículos no espaço e no tempo; o \textit{reposicionamento} move veículos ociosos antes dos pedidos \cite{pavone2012, kontou2020, pouls2025}. A \textit{atribuição} associa pedidos já conhecidos a veículos. O \textit{caminho mínimo} fornece o custo de cada deslocamento \cite{dijkstra1959}. O \textit{sequenciamento} ordena os atendimentos de cada veículo. O \textit{problema de roteamento de veículos} (VRP) constrói rotas completas \cite{toth2002}, e suas variantes de coleta e entrega e de transporte sob demanda (\textit{dial-a-ride}) acrescentam janelas de tempo e, em geral, veículos que atendem vários pedidos em uma mesma rota \cite{cordeau2007, berbeglia2010}. Em versões dinâmicas, os pedidos chegam durante a operação e as decisões são refeitas \cite{pillac2013}.
+
+A relação entre esses problemas é direta no km vazio. A distância de aproximação de um pedido é o custo do caminho entre a posição atual do veículo e a origem do passageiro; logo, depende de \emph{onde o veículo está} e de \emph{qual veículo é escolhido}. A escolha altera o futuro: o veículo atribuído termina a corrida no destino, e não onde estava, o que muda os custos dos pedidos seguintes. Um custo local menor pode, portanto, piorar o restante do dia, e o contrário também. Em um sistema em que cada veículo atende um pedido por vez, sem compartilhar corridas, a rota de um veículo é a sequência de atendimentos produzida ao longo dos lotes, e não um plano construído de uma vez.
+
+Neste trabalho, a decisão por lote é um subproblema de atribuição entre os pedidos pendentes e os veículos elegíveis daquele instante, e o Húngaro o resolve de forma ótima \emph{para o lote}. O método não resolve um VRP completo, não sequencia pedidos futuros e não prevê demanda. Também não se afirma que não haja roteamento no problema: há deslocamento entre posições, mas o modelo de cada linha é simplificado e declarado. Na linha real, a distância é a distância em linha reta (fórmula de Haversine) multiplicada por um fator rua/reta de 1,3012 e percorrida a velocidade constante de 16,079 km/h, parâmetros herdados da calibração de março; não há roteamento viário. Como a linha reta ignora barreiras como a baía e os rios da Grande Vitória, a distância de aproximação pode ser subestimada onde a ligação real exige desvio por ponte; isso é uma limitação da linha real. Nos cenários operacionais sintéticos, cuja operação (demanda, frota, jornadas) é gerada artificialmente, as distâncias vêm de caminhos mínimos (algoritmo de Dijkstra) sobre a rede viária derivada do OpenStreetMap, que contém as pontes ali mapeadas; a ligação entre as ilhas e o continente depende, portanto, do que está mapeado, e congestionamento e custos de travessia não são modelados.
+
+A Tabela~\ref{tab:problemas} resume essas relações.
+
+\begin{table}[!htb]
+\caption{Relação entre problemas clássicos e a decisão estudada}\label{tab:problemas}
+\centering\fontetabela
+\begin{tabular}{@{}p{30mm}p{58mm}p{60mm}@{}}
+\toprule
+Problema & Decisão que resolve & Relação com este estudo \\
+\midrule
+Alocação de frota e reposicionamento & onde os veículos ficam antes dos pedidos & não é decidido; estudo anterior, sem redução de km vazio \\
+Atribuição & qual veículo atende qual pedido conhecido & \textbf{subproblema resolvido a cada lote} (Húngaro) \\
+Caminho mínimo & custo do deslocamento entre dois pontos & fornece $c_{rv}$: reta $\times$ 1,3012 (linha A) ou Dijkstra (linha B) \\
+Sequenciamento & ordem dos atendimentos de um veículo & emerge da sucessão dos lotes; não é planejado \\
+VRP, coleta e entrega, \textit{dial-a-ride} & rotas completas, com janelas e vários pedidos por rota & fora do escopo; sem compartilhamento de corridas \\
+\bottomrule
+\end{tabular}
+\fonte{elaborado pelos autores a partir de \citeonline{toth2002}, \citeonline{cordeau2007}, \citeonline{berbeglia2010} e \citeonline{pillac2013}.}
+\end{table}
+
+\subsection{Formulação da atribuição por lote}
+
+Seja $t$ um instante de decisão (múltiplo de 60 s). Seja $R_t$ o conjunto de pedidos pendentes, isto é, já chegados ($t_r \le t$), não atendidos e não expirados, e $V_t$ o conjunto de veículos \emph{online}. Um par $(r,v)$ é \emph{elegível}, $(r,v)\in E_t$, se o veículo está livre em $t$, não há conflito com seus compromissos externos e a distância de aproximação está dentro do raio de despacho $\rho$ (4,5 km em linha reta na linha real; 8 km por via na sintética). O custo $c_{rv}$ é a distância de aproximação estimada, em km. A variável $x_{rv}\in\{0,1\}$ indica que o veículo $v$ é atribuído ao pedido $r$. O problema do lote é lexicográfico: primeiro maximizar o número de pedidos atendidos e, entre as soluções com esse máximo, minimizar o custo total:
+\begin{equation}
+\max \sum_{(r,v)\in E_t} x_{rv} \quad\text{e, em seguida,}\quad \min \sum_{(r,v)\in E_t} c_{rv}\,x_{rv}, \label{eq:obj}
+\end{equation}
+\begin{equation}
+\sum_{v:(r,v)\in E_t} x_{rv}\le 1\ \ \forall r\in R_t, \qquad \sum_{r:(r,v)\in E_t} x_{rv}\le 1\ \ \forall v\in V_t, \qquad x_{rv}\in\{0,1\}. \label{eq:rest}
+\end{equation}
+A equação~\ref{eq:obj} impõe prioridade ao atendimento; a~\ref{eq:rest} impede que um pedido receba dois veículos e que um veículo atenda dois pedidos. Um pedido sem par elegível, ou que perde a disputa por falta de veículo, fica sem atribuição e segue para o lote seguinte, até esgotar a paciência (180 s na linha real; 600 s na sintética).
+
+Para resolver a equação~\ref{eq:obj} com um único problema de atribuição, constrói-se uma matriz ampliada com uma linha por pedido pendente e colunas para os veículos mais $|R_t|$ colunas fictícias de \enquote{não atribuído}. O elemento de um par elegível é $c_{rv}-M$, o de um par inelegível é um valor proibitivo e o de uma coluna fictícia é zero. Com $M$ maior que a soma de qualquer conjunto de custos (no código, $M=\max c\,(|R_t|+1)+1$), todo par adicional baixa o custo total, de modo que o número de atendidos domina e o custo de aproximação desempata. Os custos são inteiros (metros multiplicados por $10^5$, somados a um índice de posição), o que torna o desempate determinístico. A matriz é retangular, mas, como há pelo menos tantas colunas quanto linhas, o método se aplica sem alteração.
+
+\subsection{Funcionamento do algoritmo Húngaro}
+
+Intuição: cada pedido e cada coluna recebem um \enquote{potencial} que abate o custo sem torná-lo negativo; só pares de custo reduzido nulo podem compor a solução. O algoritmo constrói o emparelhamento linha a linha: para cada pedido novo, procura o caminho aumentante de menor custo reduzido, que pode rearranjar pares já formados, e atualiza os potenciais. Ao terminar, os potenciais certificam a otimalidade (folgas complementares): nenhum conjunto de pares tem custo total menor \cite{kuhn1955, munkres1957}.
+
+A implementação usada é própria e segue essa formulação, com potenciais duais e caminhos aumentantes de menor custo, em $O(n^2 m)$ para $n$ linhas e $m$ colunas \cite{tomizawa1971, edmondskarp1972}; a leitura do código confirma que se trata do método de Kuhn e Munkres, e não de uma chamada de biblioteca. A rotina mantém dois vetores de potenciais (um por linha e um por coluna), a menor folga de cada coluna e o predecessor de cada coluna; para cada pedido inserido, calcula a menor folga entre as colunas ainda não visitadas, desloca os potenciais por essa folga (o que mantém os custos reduzidos não negativos e nulos nos pares escolhidos) e inverte o caminho aumentante até uma coluna livre. Não há enumeração nem programação linear. A rotina \texttt{linear\_sum\_assignment} da biblioteca SciPy, que usa busca de caminho aumentante no estilo de \citeonline{jonker1987} e atribuições retangulares \cite{crouse2016}, foi empregada apenas como oráculo em testes, para comparar o número de pares e a soma das distâncias, e não a identidade dos pares. O alcance desses testes é limitado: enumeração exaustiva em instâncias de até $4\times4$, comparação com o SciPy em instâncias maiores e conferência de 2.628 lotes reais de desenvolvimento mostram concordância de custo \emph{nas instâncias verificadas}; não constituem prova geral de correção, e a otimalidade assegurada é a de cada lote, não a do dia. Empates entre soluções de mesmo custo são resolvidos pelo índice determinístico. Em lotes com dezenas de pedidos, o custo computacional é desprezível (Seção 4).
+
+Os limites são os de um subproblema. O ótimo do lote é ótimo \emph{para aquele lote, dado o estado do instante}; não implica ótimo ao longo do dia, porque a atribuição altera as posições futuras dos veículos e quais deles estarão livres, e porque os pedidos futuros não são conhecidos. Em ambiente dinâmico, o método é uma heurística de horizonte rolante \cite{pillac2013}, cuja qualidade é uma questão empírica, tratada na Seção 4.
+
+\subsubsection{Exemplo didático (ilustrativo)}
+
+A Tabela~\ref{tab:exemplo} mostra três pedidos que chegaram em ordem ($P_1$, $P_2$, $P_3$) e três veículos livres; os valores são hipotéticos e servem apenas para ilustrar o mecanismo. O despacho sequencial pelo mais próximo atribui $P_1\to V_1$ (2 km), $P_2\to V_3$ (7 km, pois $V_1$ já foi usado) e $P_3\to V_2$ (4 km), com 13 km. A atribuição conjunta escolhe $P_1\to V_2$ (3 km), $P_2\to V_1$ (1 km) e $P_3\to V_3$ (5 km), com 9 km, uma redução de 30,8\% neste exemplo. Se $V_3$ não existisse, só dois pedidos poderiam ser atendidos: o despacho sequencial atenderia $P_1$ e $P_2$ (2 + 8 = 10 km), e a atribuição conjunta, que também atende dois pedidos, escolheria $P_1\to V_2$ e $P_2\to V_1$ (3 + 1 = 4 km), deixando $P_3$ sem veículo; é a coluna de \enquote{não atribuído} que permite essa escolha. O ganho vem de não deixar $V_1$, de que $P_2$ mais precisa, ser consumido por $P_1$, que perderia apenas 1 km usando $V_2$.
+
+\begin{table}[!htb]
+\caption{Custos de aproximação (km) de um exemplo ilustrativo}\label{tab:exemplo}
+\centering\fontetabela
+\begin{tabular}{lccc}
+\toprule
+Pedido & $V_1$ & $V_2$ & $V_3$ \\
+\midrule
+$P_1$ & 2 & 3 & 9 \\
+$P_2$ & 1 & 8 & 7 \\
+$P_3$ & 6 & 4 & 5 \\
+\bottomrule
+\end{tabular}
+\fonte{valores hipotéticos criados pelos autores; não vêm dos dados do estudo.}
+\end{table}
+
+\subsection{Trabalhos relacionados e justificativa}
+
+O problema de atribuição é clássico. A solução do Húngaro vem de \citeonline{kuhn1955} e \citeonline{munkres1957}, com aprimoramentos de eficiência \cite{tomizawa1971, edmondskarp1972, jonker1987, crouse2016}. Em transporte sob demanda, a atribuição entre veículos e viagens é formulada como problema de otimização resolvido em tempo real, com avaliação experimental sobre dados de táxis de Nova York \cite{alonsomora2017}, e o pareamento entre motoristas e passageiros é, ao lado da precificação dinâmica, uma das principais alavancas das plataformas para reduzir a espera \cite{yan2020}. O que este trabalho acrescenta não é o algoritmo, que é conhecido, e sim a medição, com configuração congelada antes de períodos nunca simulados, do efeito da atribuição conjunta sobre o km vazio e o atendimento de uma operação real da Grande Vitória, separando o efeito do lote do efeito da atribuição.
+
+Como antecedente, a literatura de reposicionamento de veículos ociosos relata ganhos em cenários próprios, com métricas diferentes. \citeonline{pavone2012} propõem uma política de rebalanceamento que, em modelo fluido, equilibra as estações minimizando o número de viagens de rebalanceamento, validada em simulação e em experimentos de hardware; \citeonline{kontou2020} relatam, com dados da RideAustin e da DiDi Chuxing, reduções de 53\% a 82\% das milhas vazias por viagem, supondo estacionamento de curta duração sem restrição; \citeonline{pouls2025} relatam, para o reposicionamento guiado por previsão, redução média de cerca de 3,5 pontos percentuais na rejeição de pedidos e melhora das esperas, e não de viagens vazias. Essas afirmações foram conferidas apenas nos resumos dos trabalhos (texto integral não lido). Resultados de outras cidades e frotas servem de contexto, não de expectativa para esta operação. Os autores testaram antes um guloso de reposicionamento D+1, sem redução de km vazio; busca local e recozimento simulado \cite{kirkpatrick1983} foram avaliados só de forma exploratória em cenários sintéticos e não integram este artigo. Em métodos desse tipo, aceitar uma piora temporária da solução corrente (como no recozimento) é diferente de guardar a melhor solução encontrada; nenhum resultado dessas buscas é usado aqui.

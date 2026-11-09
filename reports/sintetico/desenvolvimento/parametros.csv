@@ -1,0 +1,22 @@
+nome,unidade,valor,justificativa,classe
+velocidade_kmh,km/h,25.0,"velocidade média efetiva urbana constante, escolhida sem calibrar em dados privados",hipótese experimental
+raio_despacho_km,km por via,8.0,limite de busca do despacho ao mais próximo,hipótese experimental
+paciencia_s,s,600.0,prazo máximo de espera do passageiro (homogêneo),hipótese experimental
+dist_viagem_escala_km,km,6.0,escala do decaimento exponencial da distância origem-destino,hipótese experimental
+sigma_hub_km,km,3.0,largura espacial das concentrações de demanda,hipótese experimental
+fracao_hubs,fração,0.7,parcela da demanda nas concentrações (restante: fundo uniforme),hipótese experimental
+turnos_inicio_h,h,"[6, 8, 10, 12]",horários possíveis de início de jornada,hipótese experimental
+duracao_jornada_h,h,9.0,jornada homogênea,hipótese experimental
+horas_com_pedidos,h local,"[6, 22]",janela de solicitações,hipótese experimental
+dias_historico,dias,28,histórico sintético usado na previsão,hipótese experimental
+n_veiculos,veículos,100,frota homogênea,hipótese experimental
+pedidos_por_veiculo,pedidos/veículo/dia,8.0,relação demanda/frota do cenário,hipótese experimental
+res_zona,H3,7,resolução das regiões de planejamento,hipótese experimental
+ancoras,"lat,lon","{'centro_vitoria': (-20.3155, -40.3128), 'praia_da_costa': (-20.3427, -40.2896), 'campo_grande': (-20.3358, -40.3919), 'jardim_camburi': (-20.265, -40.27)}",pontos de referência do mapa onde se localizam as concentrações sintéticas (não são fluxos reais),informação geográfica
+max_km_guloso,km por via,3.0,"salto máximo do reposicionamento (artigo: 3,0)",hipótese experimental
+pedidos_por_veiculo,pedidos/veículo/dia,4.0,relação demanda/frota do cenário,hipótese experimental
+pedidos_por_veiculo,pedidos/veículo/dia,14.0,relação demanda/frota do cenário,hipótese experimental
+max_km_guloso,km por via,6.0,"salto máximo do reposicionamento (artigo: 3,0)",hipótese experimental
+max_km_guloso,km por via,10.0,"salto máximo do reposicionamento (artigo: 3,0)",hipótese experimental
+res_zona,H3,6,resolução das regiões de planejamento,hipótese experimental
+res_zona,H3,8,resolução das regiões de planejamento,hipótese experimental

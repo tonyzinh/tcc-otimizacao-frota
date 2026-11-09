@@ -1,0 +1,61 @@
+% =============================================================================
+% Pacotes utilizados pelo artigo (compilar com XeLaTeX; ver latexmkrc)
+% =============================================================================
+
+% Fonte: Arial REAL, instalada no sistema (exigência do Guia FAESA 2024).
+% Se a Arial não estiver instalada, o fontspec aborta com erro: não há
+% substituição silenciosa por fonte semelhante. As fórmulas usam a fonte
+% matemática padrão (Computer Modern), pois a Arial não tem alfabeto matemático.
+\usepackage{fontspec}
+\setmainfont{Arial}
+\setsansfont{Arial}
+\setmonofont{Arial}
+
+% Diagramação
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{etoolbox}
+
+% Figuras, tabelas e legendas
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{csquotes}
+\usepackage{xcolor}
+\usepackage{amsmath}
+
+% Números e letras das fórmulas (inclusive os valores em modo matemático nas
+% tabelas) também em Arial; operadores, somatórios, raízes e frações usam a
+% fonte matemática padrão (Computer Modern), porque a Arial não os fornece.
+\usepackage{mathspec}
+\setmathsfont(Digits,Latin,Greek)[Numbers={Lining,Proportional}]{Arial}
+\setmathrm{Arial}
+
+% Idioma e hifenização em português. O babel precisa vir DEPOIS do mathspec:
+% na ordem inversa o XeLaTeX trava em \begin{document}.
+\usepackage[brazilian]{babel}
+\usepackage{longtable}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning}
+
+% Links e metadados do PDF (carregar antes do abntex2cite)
+\usepackage[hidelinks]{hyperref}
+
+% Citações e referências no padrão ABNT (autor-data)
+\usepackage[
+  alf,
+  bibleftalign,
+  abnt-emphasize=bf,
+  abnt-full-initials=yes,
+  abnt-etal-cite=3,
+  abnt-etal-list=3,
+]{abntex2cite}
+
+% Flutuantes não atravessam o início de uma seção primária (nem aparecem acima do seu título)
+\usepackage[section,above]{placeins}

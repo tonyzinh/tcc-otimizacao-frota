@@ -1,0 +1,13 @@
+# Configuração do latexmk
+# Compilador: XeLaTeX + BibTeX (necessário para usar a Arial real via fontspec;
+# o pdfLaTeX não carrega fontes TrueType do sistema).
+# A Arial precisa estar instalada na máquina (Windows/macOS já a trazem).
+# O Overleaf NÃO traz a Arial: ver README (fonte licenciada, não versionada).
+$pdf_mode = 5;
+$bibtex_use = 2;
+$xelatex = 'xelatex -synctex=1 -interaction=nonstopmode -file-line-error %O %S';
+
+# Arquivos auxiliares removidos por "latexmk -c"
+$clean_ext = 'bbl run.xml synctex.gz nav snm vrb fls fdb_latexmk';
+$out_dir = 'build';
+ensure_path('BIBINPUTS', '.');
