@@ -1,0 +1,2 @@
+limite: pedidos < 80% da mediana de outubro no mesmo dia da semana (sem 12/10)
+dias úteis 03-06/11: todos com queda

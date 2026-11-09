@@ -1,0 +1,21 @@
+--- scripts/pos_hoc_parecer.py
++++ scripts/analyze_robustness_review.py
+@@ -1 +1 @@
+-"""Análises PÓS-HOC do parecer (plano em reports/pos_hoc_parecer/PLANO.md). Não alteram o experimento congelado.
++"""Análises PÓS-HOC do parecer (plano em reports/diagnostics/statistics/robustness_review/PLANO.md). Não alteram o experimento congelado.
+@@ -4 +4 @@
+-    python scripts/pos_hoc_parecer.py base|sens|disp|janelas|componentes
++    python scripts/analyze_robustness_review.py base|sens|disp|janelas|componentes
+@@ -29,3 +29,3 @@
+-OUT = Path("reports/pos_hoc_parecer")
+-CACHE = Path("reports/runs/cache_comparacao")
+-RAIZ = Path("data/extraido/v1_viagens")
++OUT = Path("reports/diagnostics/statistics/robustness_review")
++CACHE = Path("data/processed/world_cache")
++RAIZ = Path("data/raw/v1_viagens")
+@@ -33 +33 @@
+-FROZEN = Path("reports/atribuicao_final/execucao/grupo_B")
++FROZEN = Path("reports/historical/frozen_evaluation/execucao/grupo_B")
+@@ -537 +537 @@
+-SINT = Path("reports/sintetico_v2/metodos_avaliacao_D")
++SINT = Path("reports/synthetic/dispatch_evaluation")

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
 from tcc_frota.assignment import dispatch as dp
 from tcc_frota.domain.entities import SimDriver, SimParams, SimRequest, reta_km
@@ -91,3 +92,55 @@ def test_busy_driver_is_not_reused_before_the_trip_ends_when_two_requests_arrive
 def test_straight_line_distance_is_symmetric_and_zero_for_identical_points():
     assert reta_km(-20.3, -40.3, -20.3, -40.3) == 0.0
     assert abs(reta_km(-20.3, -40.3, -20.4, -40.2) - reta_km(-20.4, -40.2, -20.3, -40.3)) < 1e-12
+
+
+def _release_world(release_s: float):
+    """Um veículo ocupado até `release_s` (primeiro pedido) e um segundo pedido que chega antes da liberação."""
+    first = SimRequest(rid=1, t=0.0, lat=-20.30, lon=-40.30, dlat=-20.30, dlon=-40.30, trip_s=release_s)
+    second = SimRequest(rid=2, t=65.0, lat=-20.30, lon=-40.30, dlat=-20.30, dlon=-40.30, trip_s=60.0)
+    drivers = [SimDriver(did="d1", sessions=((0.0, 7200.0, -20.30, -40.30),))]
+    return [first, second], drivers
+
+
+def test_released_vehicle_waits_for_next_lot_when_it_becomes_free_between_lots():
+    # Arrange: o pedido 1 é atribuído no lote de 0 s e ocupa o veículo até 150 s; o pedido 2 espera desde 65 s
+    reqs, drivers = _release_world(150.0)
+    decided = []
+
+    def spy(t, pending, candidates):
+        pairs = dp.hungarian(t, pending, candidates)
+        decided.extend((t, rid) for rid, _ in pairs)
+        return pairs
+
+    # Act
+    simulate(reqs, drivers, PARAMS, WINDOW, {}, batch_s=60.0, assigner=spy)
+    # Assert: liberado em 150 s, o veículo só é usado no lote de 180 s (não entre lotes)
+    assert decided == [(0.0, 1), (180.0, 2)]
+
+
+def test_released_vehicle_joins_the_lot_when_it_becomes_free_exactly_at_the_lot_instant():
+    # Arrange: liberação exatamente em 120 s, instante de lote
+    reqs, drivers = _release_world(120.0)
+    decided = []
+
+    def spy(t, pending, candidates):
+        pairs = dp.hungarian(t, pending, candidates)
+        decided.extend((t, rid) for rid, _ in pairs)
+        return pairs
+
+    # Act
+    simulate(reqs, drivers, PARAMS, WINDOW, {}, batch_s=60.0, assigner=spy)
+    # Assert
+    assert decided == [(0.0, 1), (120.0, 2)]
+
+
+def test_simulation_aborts_when_assigner_returns_an_ineligible_pair():
+    # Arrange: política defeituosa que devolve um motorista inexistente
+    reqs, drivers = _random_world(4)
+
+    def broken(t, pending, candidates):
+        return [(pending[0].rid, "nao_existe")] if candidates else []
+
+    # Act / Assert
+    with pytest.raises(AssertionError):
+        simulate(reqs, drivers, PARAMS, WINDOW, {}, batch_s=60.0, assigner=broken)

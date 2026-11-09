@@ -1,6 +1,6 @@
 # Atribuição conjunta de pedidos a veículos em lotes (algoritmo Húngaro) e km vazio
 
-Trabalho de conclusão de curso sobre **Otimização da Alocação de Frota em Aplicativos de Transporte Urbano**. O repositório avalia, por **simulação**, se atribuir pedidos a veículos de forma **conjunta** (algoritmo Húngaro, lotes de 60 s) reduz o **km vazio** (aproximação do veículo até o passageiro) em relação ao despacho pelo mais próximo livre, sem piorar o atendimento.
+Trabalho de conclusão de curso. Artigo: **Despacho em lotes com atribuição conjunta pelo algoritmo Húngaro: avaliação por simulação do km vazio em aplicativos de transporte** (`article/`). O repositório avalia, por **simulação**, se atribuir pedidos a veículos de forma **conjunta** (algoritmo Húngaro, lotes de 60 s) reduz o **km vazio** (aproximação do veículo até o passageiro) em relação ao despacho pelo mais próximo livre, sem piorar o atendimento.
 
 ## O método e as três políticas
 
@@ -18,7 +18,7 @@ A cada lote, C maximiza o número de pedidos atendidos e, entre as soluções co
 * **Sintético** (rede OpenStreetMap, 22 cenários **não independentes**, sementes finais examinadas antes da decisão): mediana −8,4% contra A. Complementar e exploratório.
 * Limites: simulação, não operação real; km estimado; resultado de uma empresa e região.
 
-Detalhes e ressalvas: [`docs/methodology.md`](docs/methodology.md). Resultados congelados: `reports/atribuicao_final/`, `reports/sintetico_v2/`.
+Detalhes e ressalvas: [`docs/methodology.md`](docs/methodology.md). Resultados congelados: `reports/historical/frozen_evaluation/` e `reports/synthetic/dispatch_evaluation/`. Análises posteriores (recalibração, teste fora da amostra, guloso global, sensibilidades): `reports/diagnostics/`.
 
 ## Estrutura
 
@@ -27,10 +27,10 @@ src/tcc_frota/   domain · data · assignment · simulation · scenarios · metr
 configs/         data · policies · scenarios · experiments · private (ignorado pelo Git)
 tests/           unit · integration · regression · reproducibility · fixtures
 notebook/        01_data_overview · 02_hungarian_example · 03_greater_vitoria_h3 · 04_historical_results · 05_synthetic_results
-scripts/         extração local (.sh), download de geografia, equivalência, execução dos notebooks
-docs/            architecture · data_dictionary · methodology · reproducibility · repository_migration (+ registros do estudo)
-data/            extraido/ (privado, ignorado) · geografia/ (IBGE/OSM públicos)
-reports/         atribuicao_final/ e sintetico_v2/ (congelados) · figures/ · manifests/
+scripts/         extração local (.sh), geografia, análises posteriores, figuras, equivalência, verificação dos congelados
+docs/            architecture · data_dictionary · data_quality · availability · methodology · validation · reproducibility · decisions · repository_migration
+data/            raw/ (extrações, privado) · processed/ (cache e saídas individuais) · geographic/ (IBGE/OSM) — nada versionado
+reports/         historical/ · synthetic/ · diagnostics/ · data_quality/ · figures/ · manifests/ · examples/
 article/         artigo (LaTeX) e PDF
 ```
 
@@ -55,19 +55,19 @@ python -m ruff check . && python -m ruff format --check .
 
 ## Exemplo rápido (sintético, sem dados privados)
 
-Precisa de `data/geografia/` (`python scripts/baixar_geografia.py`, fontes públicas).
+Precisa de `data/geographic/` (`python scripts/download_geography.py`, fontes públicas).
 
 ```bash
-tcc-frota run-synthetic --scenarios S1 --seeds 101-103 --out reports/final/exemplo
-tcc-frota analyze-synthetic --input reports/final/exemplo --out reports/final/exemplo/analise
+python -m tcc_frota.cli.main run-synthetic --scenarios S1 --seeds 101-103 --out reports/examples/synthetic_quick
+python -m tcc_frota.cli.main analyze-synthetic --input reports/examples/synthetic_quick --out reports/examples/synthetic_quick/analise
 ```
 
 ## Reproduzir a análise e as figuras
 
 ```bash
-tcc-frota analyze-historical --out reports/final/historico      # a partir dos Parquet congelados (locais)
-tcc-frota figures --historical reports/final/historico --out reports/figures
-python scripts/check_equivalence.py --synthetic --analysis      # confere contra os resultados congelados
+python -m tcc_frota.cli.main analyze-historical --out data/processed/historical_analysis   # a partir dos Parquet congelados (locais)
+python scripts/check_equivalence.py --synthetic --analysis --out data/processed/equivalence.json
+python scripts/verify_frozen_results.py                          # SHA-256 dos congelados pelo mapa de caminhos
 ```
 
 ## Notebooks
@@ -88,4 +88,4 @@ Simulação com km estimado (reta × 1,3012 na linha histórica; Dijkstra sobre 
 
 ## Histórico
 
-O estudo anterior (reposicionamento preventivo D+1 e a bateria de 13 algoritmos, sem redução de km vazio) está preservado como evidência em `reports/tcc_final/`, `reports/tcc_v2/` e `resultados/`; a documentação antiga e o código correspondente saíram da árvore ativa (cópia externa; ver o documento abaixo) (ver [`docs/repository_migration.md`](docs/repository_migration.md)).
+O estudo anterior (reposicionamento preventivo D+1 e a bateria de 13 algoritmos, sem redução de km vazio) saiu da árvore ativa em 09/11/2026 e está preservado fora dela, com SHA-256 por arquivo; os hashes continuam conferidos por `scripts/verify_frozen_results.py`. Ver [`docs/repository_migration.md`](docs/repository_migration.md).

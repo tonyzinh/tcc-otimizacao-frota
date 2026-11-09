@@ -2,12 +2,12 @@ from datetime import datetime
 
 import pytest
 
-from tcc_frota.data.extraction import saida
-from tcc_frota.data.extraction.entidades import entidades_es, entidades_sql
-from tcc_frota.data.extraction.executor import _linhas_es, _tratar_sql, dias
-from tcc_frota.data.extraction.filtro import FiltroV1
-from tcc_frota.data.privacy.pseudonimizacao import Segredo, chave_id_de
-from tcc_frota.data.reading.es import ForbiddenRequestError, assert_allowed
+from tcc_frota.data.extraction import writer
+from tcc_frota.data.extraction.entities import entidades_es, entidades_sql
+from tcc_frota.data.extraction.filters import FiltroV1
+from tcc_frota.data.extraction.runner import _linhas_es, _tratar_sql, dias
+from tcc_frota.data.privacy.pseudonymization import Segredo, chave_id_de
+from tcc_frota.data.reading.elasticsearch import ForbiddenRequestError, assert_allowed
 from tcc_frota.data.reading.sql_guard import assert_read_only
 
 SAL = Segredo("x" * 32, chave_id_de("x" * 32))
@@ -54,10 +54,10 @@ def test_es_posicao_descarta_servico_fora_e_pseudonimiza():
 def test_lote_idempotente_e_checksum(tmp_path):
     cols = {"a": "int64", "b": "string"}
     pasta = tmp_path / "dt=2026-03-10"
-    saida.gravar_lote(pasta, [{"a": 1, "b": "x"}], [], meta={"assinatura": "s1", "lote": "2026-03-10"}, colunas=cols)
-    assert saida.lote_pronto(pasta, "s1") and not saida.lote_pronto(pasta, "s2")
+    writer.gravar_lote(pasta, [{"a": 1, "b": "x"}], [], meta={"assinatura": "s1", "lote": "2026-03-10"}, colunas=cols)
+    assert writer.lote_pronto(pasta, "s1") and not writer.lote_pronto(pasta, "s2")
     (pasta / "part-000.parquet").write_bytes(b"corrompido")
-    assert not saida.lote_pronto(pasta, "s1")
+    assert not writer.lote_pronto(pasta, "s1")
 
 
 def test_dias_inclusivo():
@@ -101,9 +101,23 @@ def test_cobli_consulta_o_dia_local_com_relogio_em_utc():
 def test_dia_do_registro_aceita_texto_utc_e_converte_para_dia_local():
     from types import SimpleNamespace
 
-    from tcc_frota.data.extraction.executor import _dia_do_registro
+    from tcc_frota.data.extraction.runner import _dia_do_registro
 
     ent = SimpleNamespace(coluna_lote="start_address_datetime", deslocamento_janela_h=3)
     # 01:00 UTC de 11/03 = 22:00 local de 10/03
     assert _dia_do_registro(ent, {"START_ADDRESS_DATETIME": "2026-03-11 01:00:00"}) == "2026-03-10"
     assert _dia_do_registro(ent, {"START_ADDRESS_DATETIME": datetime(2026, 3, 11, 4, 0)}) == "2026-03-11"
+
+
+def test_caminhos_padrao_apontam_para_a_raiz_do_repositorio_e_nao_para_src():
+    # Arrange
+    from pathlib import Path
+
+    from tcc_frota.data.reading.env import default_env_path
+
+    raiz = Path(__file__).resolve().parents[2]
+
+    # Act / Assert: a reorganização para src/tcc_frota/data/ deixou parents[3] (= src/), e a extração gravou em src/data/
+    assert writer.RAIZ_PADRAO == raiz / "data" / "raw" / "v1_viagens"
+    assert (raiz / "pyproject.toml").is_file()
+    assert default_env_path().parent == raiz or "TCC_ENV_FILE" in __import__("os").environ

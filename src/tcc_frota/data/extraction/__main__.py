@@ -1,6 +1,6 @@
 """CLI: python -m tcc_frota.data.extraction --fonte ods|es --entidade X --inicio AAAA-MM-DD --fim AAAA-MM-DD [--forcar]
 
-Exige TCC_REAL_DATA_AUTHORIZED=YES (portão do proprietário). Somente leitura; saída local em data/extraido/v1_viagens/.
+Exige TCC_REAL_DATA_AUTHORIZED=YES (portão do proprietário). Somente leitura; saída local em data/raw/v1_viagens/.
 """
 
 from __future__ import annotations
@@ -9,10 +9,10 @@ import argparse
 import sys
 from pathlib import Path
 
-from tcc_frota.data.extraction.entidades import entidades_es, entidades_sql
-from tcc_frota.data.extraction.executor import extrair_es, extrair_sql, gravar_campanha
-from tcc_frota.data.extraction.filtro import FiltroV1
-from tcc_frota.data.extraction.saida import RAIZ_PADRAO
+from tcc_frota.data.extraction.entities import entidades_es, entidades_sql
+from tcc_frota.data.extraction.filters import FiltroV1
+from tcc_frota.data.extraction.runner import extrair_es, extrair_sql, gravar_campanha
+from tcc_frota.data.extraction.writer import RAIZ_PADRAO
 
 
 def main(argv: list[str] | None = None) -> int:

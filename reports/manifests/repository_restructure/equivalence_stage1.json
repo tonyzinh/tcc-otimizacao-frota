@@ -1,0 +1,37 @@
+{
+ "executado_em": "2026-11-09T19:19:23",
+ "observacao": "reexecução de equivalência; não é novo teste científico",
+ "sintetico": {
+  "equivalente": true,
+  "casos": [
+   {
+    "cenario": "S1",
+    "semente": 20001,
+    "diferencas": []
+   },
+   {
+    "cenario": "S3",
+    "semente": 20007,
+    "diferencas": []
+   },
+   {
+    "cenario": "S2_frota_escassa",
+    "semente": 20040,
+    "diferencas": []
+   }
+  ]
+ },
+ "analise": {
+  "equivalente": true,
+  "periodos": {
+   "replicacao": {
+    "totais_iguais": true,
+    "contrastes_iguais": true
+   },
+   "final": {
+    "totais_iguais": true,
+    "contrastes_iguais": true
+   }
+  }
+ }
+}

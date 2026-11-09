@@ -6,7 +6,7 @@ não é uma rota: nenhuma linha liga veículo e passageiro. O recorte (até 20 k
 administrativo nem a área de operação de empresa alguma, e é menor que a região metropolitana inteira.
 
 Fontes: IBGE, API de Malhas v3 (limites municipais, WGS84/EPSG:4326, baixados em 08/11/2026, dados públicos; citar IBGE); OpenStreetMap via
-Overpass (ODbL 1.0, © colaboradores do OpenStreetMap), ver ``data/geografia/manifesto_geografia.json``. Indexação: H3 (Uber), resolução 7.
+Overpass (ODbL 1.0, © colaboradores do OpenStreetMap), ver ``data/geographic/manifesto_geografia.json``. Indexação: H3 (Uber), resolução 7.
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ def cell_polygon(cell: str) -> np.ndarray:
     return np.array([(lng, lat) for lat, lng in h3.cell_to_boundary(cell)])
 
 
-def plot_study_cut(out: Path | None = None, name: str = "mapa_recorte_h3", footer: bool = True) -> plt.Figure:
+def plot_study_cut(out: Path | None = None, name: str = "study_area_h3_map", footer: bool = True) -> plt.Figure:
     """Figura estática: municípios, células H3 do recorte (cor = nº de pontos de parada) e âncora do recorte.
 
     ``footer=False`` omite o rodapé de fonte/atribuição (a legenda do artigo o declara).

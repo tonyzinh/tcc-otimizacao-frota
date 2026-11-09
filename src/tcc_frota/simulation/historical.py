@@ -26,8 +26,8 @@ from tcc_frota.data.world import montar, origens_por_motorista
 from tcc_frota.domain.entities import SimParams, SimResult
 from tcc_frota.simulation.engine import simulate
 
-RAIZ = Path("data/extraido/v1_viagens")
-CACHE = Path("reports/runs/cache_comparacao")
+RAIZ = Path("data/raw/v1_viagens")
+CACHE = Path("data/processed/world_cache")
 PARAMS = SimParams(radius_km=4.5, speed_kmh=16.079, road_factor=1.3012, patience_s=180.0)  # herdados da calibração de março
 DAY_WINDOW_S = (0.0, 86400.0)  # avaliação: dia inteiro
 BATCH_S = 60.0  # janela de lote das políticas B e C

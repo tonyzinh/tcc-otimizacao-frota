@@ -10,6 +10,6 @@
   "criterios_de_servico": {"E1": "nenhuma violação de compromisso causada pela política", "E2": "atendidos(política) >= atendidos(referência) no período", "E3": "P90 agregado da espera <= o da referência"},
   "estatistica": {"unidade": "dia", "intervalo": "IC95% bootstrap de blocos móveis de 7 dias", "reamostragens": 10000, "semente": 20261108},
   "espera": "calculada só entre os pedidos atendidos",
-  "resultados_congelados": "reports/atribuicao_final/",
+  "resultados_congelados": "reports/historical/frozen_evaluation/",
   "comando": "tcc-frota analyze-historical --out reports/final/historico"
 }

@@ -1,6 +1,6 @@
 """Execução de UM par (cenário, semente) sintético com as políticas A, B e C no MESMO mundo.
 
-Políticas (identificadores iguais aos dos resultados congelados em ``reports/sintetico_v2/metodos_avaliacao_D``):
+Políticas (identificadores iguais aos dos resultados congelados em ``reports/synthetic/dispatch_evaluation``):
   ``A`` despacho imediato pelo mais próximo; ``D_lote60s_guloso_fifo`` = B (mais próximo em lotes de 60 s);
   ``D_lote60s_hungaro`` = C (atribuição conjunta, Húngaro, lotes de 60 s).
 Sem reposicionamento: km vazio = km de busca. Resultado de simulação em cenários sintéticos; não é desempenho operacional.

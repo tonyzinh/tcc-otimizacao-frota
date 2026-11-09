@@ -10,9 +10,9 @@ import pytest
 
 from tcc_frota.scenarios import geography as geo
 
-GEO = Path(__file__).resolve().parents[2] / "data" / "geografia"
+GEO = Path(__file__).resolve().parents[2] / "data" / "geographic"
 pytestmark = pytest.mark.skipif(
-    not (GEO / "osm_highways_raw.json").exists(), reason="dados geográficos públicos não baixados (scripts/baixar_geografia.py)"
+    not (GEO / "osm_highways_raw.json").exists(), reason="dados geográficos públicos não baixados (scripts/download_geography.py)"
 )
 
 

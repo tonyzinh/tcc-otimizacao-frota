@@ -6,8 +6,8 @@ from datetime import datetime
 import pytest
 
 import tcc_frota.data.reading as leitura
-from tcc_frota.data.extraction.executor import extrair_sql
-from tcc_frota.data.privacy import pseudonimizacao as pz
+from tcc_frota.data.extraction.runner import extrair_sql
+from tcc_frota.data.privacy import pseudonymization as pz
 
 
 class _Leitor:

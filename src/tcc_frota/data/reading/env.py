@@ -22,7 +22,7 @@ def default_env_path() -> Path:
     override = os.getenv("TCC_ENV_FILE")
     if override:
         return Path(override)
-    return Path(__file__).resolve().parents[3] / ".env"
+    return Path(__file__).resolve().parents[4] / ".env"  # src/tcc_frota/data/reading/env.py -> raiz do repositório
 
 
 def parse_env(text: str) -> dict[str, str]:

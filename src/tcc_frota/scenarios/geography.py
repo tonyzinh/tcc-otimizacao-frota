@@ -1,6 +1,6 @@
 """Geografia pública da Grande Vitória (recorte: Vitória, Vila Velha, Serra e Cariacica) e rede viária para o estudo SINTÉTICO.
 
-Fontes públicas (ver `scripts/baixar_geografia.py` e `data/geografia/manifesto_geografia.json`): limites municipais IBGE (API de Malhas v3,
+Fontes públicas (ver `scripts/download_geography.py` e `data/geographic/manifesto_geografia.json`): limites municipais IBGE (API de Malhas v3,
 WGS84) e rede viária do OpenStreetMap (© colaboradores do OpenStreetMap, ODbL 1.0). Nada aqui lê dados privados.
 
 O recorte é "parte da Grande Vitória", não toda a região metropolitana. Origens e destinos sintéticos são **nós da rede viária** dentro dos
@@ -23,7 +23,7 @@ import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components, dijkstra
 
-PASTA = Path("data/geografia")
+PASTA = Path("data/geographic")
 MUNICIPIOS = {"3205309": "Vitória", "3205200": "Vila Velha", "3205002": "Serra", "3201308": "Cariacica"}
 RAIO_TERRA_KM = 6371.0088
 

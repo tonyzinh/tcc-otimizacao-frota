@@ -6,8 +6,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from tcc_frota.data.extraction.saida import RAIZ_PADRAO
-from tcc_frota.data.privacy import pseudonimizacao as p
+from tcc_frota.data.extraction.writer import RAIZ_PADRAO
+from tcc_frota.data.privacy import pseudonymization as p
 
 
 def main(argv: list[str] | None = None) -> int:

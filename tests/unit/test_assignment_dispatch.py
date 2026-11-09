@@ -191,3 +191,39 @@ def test_didactic_fixture_shows_joint_assignment_cheaper_than_sequential_when_ne
     joint = dp.hungarian(0.0, _requests(3), cands)
     assert _cost_of(sequential, costs) == fx["custo_sequencial_km"]
     assert _cost_of(joint, costs) == fx["custo_otimo_km"] == _brute_force_optimum(costs)[1]
+
+
+def _timed_requests(n):
+    return [SimpleNamespace(rid=f"r{i}", t=float(i)) for i in range(n)]
+
+
+def test_global_greedy_takes_the_smallest_eligible_pair_first_when_pairs_compete():
+    # Arrange: r0-d0 = 2 km, r1-d0 = 1 km (menor par); r0-d1 = 3 km
+    reqs, cands = _timed_requests(2), _candidates([[2.0, 3.0], [1.0, None]])
+    # Act
+    pairs = dp.global_greedy(0.0, reqs, cands)
+    # Assert
+    assert sorted(pairs) == [("r0", "d1"), ("r1", "d0")]
+
+
+def test_global_greedy_can_serve_fewer_requests_than_hungarian_when_smallest_pair_blocks_another_request():
+    # Arrange: r0 só alcança d0 (2 km); r1 alcança d0 (1 km) e d1 (5 km). O menor par (r1-d0) tira de r0 o único veículo.
+    reqs, cands = _timed_requests(2), _candidates([[2.0, None], [1.0, 5.0]])
+    cands_block = _candidates([[2.0], [1.0]])
+    # Act
+    greedy = dp.global_greedy(0.0, reqs, cands_block)
+    hung = dp.hungarian(0.0, reqs, cands)
+    greedy_full = dp.global_greedy(0.0, reqs, cands)
+    # Assert: com um só veículo, ambos servem 1; com d1 disponível, o guloso pega r1-d0 e deixa r0 sem par, o Húngaro serve os dois
+    assert len(greedy) == 1
+    assert len(hung) == 2
+    assert greedy_full == [("r1", "d0")]
+
+
+def test_global_greedy_breaks_distance_ties_by_request_arrival_when_costs_are_equal():
+    # Arrange: dois pedidos à mesma distância do único veículo
+    reqs, cands = _timed_requests(2), _candidates([[1.0], [1.0]])
+    # Act
+    pairs = dp.global_greedy(0.0, reqs, cands)
+    # Assert: o pedido que chegou antes vence o empate
+    assert pairs == [("r0", "d0")]

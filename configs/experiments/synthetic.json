@@ -6,6 +6,6 @@
   "criterio_de_servico_sintetico": {"razao_media_de_atendidos_minima": 0.995, "razao_das_medias_de_P90_maxima": 1.05,
                                     "diferenca_para_E2_historico": "E2 histórico exige atendidos(C) >= atendidos(ref) sem tolerância; o sintético tolera até 0,5% de perda média por semente"},
   "estatistica": {"unidade": "semente", "intervalo": "IC95% percentil, bootstrap de sementes, 10000, semente 20261108", "correcao": "Holm nos testes confirmatórios (política em lote × A nos cenários S1–S5)"},
-  "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+  "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
   "comando": "tcc-frota run-synthetic --out reports/final/sintetico_novo && tcc-frota analyze-synthetic --input reports/final/sintetico_novo --out reports/final/sintetico_novo/analise"
 }

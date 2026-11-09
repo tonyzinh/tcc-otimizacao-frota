@@ -2,10 +2,10 @@
 
 import pytest
 
+from tcc_frota.data.reading.elasticsearch import ElasticSettings, ForbiddenRequestError, assert_allowed
 from tcc_frota.data.reading.env import ConfigError, parse_env
-from tcc_frota.data.reading.es import ElasticSettings, ForbiddenRequestError, assert_allowed
 from tcc_frota.data.reading.sql_guard import UnsafeQueryError, assert_read_only
-from tcc_frota.data.reading.sqlserver import SqlServerReader, SqlServerSettings, build_connection_string
+from tcc_frota.data.reading.sql_server import SqlServerReader, SqlServerSettings, build_connection_string
 
 
 def test_parse_env_ignora_comentarios_traco_duplo_e_remove_aspas():

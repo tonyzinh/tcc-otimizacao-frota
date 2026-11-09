@@ -9,10 +9,10 @@ from pathlib import Path
 
 import pytest
 
-from tcc_frota.data.extraction.entidades import entidades_es, entidades_sql
-from tcc_frota.data.extraction.executor import _linhas_es, _tratar_sql
-from tcc_frota.data.extraction.filtro import FiltroV1
-from tcc_frota.data.privacy import pseudonimizacao as pz
+from tcc_frota.data.extraction.entities import entidades_es, entidades_sql
+from tcc_frota.data.extraction.filters import FiltroV1
+from tcc_frota.data.extraction.runner import _linhas_es, _tratar_sql
+from tcc_frota.data.privacy import pseudonymization as pz
 
 SEG_A = pz.Segredo("a" * 40, pz.chave_id_de("a" * 40))
 SEG_B = pz.Segredo("b" * 40, pz.chave_id_de("b" * 40))
@@ -37,7 +37,7 @@ def test_coluna_sem_entidade_declarada_falha_explicitamente():
 
 def test_vinculos_sobrevivem_a_processos_separados(tmp_path):
     """Dois processos distintos (como duas execuções de extração) produzem os mesmos pseudônimos."""
-    codigo = "from tcc_frota.data.privacy import pseudonimizacao as p; s=p.carregar_segredo(); print(p.pseudonimo('motorista', 123, s), p.pseudonimo('placa', 'abc-1d23', s), s.chave_id)"
+    codigo = "from tcc_frota.data.privacy import pseudonymization as p; s=p.carregar_segredo(); print(p.pseudonimo('motorista', 123, s), p.pseudonimo('placa', 'abc-1d23', s), s.chave_id)"
     env = {**os.environ, "TCC_PSEUDO_SECRET": "z" * 40, "PYTHONPATH": str(Path(__file__).resolve().parents[2] / "src")}
     saidas = [subprocess.run([sys.executable, "-c", codigo], capture_output=True, text=True, env=env, check=True).stdout for _ in range(2)]
     assert saidas[0] == saidas[1] and saidas[0].strip()

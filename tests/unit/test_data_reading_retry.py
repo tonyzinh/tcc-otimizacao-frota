@@ -5,7 +5,7 @@ import urllib.error
 
 import pytest
 
-import tcc_frota.data.reading.es as es
+import tcc_frota.data.reading.elasticsearch as es
 
 
 class _Resp:

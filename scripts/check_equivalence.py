@@ -1,8 +1,8 @@
 """Verifica que o código reorganizado reproduz os resultados congelados (NÃO é novo teste científico: reexecução de equivalência).
 
-  --synthetic   3 pares (cenário, semente) sintéticos contra ``reports/sintetico_v2/metodos_avaliacao_D`` (não exige dados privados);
-  --historical  1 dia real por período contra ``reports/atribuicao_final/execucao`` (exige TCC_REAL_DATA_AUTHORIZED=YES e dados locais);
-  --analysis    regenera totais, contrastes e tabelas a partir dos Parquet congelados e compara com ``reports/atribuicao_final/analise``.
+  --synthetic   3 pares (cenário, semente) sintéticos contra ``reports/synthetic/dispatch_evaluation`` (não exige dados privados);
+  --historical  1 dia real por período contra ``reports/historical/frozen_evaluation/execucao`` (exige TCC_REAL_DATA_AUTHORIZED=YES e dados locais);
+  --analysis    regenera totais, contrastes e tabelas a partir dos Parquet congelados e compara com ``reports/historical/frozen_evaluation/analise``.
 
 Não escreve em pastas congeladas; grava o resultado em ``reports/manifests/equivalencia_reorganizacao.json``.
 Uso: python scripts/check_equivalence.py --synthetic --analysis [--historical --historical-days 2026-09-16,2026-10-01]
@@ -21,8 +21,8 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-FROZEN_SYNTH = Path("reports/sintetico_v2/metodos_avaliacao_D")
-FROZEN_HIST = Path("reports/atribuicao_final")
+FROZEN_SYNTH = Path("reports/synthetic/dispatch_evaluation")
+FROZEN_HIST = Path("reports/historical/frozen_evaluation")
 OUT = Path("reports/manifests/equivalencia_reorganizacao.json")
 
 
@@ -104,6 +104,7 @@ def main() -> int:
     ap.add_argument("--historical", action="store_true")
     ap.add_argument("--historical-days", default="2026-09-16,2026-10-01")
     ap.add_argument("--analysis", action="store_true")
+    ap.add_argument("--out", type=Path, default=OUT, help="arquivo JSON de saída (não sobrescreva evidências anteriores)")
     a = ap.parse_args()
     result: dict = {
         "executado_em": time.strftime("%Y-%m-%dT%H:%M:%S"),
@@ -118,8 +119,8 @@ def main() -> int:
 
         authorize("real")
         result["historico"] = check_historical(a.historical_days.split(","))
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
+    a.out.parent.mkdir(parents=True, exist_ok=True)
+    a.out.write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
     print(json.dumps(result, ensure_ascii=False, indent=1))
     parts = [v["equivalente"] for k, v in result.items() if isinstance(v, dict)]
     return 0 if parts and all(parts) else 1

@@ -1,0 +1,17 @@
+{
+ "analise_posterior": true,
+ "observacao": "análise posterior aos resultados congelados; não é avaliação independente",
+ "rodada": 4,
+ "caminho_antigo": "reports/pos_hoc_parecer/ (arquivos da raiz)",
+ "data": "2026-11-09",
+ "plano": "PLANO.md (nesta pasta)",
+ "relatorio": "RELATORIO.md (nesta pasta)",
+ "script": "scripts/analyze_robustness_review.py (antes scripts/pos_hoc_parecer.py)",
+ "finalidade": "sensibilidade, disponibilidade, janelas, componentes, distância viária e estatística da avaliação congelada (parecer)",
+ "entradas": [
+  "reports/historical/frozen_evaluation/",
+  "reports/synthetic/dispatch_evaluation/",
+  "data/raw/v1_viagens/ (local)"
+ ],
+ "relacao": "primeira análise posterior aos resultados congelados; lida pelas rodadas 5 e 7"
+}

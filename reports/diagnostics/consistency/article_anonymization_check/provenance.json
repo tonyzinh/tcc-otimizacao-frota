@@ -1,0 +1,12 @@
+{
+ "analise_posterior": true,
+ "observacao": "análise posterior aos resultados congelados; não é avaliação independente",
+ "rodada": 9,
+ "caminho_antigo": "reports/pos_hoc_parecer/rodada9/",
+ "data": "2026-11-09",
+ "plano": "decisions.md R-33",
+ "relatorio": "RELATORIO.md (nesta pasta)",
+ "script": "script local da sessão (busca no fonte, nas figuras e no PDF)",
+ "finalidade": "retirada dos identificadores da empresa do artigo",
+ "relacao": "não simula"
+}

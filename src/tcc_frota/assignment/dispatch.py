@@ -109,4 +109,24 @@ def hungarian(t, pedidos, candidatos):
     return [(rids[i], dids[j]) for i, j in enumerate(cols) if j < m and np.isfinite(inf[i, j])]
 
 
+def global_greedy(t, pedidos, candidatos):
+    """Variante D (análise pós-hoc, não usada no experimento congelado): guloso global pelo menor par elegível.
+
+    Ordena todos os pares elegíveis do lote por (distância, chegada do pedido, id do pedido, id do motorista) e aceita cada par
+    cujo pedido e motorista ainda estão livres. Não maximiza a cardinalidade: pode atender menos pedidos que o Húngaro no mesmo lote.
+    """
+    ordem = {r.rid: (r.t, r.rid) for r in pedidos}
+    pares = sorted((d, ordem[rid], did, rid) for rid, lst in candidatos.items() if rid in ordem for d, did in lst)
+    usados_r: set[int] = set()
+    usados_d: set[str] = set()
+    saida = []
+    for _d, _o, did, rid in pares:
+        if rid not in usados_r and did not in usados_d:
+            saida.append((rid, did))
+            usados_r.add(rid)
+            usados_d.add(did)
+    return saida
+
+
 POLICIES = {"nearest_fifo": nearest_fifo, "hungarian": hungarian}
+POST_HOC_POLICIES = {"global_greedy": global_greedy}  # fora de POLICIES: não integra o experimento congelado

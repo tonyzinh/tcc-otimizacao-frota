@@ -34,7 +34,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "confirmatorio_principal",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S1"
   },
   {
@@ -70,7 +70,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "confirmatorio_principal",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S2"
   },
   {
@@ -106,7 +106,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "confirmatorio_principal",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S3"
   },
   {
@@ -142,7 +142,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "confirmatorio_principal",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S4"
   },
   {
@@ -178,7 +178,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "confirmatorio_principal",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S5"
   },
   {
@@ -214,7 +214,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S2_frota_abundante"
   },
   {
@@ -250,7 +250,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S2_frota_escassa"
   },
   {
@@ -286,7 +286,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S2_salto6km"
   },
   {
@@ -322,7 +322,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S2_salto10km"
   },
   {
@@ -358,7 +358,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S2_res6"
   },
   {
@@ -394,7 +394,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S2_res8"
   },
   {
@@ -430,7 +430,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S3_frota_abundante"
   },
   {
@@ -466,7 +466,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S3_frota_escassa"
   },
   {
@@ -502,7 +502,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S3_salto6km"
   },
   {
@@ -538,7 +538,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S3_salto10km"
   },
   {
@@ -574,7 +574,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S3_res6"
   },
   {
@@ -610,7 +610,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S3_res8"
   },
   {
@@ -646,7 +646,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S2_previsao_perfeita"
   },
   {
@@ -682,7 +682,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S3_previsao_perfeita"
   },
   {
@@ -718,7 +718,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S4_previsao_perfeita"
   },
   {
@@ -754,7 +754,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S5_previsao_perfeita"
   },
   {
@@ -790,7 +790,7 @@
    "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
    "finalidade": "exploratorio_complementar",
    "configuracao": "configs/scenarios/catalog.json",
-   "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+   "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
    "nome_antigo": "S2_erro_previsao"
   }
  ]

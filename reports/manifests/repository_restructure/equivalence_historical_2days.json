@@ -1,0 +1,19 @@
+{
+ "executado_em": "2026-11-09T20:01:42",
+ "observacao": "reexecução de equivalência; não é novo teste científico",
+ "historico": {
+  "equivalente": true,
+  "casos": [
+   {
+    "dia": "2026-09-16",
+    "diferencas": [],
+    "segundos": 1.0
+   },
+   {
+    "dia": "2026-10-01",
+    "diferencas": [],
+    "segundos": 0.8
+   }
+  ]
+ }
+}

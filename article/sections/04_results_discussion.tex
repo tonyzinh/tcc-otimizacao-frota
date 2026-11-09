@@ -1,0 +1,162 @@
+\section{Resultados e discussão}\label{sec:resultados}
+
+\subsection{Resumo das comparações}
+
+A Tabela~\ref{tab:resumo} reúne as comparações principais. As linhas de setembro e outubro vêm da execução congelada. As do teste de 26/10 a 08/11 vêm de uma análise posterior, com calibração nova (Seção~\ref{sec:validade}). Todas as diferenças são simuladas e não representam economia observada.
+
+\begin{table}[!htb]
+\caption{Atribuição conjunta contra as duas referências: resumo}\label{tab:resumo}
+\centering\fontetabela\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{37mm}>{\raggedright\arraybackslash}p{27mm}rcr>{\raggedright\arraybackslash}p{36mm}@{}}
+\toprule
+Período & Contra & \shortstack{Km vazio\\(\%)} & \shortstack{Intervalo\\inclui zero?} & $\Delta N$ & Critério de atendimento \\
+\midrule
+Setembro (15 dias) & despacho imediato & −5,96 & não & +16 & cumprido \\
+ & lote simples & −2,74 & não & +191 & cumprido \\
+Outubro (25 dias) & despacho imediato & −5,04 & não & −85 & \textbf{não cumprido} (menos atendidos) \\
+ & lote simples & −1,40 & não & +149 & cumprido \\
+\midrule
+Teste posterior, 26/10--08/11 (12 dias) & despacho imediato & −2,79 & sim & −18 & \textbf{não cumprido} (menos atendidos) \\
+ & lote simples & \textbf{+0,87} & sim & +29 & não se aplica (sem redução); mesmo km por atendido (2,84) \\
+\bottomrule
+\end{tabular}
+\fonte{elaborada pelos autores. Setembro e outubro: resultados congelados (detalhes nas Tabelas~\ref{tab:abs} e~\ref{tab:contr}). Teste: análise posterior com calibração nova (Apêndice~\ref{ap:repro}); nele, as violações de compromisso não foram registradas. $\Delta N$: atendidos pela atribuição conjunta menos atendidos pela referência.}
+\end{table}
+
+\subsection{Dados reais: avaliação congelada}
+
+A Tabela~\ref{tab:abs} traz os valores absolutos de setembro e outubro, e a Tabela~\ref{tab:contr}, as diferenças. Nos 40 dias, houve 0 falhas técnicas, 0 violações de compromisso causadas por qualquer política e entradas idênticas nas três políticas, conferidas por assinatura SHA-256.
+
+\begin{table}[!t]
+\caption{Valores absolutos por política e período (dados reais)}\label{tab:abs}
+\centering\fontetabela
+\begin{tabular}{@{}llrrrrr@{}}
+\toprule
+Período & Política & Atendidos (\%) & Km vazio & Km/atend. & Espera média (s) & P90 (s) \\
+\midrule
+\multirow{3}{*}{\shortstack[l]{Setembro\\(15 dias;\\16.918 pedidos)}} & A & 11.125 (65,76) & 29.628,3 & 2,66 & 616,4 & 1.183,2 \\
+ & B & 10.950 (64,72) & 28.644,9 & 2,62 & 630,6 & 1.195,8 \\
+ & C & 11.141 (65,85) & 27.861,1 & 2,50 & 600,8 & 1.171,6 \\
+\midrule
+\multirow{3}{*}{\shortstack[l]{Outubro\\(25 dias;\\23.523 pedidos)}} & A & 14.551 (61,86) & 39.205,0 & 2,69 & 621,0 & 1.189,7 \\
+ & B & 14.317 (60,86) & 37.756,7 & 2,64 & 633,4 & 1.201,5 \\
+ & C & 14.466 (61,50) & 37.228,7 & 2,57 & 615,8 & 1.181,7 \\
+\bottomrule
+\end{tabular}
+\fonte{elaborada pelos autores (resultados congelados). A: despacho imediato; B: lote simples; C: atribuição conjunta. Espera e P90 calculados \textbf{apenas entre os atendidos} de cada política; os conjuntos de atendidos diferem entre políticas.}
+\end{table}
+
+\begin{table}[!htb]
+\caption{Diferenças entre políticas (variação de km vazio: negativo = redução)}\label{tab:contr}
+\centering\fontetabela
+\begin{tabular}{@{}llrrcrrl@{}}
+\toprule
+Período & Contraste & $\Delta K$ (km) & $\Delta\%$ & \shortstack{IC95\% da média\\diária (km)} & \shortstack{Dias\\melh./pior} & $\Delta N$ & Atendimento \\
+\midrule
+Set. & C×A & −1.767,1 & −5,96 & (−133,0; −102,9) & 14/1 & +16 & preservado \\
+Set. & C×B & −783,8 & −2,74 & (−61,2; −43,1) & 14/1 & +191 & preservado \\
+Set. & B×A & −983,4 & −3,32 & (−76,1; −54,8) & 14/1 & −175 & não (atend., P90) \\
+Out. & C×A & −1.976,3 & −5,04 & (−97,3; −62,8) & 25/0 & −85 & \textbf{não (atend.)} \\
+Out. & C×B & −528,0 & −1,40 & (−31,1; −11,5) & 16/9 & +149 & preservado \\
+Out. & B×A & −1.448,3 & −3,69 & (−77,0; −42,0) & 25/0 & −234 & não (atend., P90) \\
+\bottomrule
+\end{tabular}
+\fonte{elaborada pelos autores (resultados congelados). A: despacho imediato; B: lote simples; C: atribuição conjunta. IC95\% por \textit{bootstrap} de blocos de 7 dias sobre a diferença média diária; intervalos alternativos e resultados diários no Apêndice~\ref{ap:repro}.}
+\end{table}
+
+\textbf{Km vazio.} A atribuição conjunta teve menos km vazio que o despacho imediato e que o lote simples nos dois períodos. Em todas essas comparações, o intervalo ficou abaixo de zero (Figura~\ref{fig:km}, no Apêndice~\ref{ap:repro}). Contra o despacho imediato, a redução foi de 1.767,1 km (5,96\%) em setembro, com melhora em 14 de 15 dias, e de 1.976,3 km (5,04\%) em outubro, com melhora em 25 de 25 dias. Esses valores são parecidos com os dos períodos de seleção (treino: −5,02\%; validação: −4,76\%), que não são evidência independente.
+
+\textbf{Atendimento.} Em setembro, a atribuição conjunta atendeu 16 pedidos a mais que o despacho imediato (+0,09 ponto percentual; IC95\% da diferença média diária de atendidos: −6,2 a +8,0), e o critério de atendimento foi cumprido com os parâmetros de março (com a calibração posterior, não; Seção~\ref{sec:validade}). Em outubro, ela atendeu \textbf{85 pedidos a menos}: 14.466 contra 14.551, de 23.523 pedidos elegíveis (61,50\% contra 61,86\%). A taxa de atendimento caiu 0,36 ponto percentual ($85/23.523$), e o número de atendidos ficou 0,58\% abaixo ($85/14.551$). O critério de atendimento \textbf{não foi cumprido} em outubro, e a redução de km desse mês é \enquote{sem atendimento preservado}. A diferença média diária de atendidos inclui zero (IC95\% de −7,8 a +0,9; mais atendidos em 9 dias, menos em 15 e igual em 1). Isso não mostra equivalência: nenhuma margem foi definida. A diferença por dia caiu ao longo do ano: +2,3 atendidos por dia no treino, +1,1 em setembro e −3,4 em outubro.
+
+Como foram atendidos menos pedidos em outubro, parte da redução de km pode vir de menos corridas. O km por atendido também caiu (de 2,69 para 2,57 km, −4,5\%), o que indica efeito além do volume. Em uma conta descritiva, \emph{não simulada}, se cada um dos 85 atendimentos faltantes custasse 2,69 km, o km da atribuição conjunta aumentaria cerca de 229 km, e a redução ficaria em torno de 1.748 km (4,5\%).
+
+\textbf{Lote e decisão conjunta.} O lote simples também reduz o km em relação ao despacho imediato (−3,32\% e −3,69\%), mas atende menos e tem P90 maior nos dois períodos; não cumpre o critério de atendimento. A atribuição conjunta reduz mais um pouco em relação ao lote simples (−2,74\% e −1,40\%), atende mais (+191 e +149), espera menos e cumpre o critério nos dois períodos. Em outubro, essa vantagem é menor e menos regular: melhora em 16 dias e piora em 9.
+
+\textbf{Espera.} A espera média e o P90 da atribuição conjunta foram menores que os do despacho imediato nos dois períodos (setembro: −15,7 s e −11,6 s; outubro: −5,2 s e −8,0 s), embora o lote acrescente em média cerca de 40 s até o fechamento. Esses valores consideram só os atendidos de cada política e são descritivos.
+
+\textbf{Significado prático.} Os números a seguir foram calculados depois, sobre as mesmas execuções. A redução contra o despacho imediato equivale a 117,8 km vazios a menos por dia em setembro (de 1.975,2 para 1.857,4) e 79,1 km em outubro (de 1.568,2 para 1.489,1). O km vazio é cerca de um quinto do km modelado (aproximação mais trecho com passageiro). Sua participação caiu de 22,6\% para 21,3\% em setembro e de 21,6\% para 20,8\% em outubro: cerca de 1,3 e 0,9 ponto percentual do km total modelado (diferenças calculadas antes do arredondamento). P95, P99 e máximo da espera ficaram próximos nas duas políticas (diferenças de até 25 s). A atribuição conjunta não considera há quanto tempo o pedido espera; por isso, contou-se a preterição. Um pedido com veículo elegível pode ficar sem par em no máximo três lotes, e os que expiraram depois de ter tido veículo elegível foram menos na atribuição conjunta que no lote simples (1.370 contra 1.437 em setembro; 1.552 contra 1.592 em outubro). O km não foi convertido em combustível, receita ou custo, por falta de parâmetros sustentados. Simular um dia levou em média 0,05--0,06 s no despacho imediato, 0,08--0,09 s no lote simples e 0,10--0,12 s na atribuição conjunta (Python 3.12.14, Windows 11, um processo).
+
+\subsection{Análises posteriores}\label{sec:validade}
+
+Esta subseção reúne \textbf{análises de sensibilidade definidas depois dos resultados}. Os planos foram escritos antes de executá-las. Elas não alteram nem substituem os números congelados. A reexecução das três políticas sobre as mesmas entradas reproduziu os 120 resultados (dia e política) de setembro e outubro.
+
+\textbf{O simulador e a operação.} O simulador atende de 9 a 23 pontos percentuais mais pedidos que a operação real, com aproximação e espera menores (Tabela~\ref{tab:valid}, no Apêndice~\ref{ap:repro}). As populações diferem (outra política, outro conjunto de atendidos), e nenhuma diferença isolada prova erro do simulador; a duração das viagens é entrada observada. Mas a direção é sistemática. Nenhum ajuste de raio e paciência reproduz ao mesmo tempo o aceite e o tempo de busca observados. Aqui, \textit{aceite} é o pedido com registro de motorista a caminho; por essa definição, ele caiu de 55,9\% e 58,9\% no treino e na validação para 44,2\% e 40,5\% em setembro e outubro. A razão provável é que o simulador não modela a recusa de corridas: na operação, o aceite cai com a distância, de 64\% com motorista livre a até 0,5 km para cerca de 40\% acima de 6 km. A validação operacional, portanto, \textbf{não foi alcançada}, e os resultados comparam políticas no modelo construído.
+
+\textbf{Sensibilidade.} A Tabela~\ref{tab:sens}, no Apêndice~\ref{ap:repro}, muda um elemento por vez nos 40 dias: a reconstrução da disponibilidade (lacunas de 600 e 2.400 s, janela só pelo registro de posições e 20\% menos motoristas, escolhidos por sorteio fixo; nenhum veículo foi inventado), o fator rua/reta, a velocidade, o raio e a paciência. Em apenas quatro dias de outubro, fixados por calendário (01, 08, 15 e 22), usaram-se distâncias pela rede viária do OpenStreetMap, com raio por via equivalente (4,5 × 1,3012 km). A redução contra o despacho imediato apareceu em todas as variantes (de −3,3\% a −7,4\%). Contra o lote simples, a vantagem foi pequena e frágil (de −0,3\% a −4,6\%), e o intervalo $t$ pareado da diferença diária incluiu zero em 3 de 12 variantes em cada mês (2 e 1 com o \textit{bootstrap} de blocos; Tabela~\ref{tab:sensic}). O atendimento depende do período: em setembro, a atribuição conjunta atendeu mais que o despacho imediato em 8 de 12 variantes; em outubro, atendeu menos em 10 de 12.
+
+\textbf{Recalibração e teste fora da amostra.} Em uma rodada posterior, com plano escrito antes, fator, velocidade, raio e paciência foram recalibrados com janeiro a agosto de 2026 (242 dias; setembro e outubro não entraram) e congelados antes de qualquer simulação nova. O fator rua/reta mediano foi 1,54 ($n = 90.022$) e a velocidade, 18,3~km/h ($n = 118.256$). Os fatores mudam com o campo de distância usado, e nenhum vem de odômetro: 1,30 vem da distância de aproximação registrada pelo aplicativo em 466 corridas de março; cerca de 1,36, da distância restante até a origem no registro de posições, campo cujo significado foi inferido; 1,54, da distância entre aceite e chegada registrada no pedido, a mesma usada para a velocidade, o que mantém o tempo de aproximação igual ao observado. A avaliação congelada usa 1,30; a recalibração, 1,54. A sensibilidade já inclui fator 1,6 (Tabela~\ref{tab:sens}). A busca escolheu raio de 4,5~km e paciência de 240~s. Essa paciência ficou no limite superior dos valores testados; a análise de sensibilidade já inclui uma paciência de 300~s, com os parâmetros de março. Com a calibração nova, os 12 dias elegíveis de 26/10 a 08/11, nunca simulados antes, formam o único teste fora da amostra (Tabela~\ref{tab:r5}, no Apêndice~\ref{ap:repro}). Nele, a atribuição conjunta teve 2,79\% menos km que o despacho imediato, com intervalo que inclui zero, e 18 atendimentos a menos. Contra o lote simples, teve \textbf{0,87\% mais km}, mas atendeu 29 pedidos a mais, com o mesmo km por atendido (2,84). Em uma divisão exploratória, fixada depois de ver o inventário e antes de simular, a diferença para o despacho imediato caiu a 0,39\% a partir de 31/10, quando pedidos e motoristas ficaram muito menores. Parte dessa queda é de calendário: 31/10 e 07/11 são sábados, 01/11 e 08/11 são domingos e 02/11 é feriado (Finados). Mas os dias úteis de 03 a 06/11 também tiveram só de 26\% a 38\% dos pedidos dos mesmos dias da semana em outubro (Tabela~\ref{tab:diasemana}). A conferência desses dias (Apêndice~\ref{ap:repro}) não encontrou sinal de coleta incompleta: os registros de posição cobrem as 24 horas, com tantos instantes por motorista quanto em outubro. A queda aparece ao mesmo tempo nos pedidos, nos motoristas do registro de posições e nas jornadas, inclusive nas de todas as regiões. Ela pode vir da operação ou de mudança no que os sistemas registram ou no recorte do estudo; a contagem por serviço, que ajudaria a separar as duas, não pôde ser feita. Nos meses de fevereiro a agosto, cada um simulado com a calibração dos meses anteriores, a atribuição conjunta teve menos km que o despacho imediato (−5,2\% a −7,6\%) e que o lote simples (−2,5\% a −4,8\%) em todos, com intervalos abaixo de zero (Figura~\ref{fig:r5}). O atendimento, porém, nem sempre foi maior. Com a calibração nova, a atribuição conjunta atendeu menos que o despacho imediato em setembro (40 a menos), em outubro (54 a menos) e em abril (114 a menos). Assim, o critério de atendimento cumprido em setembro vale com os parâmetros de março; com a calibração nova, a diferença de atendidos é negativa também em setembro. Com 12 dias, o teste tem pouco poder: não mostra efeito nulo, mas não confirma a vantagem sobre o lote simples.
+
+\textbf{Guloso global e janela.} Depois dos resultados congelados, avaliou-se também um guloso global (D), que em cada lote aceita os pares elegíveis do mais curto para o mais longo, com os mesmos pedidos, veículos, janela e restrições. A Tabela~\ref{tab:bcd} põe lado a lado o lote simples, a atribuição conjunta e o guloso global. Com os parâmetros de março, o guloso teve \emph{menos} km que a atribuição conjunta (−2,66\% em setembro e −1,88\% em outubro), mas atendeu bem menos (179 e 83 pedidos a menos): escolher primeiro o par mais curto reduz o número de pares do lote. Com a calibração nova, essa diferença de atendimento caiu para 41 e 25 pedidos e, no teste, se inverteu: o guloso teve 0,62\% menos km \emph{e} 29 atendimentos a mais. A vantagem do Húngaro sobre um guloso global simples, portanto, não se confirmou.
+\begin{table}[!htb]
+\caption{Lote simples, atribuição conjunta e guloso global lado a lado}\label{tab:bcd}
+\centering\fontetabela\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llcrrrrr@{}}
+\toprule
+Período & Calibração & Pol. & Km vazio & Atendidos & Km/atend. & \shortstack{Espera\\média (s)} & \shortstack{P90\\(s)} \\
+\midrule
+Setembro & março (congelada) & B & 28.644,9 & 10.950 & 2,62 & 630,6 & 1.195,8 \\
+ &  & C & 27.861,1 & 11.141 & 2,50 & 600,8 & 1.171,6 \\
+ &  & D & 27.121,1 & 10.962 & 2,47 & 594,8 & 1.165,7 \\
+\midrule
+Outubro & março (congelada) & B & 37.756,7 & 14.317 & 2,64 & 633,4 & 1.201,5 \\
+ &  & C & 37.228,7 & 14.466 & 2,57 & 615,8 & 1.181,7 \\
+ &  & D & 36.529,2 & 14.383 & 2,54 & 608,2 & 1.180,7 \\
+\midrule
+Setembro & nova & B & 34.368,6 & 10.990 & 3,13 & 671,7 & 1.256,1 \\
+ &  & C & 33.117,0 & 11.126 & 2,98 & 634,2 & 1.216,7 \\
+ &  & D & 32.709,8 & 11.085 & 2,95 & 629,3 & 1.227,5 \\
+\midrule
+Outubro & nova & B & 45.494,4 & 14.477 & 3,14 & 671,5 & 1.264,2 \\
+ &  & C & 44.208,6 & 14.532 & 3,04 & 646,0 & 1.238,1 \\
+ &  & D & 43.307,4 & 14.507 & 2,99 & 634,4 & 1.228,4 \\
+\midrule
+Teste 26/10--08/11 & nova & B & 10.534,0 & 3.712 & 2,84 & 601,8 & 1.204,4 \\
+ &  & C & 10.626,0 & 3.741 & 2,84 & 600,5 & 1.199,5 \\
+ &  & D & 10.560,1 & 3.770 & 2,80 & 592,2 & 1.194,5 \\
+\bottomrule
+\end{tabular}
+\fonte{elaborada pelos autores; análise posterior aos resultados. B: lote simples; C: atribuição conjunta; D: guloso global, definido depois dos resultados congelados. B e C com a calibração de março são os da execução congelada (Tabela~\ref{tab:abs}); as demais linhas vêm de simulações posteriores. Espera e P90 só entre os atendidos de cada política.}
+\end{table}
+ Uma grade de janelas fixada antes e avaliada só no treino mostra a troca entre as duas metas: contra o despacho imediato, a atribuição conjunta reduziu o km em 4,0\%, 5,0\% e 8,7\% com janelas de 30, 60 e 120 s, com 267 e 98 atendimentos a mais nas duas primeiras e 416 a menos na última. Nenhuma janela foi reavaliada em setembro ou outubro.
+
+\subsection{Cenários sintéticos}
+
+A Tabela~\ref{tab:sint} mostra os cinco cenários principais, com a dispersão entre as 40 sementes. Em quatro deles, a atribuição conjunta reduziu o km vazio em relação ao despacho imediato em todas ou quase todas as sementes, com mediana de 7,8\% a 8,9\%. Com demanda uniforme, a redução mediana foi de 2,0\%, sem redução em 8 de 40 sementes. O critério de atendimento destes cenários, fixado antes, exige razão média de atendidos de pelo menos 0,995 e razão das médias de P90 de no máximo 1,05. Ele admite perda média de até 0,5\% dos atendidos e é, por isso, mais tolerante que o dos dados reais. Os cinco cenários o cumpriram. Com demanda uniforme, porém, a atribuição conjunta atendeu em média 1,1 pedido a menos e atendeu menos em 24 de 40 sementes; nos outros cenários, atendeu em média mais.
+
+\begin{table}[!htb]
+\caption{Cenários sintéticos principais: atribuição conjunta contra despacho imediato (40 sementes)}\label{tab:sint}
+\centering\fontetabela\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Cenário & \shortstack{$\Delta\%$ km, mediana\\(P10; P90)} & \shortstack{Sementes\\com redução} & \shortstack{$\Delta N$ médio\\(C−A)} & \shortstack{Sementes em que\\C atende menos} & \shortstack{Razão\\de P90} \\
+\midrule
+Demanda uniforme & −2,0 (−4,6; +0,9) & 32 & −1,1 & 24 & 1,000 \\
+Demanda concentrada & −8,9 (−13,0; −6,2) & 40 & +5,2 & 13 & 0,933 \\
+Frota desequilibrada & −8,2 (−10,5; −4,1) & 40 & +8,4 & 7 & 0,918 \\
+Mudança inesperada & −7,8 (−10,2; −5,4) & 40 & +8,8 & 5 & 0,945 \\
+Demanda migrante & −8,3 (−12,3; −4,3) & 39 & +6,9 & 13 & 0,941 \\
+\bottomrule
+\end{tabular}
+\fonte{elaborada pelos autores; dispersão entre sementes calculada depois dos resultados sobre as execuções congeladas. A: despacho imediato; C: atribuição conjunta.}
+\end{table}
+
+Com frota escassa (14 pedidos por veículo, contra 8 no padrão), a redução foi maior (média de −14,0\% com demanda concentrada e −12,5\% com frota desequilibrada), e a atribuição conjunta atendeu mais em quase todas as sementes. Com frota abundante (4 pedidos por veículo), a redução foi menor (−3,4\% e −4,0\%), e com demanda concentrada a atribuição conjunta atendeu em média menos, ainda dentro da tolerância. Nove das variantes só repetem o cenário-base com outro sorteio; por isso, uma mediana sobre os 22 cenários não é usada como prova de robustez (Apêndice~\ref{ap:sint}). Contra o lote simples, a atribuição conjunta reduziu o km nos cinco cenários (mediana entre sementes de 1,0\% a 7,1\%). Os testes com correção de Holm, previstos no plano, rejeitaram a igualdade nos cinco cenários, mas significância não mede relevância.
+
+\subsection{Discussão}
+
+\textbf{Mecanismo.} O resultado é coerente com o mecanismo da Seção~2: com poucos veículos livres e pedidos simultâneos, o despacho um a um gasta o veículo mais próximo de um pedido para atender outro que teria alternativa quase igual. O ganho sobre o lote simples isola a decisão conjunta. O ganho do lote simples sobre o despacho imediato, que vem com perda de atendimento, mostra o custo de esperar o lote. O guloso global mostra o outro lado. Com os parâmetros de março, ele reduziu mais o km e atendeu bem menos que a atribuição conjunta. Com a calibração nova, a diferença de atendimento a favor da atribuição conjunta diminuiu em setembro e outubro e se inverteu no teste. A vantagem do Húngaro sobre um guloso global simples não se confirmou. A redução contra o despacho imediato não pode ser atribuída toda à decisão conjunta, porque parte vem do lote, nem toda à perda de atendimento, por causa do km por atendido.
+
+\textbf{Atendimento e km.} A redução de km contra o despacho imediato apareceu em todas as variações, mas encolheu no teste fora da amostra. A diferença de atendimento mudou de sinal entre períodos e variantes. Uma leitura coerente com o mecanismo, não testada, é que com poucos pedidos simultâneos por lote, como a partir de 31/10, a atribuição conjunta tem pouco a reordenar. A queda de motoristas e de atendimento nesses dias também pode vir de limitação dos dados.
+
+\textbf{Ótimo local e concordância.} O ótimo de cada lote não é o do dia. As duas avaliações apontam para menos km vazio com a atribuição conjunta, mas não se somam nem se validam, porque diferem em demanda, frota, parâmetros e distância.
+
+\subsection{O que este estudo não mostra}
+
+\begin{itemize}
+\item \textbf{Economia na operação real.} Não houve implantação nem medição em produção. A referência é um despacho simplificado, não o despacho praticado pela empresa.
+\item \textbf{Um simulador fiel à operação.} O simulador atende mais e com aproximação menor que a operação, e a recalibração não fechou essa diferença. Aceite, recusa pelo motorista, cancelamento depois da atribuição e novas tentativas não são modelados, embora o aceite observado (pedido com registro de motorista a caminho) tenha caído de 55,9\% e 58,9\% no treino e na validação para 44,2\% e 40,5\% em setembro e outubro.
+\item \textbf{Distâncias reais.} A distância é estimada, com fator e velocidade constantes e sem tráfego. A linha reta ignora barreiras como a baía e os rios, e pode subestimar a aproximação onde a ligação exige ponte. A verificação com a rede viária cobriu só 4 dias de outubro.
+\item \textbf{O que a política saberia na prática.} A disponibilidade dos motoristas foi reconstruída depois, com a jornada realizada, que o avaliador conhece e a política não. O cadastro de veículos é uma fotografia única.
+\item \textbf{Generalização.} Os dados são de uma empresa e uma região, em quatro períodos, mais 12 dias de teste com pouco poder, nos quais a queda de pedidos e motoristas não foi explicada. Os cenários sintéticos são exploratórios e não confirmam os dados reais.
+\item \textbf{Equivalência no atendimento.} Nenhuma margem foi fixada; um intervalo que inclui zero não mostra que a atribuição conjunta atende tanto quanto o despacho imediato.
+\end{itemize}

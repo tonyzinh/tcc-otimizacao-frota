@@ -1,12 +1,20 @@
-# Verificações leves e locais. Não tocam em artefatos científicos congelados (listados em `exclude`).
-# Instalação: `pip install pre-commit && pre-commit install`. Configuração não testada nesta sessão.
-exclude: ^(reports/(tcc_final|tcc_v2)|resultados)/
+# Verificações leves e locais. Instalação: `pip install pre-commit && pre-commit install`.
+# As pastas de resultados congelados ficam fora dos ganchos que reescrevem arquivos, mas NÃO do gancho de dados.
 repos:
+  - repo: local
+    hooks:
+      - id: check-data-files
+        name: bloquear dados, segredos e arquivos grandes
+        entry: python scripts/check_data_files.py
+        language: system
+        pass_filenames: true
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.17.3
     hooks:
       - id: ruff-check
+        exclude: ^reports/
       - id: ruff-format
+        exclude: ^reports/
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:

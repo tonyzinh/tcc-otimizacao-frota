@@ -1,0 +1,23 @@
+# Hipóteses da referência "espera no destino" (SIMULAÇÃO; não é a operação real nem política da empresa).
+versao: 2
+rotulo: baseline_simplificado_calibrado_espera_no_destino
+simulacao: true
+validado_empiricamente: false
+posicao_inicial_da_jornada:
+  # Duas condições SEPARADAS; a primeira posição observada NÃO equivale à matriz.
+  regra: primeira_posicao_observada     # implementado
+  primeira_posicao_observada:
+    max_idade_s: 1800                   # cenário (ver configs/data/time_access_assumptions.yaml); reportar 600 e 3600
+    sem_observacao_ate_o_inicio: indisponivel_ate_primeira_observacao   # intervalo inicial DESCONHECIDO, quantificado
+    nao_extrapola_atraves_de: [viagem, compromisso_externo]
+    posicao_do_dia_alvo_e_info_do_planejador: false   # inicializa o ambiente simulado, não é conhecida na véspera
+  matriz_configurada:                   # PENDENTE: base física não encontrada nas regras (RN) nem nos cadastros ODS (busca por nome)
+    lat: null
+    lon: null
+    fonte: null                         # regra confirmada ou hipótese explícita do proprietário
+permanencia_no_destino:
+  regra: fica_no_destino                # implementado; retorna_a_matriz e circula: não implementados (erro explícito)
+compromissos_externos:
+  conhecimento: ate_decisao
+  deslocamento_ate_origem: auditado     # a simulação v2 teletransporta o motorista ao compromisso: AUDITADO, não corrigido
+  posicao_de_liberacao: destino_do_compromisso

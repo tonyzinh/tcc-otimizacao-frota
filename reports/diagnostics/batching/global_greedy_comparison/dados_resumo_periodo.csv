@@ -1,0 +1,5 @@
+periodo,instantes_posicao,motoristas_no_registro,instantes_por_motorista_mediana,horas_com_posicao,pedidos_tempo_real,horas_com_pedido,hora_media_pedido,jornadas,dias,dias_com_sinal
+outubro,711.0,80.0,334.0,24.0,932.0,24.0,13.8,99.0,25,0
+setembro,716.0,94.5,336.25,24.0,1083.0,24.0,13.76,25.0,30,15
+teste_26-30/10,713.0,81.0,336.0,24.0,817.0,24.0,13.83,102.0,5,0
+teste_31/10-08/11,716.0,41.0,330.0,24.0,298.0,22.0,13.37,45.0,9,1

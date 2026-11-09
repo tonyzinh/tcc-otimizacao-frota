@@ -40,7 +40,7 @@ def _comma(v: float, fmt: str) -> str:
     return format(v, fmt).replace(".", ",")
 
 
-def plot_km_and_attendance(summary: dict, out: Path, name: str = "km_atendimento") -> list[Path]:
+def plot_km_and_attendance(summary: dict, out: Path, name: str = "empty_km_service_differences") -> list[Path]:
     """Duas faixas: variação do km vazio (%) e do atendimento (p.p.) por contraste e período. Negativo no km = redução."""
     _style()
     fig, ax = plt.subplots(1, 2, figsize=(6.3, 2.7))
@@ -92,10 +92,10 @@ def plot_daily_differences(daily_km: pd.DataFrame, out: Path, period: str, name:
     ax.set_ylabel("C − A (km vazio por dia)\nnegativo = redução", fontsize=8)
     ax.set_title(f"Diferença diária pareada, {PERIOD_LABELS.get(period, period)} (vermelho = dia em que C piora)", fontsize=9, loc="left")
     fig.tight_layout()
-    return _save(fig, out, name or f"diferenca_diaria_{period}")
+    return _save(fig, out, name or f"daily_differences_{period}")
 
 
-def plot_confidence_intervals(summary: dict, out: Path, name: str = "ic_diferenca_diaria") -> list[Path]:
+def plot_confidence_intervals(summary: dict, out: Path, name: str = "daily_difference_intervals") -> list[Path]:
     """IC95% (bootstrap de blocos) da diferença média diária de km vazio, por contraste e período."""
     _style()
     fig, ax = plt.subplots(figsize=(6.3, 2.6))
@@ -118,7 +118,7 @@ def plot_confidence_intervals(summary: dict, out: Path, name: str = "ic_diferenc
     return _save(fig, out, name)
 
 
-def plot_attendance_vs_km(summary: dict, out: Path, name: str = "atendimento_vs_km") -> list[Path]:
+def plot_attendance_vs_km(summary: dict, out: Path, name: str = "service_vs_empty_km") -> list[Path]:
     """Dispersão: variação do km vazio (%) × variação do atendimento (p.p.), um ponto por contraste e período."""
     _style()
     fig, ax = plt.subplots(figsize=(4.6, 3.2))
@@ -142,7 +142,7 @@ def plot_attendance_vs_km(summary: dict, out: Path, name: str = "atendimento_vs_
     return _save(fig, out, name)
 
 
-def plot_wait_by_policy(summary: dict, out: Path, name: str = "espera_por_politica") -> list[Path]:
+def plot_wait_by_policy(summary: dict, out: Path, name: str = "wait_by_policy") -> list[Path]:
     """Espera média e P90 por política e período. A espera é medida SÓ entre os pedidos atendidos (denominadores no rótulo)."""
     _style()
     fig, ax = plt.subplots(1, 2, figsize=(6.3, 2.8), sharey=True)
@@ -163,7 +163,7 @@ def plot_wait_by_policy(summary: dict, out: Path, name: str = "espera_por_politi
     return _save(fig, out, name)
 
 
-def plot_synthetic_summary(table: pd.DataFrame, out: Path, name: str = "sintetico") -> list[Path]:
+def plot_synthetic_summary(table: pd.DataFrame, out: Path, name: str = "synthetic_contrasts") -> list[Path]:
     """Variação do km vazio (%) de B e C contra A nos cenários sintéticos. Os cenários compartilham estrutura: não são 22 confirmações."""
     _style()
     c = table[(table.politica == "D_lote60s_hungaro") & (table.referencia == "A")].reset_index(drop=True)

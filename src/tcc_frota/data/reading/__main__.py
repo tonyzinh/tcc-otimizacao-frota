@@ -6,7 +6,7 @@ import json
 import sys
 
 from tcc_frota.data.reading import ElasticReader, SqlServerReader
-from tcc_frota.data.reading.sqlserver import DATABASES
+from tcc_frota.data.reading.sql_server import DATABASES
 
 
 def main(argv: list[str]) -> int:

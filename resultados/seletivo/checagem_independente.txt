@@ -1,8 +1,0 @@
-
-marco: 16 dias; linhas com B+R != total: 0
-  C1_guloso_marginal_a0.2      km vazio/corrida   +9.88% [+8.34; +11.43]   corridas  +0.40% [-0.36; +1.16]
-  C2_guloso_seletivo           km vazio/corrida   +0.00% [-0.00; +0.00]   corridas  +0.00% [+0.00; +0.00]
-
-setembro: 15 dias; linhas com B+R != total: 0
-  C1_guloso_marginal_a0.2      km vazio/corrida   +7.83% [+5.91; +9.73]   corridas  +2.06% [+1.21; +3.16]
-  C2_guloso_seletivo           km vazio/corrida   +0.00% [-0.00; +0.00]   corridas  +0.00% [+0.00; +0.00]

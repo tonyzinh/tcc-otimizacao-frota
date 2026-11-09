@@ -1,0 +1,16 @@
+{
+ "analise_posterior": true,
+ "observacao": "análise posterior aos resultados congelados; não é avaliação independente",
+ "rodada": 5,
+ "caminho_antigo": "reports/pos_hoc_parecer/rodada5/",
+ "data": "2026-11-09",
+ "plano": "PLANO.md (nesta pasta); decisions.md R-27",
+ "script": "scripts/analyze_recalibration_out_of_sample.py (antes scripts/pos_hoc_rodada5.py)",
+ "finalidade": "recalibração com janeiro–agosto de 2026, teste fora da amostra 26/10–08/11 e corte mês a mês",
+ "congelamento": "calibracao_congelada.json (09/11/2026 16:59:48 -03:00); trava aceita os caminhos novos por reports/manifests/repository_restructure/frozen_code_equivalence.json",
+ "entradas": [
+  "data/raw/v1_viagens/ (local)",
+  "reports/diagnostics/statistics/robustness_review/"
+ ],
+ "relacao": "usa a rodada 4; lida pelas rodadas 7 e 8 e pela figura plot_recalibration_daily_differences.py"
+}

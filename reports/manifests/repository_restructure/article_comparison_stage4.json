@@ -1,0 +1,37 @@
+{
+ "data": "2026-11-09",
+ "pdf_antes": "preservação: copia_completa_pre_migracao/estado_antes/ARTIGO_ATRIBUICAO_HUNGARO_antes.pdf",
+ "sha256_antes": "28256442cd207df26d37f49b2742cc768b80d7291f46b1377047b62eae80e73a",
+ "pdf_depois": "article/ARTIGO_ATRIBUICAO_HUNGARO.pdf",
+ "sha256_depois": "433b952576dedc86b6db9d2c3f469e747fb2d486f6f70c83aa48f435497ea5f0",
+ "paginas": {
+  "antes": 37,
+  "depois": 37,
+  "mapa_de_secoes_identico": true,
+  "corpo": "p. 2-23"
+ },
+ "log_latex": {
+  "overfull": 0,
+  "underfull": 7,
+  "referencias_indefinidas": 0,
+  "citacoes_indefinidas": 0,
+  "igual_ao_antes": true
+ },
+ "numeros": {
+  "antes": 2437,
+  "depois": 2428,
+  "so_no_antes": {
+   "2": 1,
+   "5": 1,
+   "5.": 2,
+   "6": 1,
+   "7": 1,
+   "7.": 1,
+   "8": 1,
+   "8.": 1
+  },
+  "explicacao": "todos vêm de caminhos do Apêndice D: sintetico_v2 (2), rodada5/ (5), pos_hoc_rodada5.py e figura_rodada5.py (5.), rodada6/ (6), rodada7/ e pos_hoc_rodada7.py (7, 7.), rodada8/ e pos_hoc_rodada8.py (8, 8.)",
+  "so_no_depois": {}
+ },
+ "diferencas_de_texto": "só os caminhos de pastas e scripts do Apêndice D e quebras de linha decorrentes; nenhum valor, tabela ou frase científica mudou"
+}

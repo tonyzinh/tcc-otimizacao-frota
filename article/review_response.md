@@ -1,0 +1,41 @@
+# Auditoria do parecer crítico (09/11/2026)
+
+O parecer foi recebido como lista de críticas no pedido do proprietário; os pontos abaixo são os que ele levanta. Veredito por evidência
+(trecho do artigo, código ou resultado). Números pós-hoc: `reports/diagnostics/statistics/robustness_review/RELATORIO.md` (plano escrito antes em `PLANO.md`).
+
+## Matriz
+
+| # | Ponto do parecer | Veredito | Evidência | Consequência | Correção |
+|---|---|---|---|---|---|
+| 1 | O simulador não foi validado contra a operação | **Confirmado** | Artigo 3.1 diz que a referência "não é a operação manual"; não há comparação com o observado. Pós-hoc: simulado A atende 61,9–73,4% dos pedidos e a operação aceitou 41,0–59,6%; aproximação simulada 2,4–2,7 km/atendido contra mediana observada 3,1–4,1 km; a diferença cresceu em set/out | Os resultados valem como comparação entre políticas no modelo construído; representatividade da operação não demonstrada | Nova subseção 4.1 de validade, com verificação × validação de componentes × validação operacional; resumo e conclusão restritos |
+| 2 | Queda de motoristas por dia sugere oferta subestimada ou problema de cobertura | **Parcialmente confirmado** | Queda de 106,8 (treino) para 74,3 (out) motoristas/dia no registro de ofertas, acompanhada pelos motoristas com corrida encerrada (108,4 → 70,4) e pela demanda (1.207 → 941 pedidos/dia): indica mudança de operação. Vínculo ambíguo descarta 36–47 jornadas/dia (altera janelas, não a contagem) | A queda é real nas fontes; a reconstrução das janelas é hipótese | Texto 3.3 e 4.1; sensibilidade (E, pontes 600/2.400 s, −20% de motoristas): redução de km de C mantida |
+| 3 | Origem não documentada de 1,3012, 16,079 km/h, raio e paciência | **Parcialmente confirmado** | Fator e velocidade medidos na calibração de março sobre extrato anterior (n = 466 aproximações; `docs_antigos/resultados_reais.md` §4.4, arquivado fora do repositório); raio e paciência ajustados para reproduzir aceite e busca observados (março, 04–11 h). Não recalibrados. No registro de ofertas, fator mediano 1,36–1,37 e velocidade 17–20 km/h | Raio e paciência são parâmetros ajustados, não validados para set/out | Texto 3.3 com origem, período e classificação |
+| 4 | Multiplicar distâncias por constante não muda o ótimo | **Confirmado com ressalva** | `assignment/dispatch.py` e `simulation/engine.py`: elegibilidade e custos do lote usam a distância em linha reta; o fator só entra no km e no tempo de aproximação, que alteram ocupação e evolução | O fator não muda decisões de um lote fixo, mas muda a dinâmica | Explicação em 3.3; sensibilidade fator 1,2/1,6 |
+| 5 | Distâncias viárias poderiam mudar o resultado | **Hipótese investigada** | Pós-hoc em 4 dias fixados por calendário: C×A −6,24% (reta×fator −6,29%); ΔN −61 (reta +4) | Redução de km mantida; atendimento sensível | Tabela pós-hoc 4.2 |
+| 6 | Mediana sobre 22 cenários redundantes não é robustez | **Confirmado** | `scenarios/catalog.py`: 9 variantes (salto, previsão perfeita, erro de previsão) só mudam o planejador D+1; o código do cenário entra na semente | "22 de 22" superestima a variedade | Tabela das 5 famílias com dispersão entre sementes; variantes como sensibilidade |
+| 7 | Resumo confunde atendimento preservado com tolerância | **Confirmado** | Resumo: "atendimento preservado em todos pelo critério sintético"; S1 e S2 com frota abundante atenderam em média menos que A | Leitura enganosa | Resumo e abstract distinguem as duas coisas |
+| 8 | Diferenças de velocidade, raio e paciência entre linhas não explicadas | **Parcialmente confirmado** | Valores declarados (2.1, 3.3, 3.4), sem justificativa | — | Frase em 3.4 (hipóteses do gerador, não calibradas) |
+| 9 | Significância tratada como relevância; mais sementes reduziriam p | **Parcialmente confirmado** | 4.2 destaca "p = 0,002 após Holm"; o texto não afirma que mais sementes reduzem p | — | Prioridade a efeito e dispersão; p só como nota |
+| 10 | Possível defeito no fechamento de lotes e na liberação de veículos | **Não sustentado** | `engine.py`: lotes em múltiplos de 60 s; pedido que chega no instante do lote entra (prioridade de evento 4 < 4,5); veículo liberado até o instante do lote entra nele (3 < 4,5); em lote, veículo liberado não pega pedido entre lotes (regra deliberada, `become_free`). Testes `test_batch_wait_*`, `test_assigner_que_viola_unicidade_e_rejeitado`. Em A, o veículo liberado pega o pedido em espera mais antigo elegível | Regra deliberada, não defeito | Explicação em 3.2 |
+| 11 | Falta comparador guloso global (menor par) | **Confirmado (lacuna)** | Não existia | — | Variante D pós-hoc implementada e testada: menos km que C e menos atendidos (set −2,66%/−179; out −1,88%/−83) |
+| 12 | Janela não explorada | **Parcialmente confirmado** | 30 s e 60 s comparados no treino antes do congelamento (3.5) | — | Grade 30/60/120 s só no treino (pós-hoc): troca entre km e atendimento |
+| 13 | Bootstrap inadequado para séries curtas | **Confirmado** | `metrics/statistics.py`: blocos circulares de 7 dias; com 15 dias, ~3 blocos; intervalo de setembro mais estreito que o t pareado | Intervalos descritivos e otimistas em setembro; conclusão de km inalterada | 3.6 explica; tabela diária pareada no apêndice; sensibilidade bloco 3/5/7 e t |
+| 14 | E2, evidência estatística e equivalência confundidos | **Parcialmente confirmado** | 4.1 já diz que IC com zero não é equivalência; falta separar os três | — | 3.6 e 4.1 separam; sem margem de não inferioridade (sem justificativa externa) |
+| 15 | Classificação do algoritmo | **Parcialmente confirmado** | `kuhn_munkres`: potenciais por linha e coluna, inserção linha a linha, caminho aumentante de menor custo reduzido, O(n²m): forma de caminhos aumentantes mínimos do método húngaro (Tomizawa; Edmonds–Karp). O texto dizia "a leitura do código confirma que se trata do método de Kuhn e Munkres" | Nome correto como família; variante precisa | 2.3 reescrito; motivo da implementação própria declarado como não registrado |
+| 16 | Literatura de despacho em lotes ausente; reposicionamento excessivo | **Confirmado** | 2.4 citava reposicionamento e recozimento | — | + Xu et al. (2018), Qin et al. (2020), Ashlagi et al. (2023), verificados; reposicionamento reduzido; Kirkpatrick removido |
+| 17 | Título "alocação" contradiz o corpo | **Confirmado (definição)** | 2.1 definia alocação como distribuição espacial (reposicionamento) | Contradição criada pela definição, não pelo título | Definição ampla em 2.1; título mantido |
+| 18 | Duas hipóteses quando só uma é formulada | **Parcialmente confirmado** | Introdução: "H2" é critério de preservação, não hipótese | — | Uma hipótese e critérios |
+| 19 | Identificadores de código e caminhos no texto | **Confirmado** | Fontes das Tabelas 2, 4, 5, 6, 7, Algoritmo 1, Figura 1 e nomes `S2\_frota\_escassa` | — | Fontes reescritas; rastreabilidade no Apêndice C |
+| 20 | Resíduos de recozimento e D+1 | **Confirmado** | Introdução (parágrafo D+1) e 2.4 (recozimento) | — | Removidos; D+1 só numa frase de contexto |
+| 21 | Generalizações sobre a operação real | **Parcialmente confirmado** | "custo real que o simulador conta", "ganho real depende" | — | Frases reescritas |
+| 22 | Falta significado prático | **Confirmado** | Não havia km/dia, participação no total, P95/P99/máx. | — | Parágrafo e tabela pós-hoc |
+| 23 | Pedidos antigos podem ser preteridos | **Hipótese investigada** | Pós-hoc: preterição limitada a 3 lotes pela paciência; C preteriu menos que B e D | Sem evidência de preterição sistemática no modelo | Frase em 4.1 |
+| 24 | Falta transparência (dados, código, vínculos) | **Confirmado** | Não havia declarações | — | Seção "Declarações"; vínculo dos autores marcado como pendente (informação não fornecida) |
+
+## Separação pedida
+
+- **A. Experimento original congelado:** números de setembro e outubro (Tabelas 6 e 7 do artigo revisado), critérios E1–E3 e classe de outubro
+  ("E2 não cumprido") inalterados; manifestos e Parquet congelados intocados.
+- **B. Correções de apresentação:** itens 7, 8, 14, 15, 17–21, 24.
+- **C. Diagnósticos e sensibilidades pós-hoc:** itens 1–6, 9, 12, 13, 22, 23 (`reports/diagnostics/statistics/robustness_review/`).
+- **D. Novas variantes:** item 11 (guloso global D), só pós-hoc; não substitui C nem entra no congelamento.

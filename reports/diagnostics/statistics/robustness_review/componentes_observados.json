@@ -1,0 +1,222 @@
+{
+ "treino": {
+  "dias": 43,
+  "pedidos": 51909,
+  "status_pct": {
+   "CorridaEncerrada": 47.61,
+   "NaoAtendida": 28.11,
+   "CorridaCanceladaSolicitante": 8.9,
+   "CorridaCanceladaSolicitantePosAceite": 5.59,
+   "CorridaCanceladaMotoristaPosAceite": 3.33,
+   "LimiteEsperaAtingido": 2.78,
+   "PagamentoRejeitado": 2.36,
+   "Retracamento": 1.1,
+   "CorridaCanceladaOperador": 0.15,
+   "CorridaCanceladaAgendamento": 0.07,
+   "CondutorACaminho": 0.0,
+   "CorridaIniciada": 0.0
+  },
+  "corrida_encerrada_pct": 47.61,
+  "aceitas_pct (encerrada + canceladas pos-aceite)": 56.53,
+  "pickup_observado_km": {
+   "n": 24554,
+   "p25": 1.59925,
+   "mediana": 3.075,
+   "p75": 5.646,
+   "media_aparada_5pct": 3.8138306411474594
+  },
+  "pickup_observado_nulo_ou_zero": 159,
+  "espera_observada_registro_ate_inicio_s": {
+   "n": 19792,
+   "p25": 513.3022500000001,
+   "mediana": 790.13,
+   "p75": 1389.7885,
+   "media_aparada_5pct": 1038.9213914776556
+  },
+  "duracao_viagem_observada_s": {
+   "n": 24662,
+   "p25": 620.37725,
+   "mediana": 1017.24,
+   "p75": 1828.41825,
+   "media_aparada_5pct": 1269.5852258718571
+  },
+  "fator_rua_reta_registro_ofertas": {
+   "n": 124591,
+   "p25": 1.2003619027139254,
+   "mediana": 1.3629292577841048,
+   "p75": 1.6111099569685936,
+   "media_aparada_5pct": 1.4282374581644206
+  },
+  "velocidade_aproximacao_registro_ofertas_kmh": {
+   "n": 128524,
+   "p25": 6.872168855419478,
+   "mediana": 18.3210386607648,
+   "p75": 31.58894703509877,
+   "media_aparada_5pct": 20.140815711607004
+  }
+ },
+ "validacao": {
+  "dias": 16,
+  "pedidos": 20178,
+  "status_pct": {
+   "CorridaEncerrada": 49.8,
+   "NaoAtendida": 25.12,
+   "CorridaCanceladaSolicitante": 8.78,
+   "CorridaCanceladaSolicitantePosAceite": 5.82,
+   "CorridaCanceladaMotoristaPosAceite": 3.92,
+   "LimiteEsperaAtingido": 3.04,
+   "PagamentoRejeitado": 1.99,
+   "Retracamento": 1.16,
+   "CorridaCanceladaOperador": 0.24,
+   "CorridaCanceladaAgendamento": 0.12,
+   "CorridaIniciada": 0.01
+  },
+  "corrida_encerrada_pct": 49.8,
+  "aceitas_pct (encerrada + canceladas pos-aceite)": 59.55,
+  "pickup_observado_km": {
+   "n": 9988,
+   "p25": 1.622,
+   "mediana": 3.1225,
+   "p75": 5.793,
+   "media_aparada_5pct": 3.928097463284379
+  },
+  "pickup_observado_nulo_ou_zero": 61,
+  "espera_observada_registro_ate_inicio_s": {
+   "n": 8062,
+   "p25": 531.1985,
+   "mediana": 838.7515,
+   "p75": 1563.01475,
+   "media_aparada_5pct": 1116.8989463744142
+  },
+  "duracao_viagem_observada_s": {
+   "n": 10018,
+   "p25": 624.59075,
+   "mediana": 1031.2135,
+   "p75": 1900.88875,
+   "media_aparada_5pct": 1304.784613464951
+  },
+  "fator_rua_reta_registro_ofertas": {
+   "n": 53669,
+   "p25": 1.2056383829179596,
+   "mediana": 1.3717234002152474,
+   "p75": 1.6179193258278668,
+   "media_aparada_5pct": 1.4356003149723715
+  },
+  "velocidade_aproximacao_registro_ofertas_kmh": {
+   "n": 53556,
+   "p25": 6.048558332863966,
+   "mediana": 17.431229449437435,
+   "p75": 30.44643713800107,
+   "media_aparada_5pct": 19.14398746090918
+  }
+ },
+ "setembro": {
+  "dias": 15,
+  "pedidos": 16918,
+  "status_pct": {
+   "CorridaEncerrada": 37.69,
+   "NaoAtendida": 34.51,
+   "CorridaCanceladaSolicitante": 10.77,
+   "CorridaCanceladaSolicitantePosAceite": 4.39,
+   "LimiteEsperaAtingido": 4.26,
+   "CorridaCanceladaMotoristaPosAceite": 2.88,
+   "PagamentoRejeitado": 2.33,
+   "CorridaCanceladaOperador": 2.23,
+   "Retracamento": 0.87,
+   "CorridaCanceladaAgendamento": 0.07,
+   "CorridaIniciada": 0.01
+  },
+  "corrida_encerrada_pct": 37.69,
+  "aceitas_pct (encerrada + canceladas pos-aceite)": 44.96,
+  "pickup_observado_km": {
+   "n": 6316,
+   "p25": 1.888,
+   "mediana": 3.8355,
+   "p75": 6.83625,
+   "media_aparada_5pct": 4.8800490851513025
+  },
+  "pickup_observado_nulo_ou_zero": 60,
+  "espera_observada_registro_ate_inicio_s": {
+   "n": 5085,
+   "p25": 635.107,
+   "mediana": 1028.553,
+   "p75": 2126.716,
+   "media_aparada_5pct": 1376.0302904918033
+  },
+  "duracao_viagem_observada_s": {
+   "n": 6325,
+   "p25": 720.243,
+   "mediana": 1233.227,
+   "p75": 2183.347,
+   "media_aparada_5pct": 1518.176577578633
+  },
+  "fator_rua_reta_registro_ofertas": {
+   "n": 43599,
+   "p25": 1.2029735724229946,
+   "mediana": 1.3625505419399397,
+   "p75": 1.6005535530777497,
+   "media_aparada_5pct": 1.4257698172690123
+  },
+  "velocidade_aproximacao_registro_ofertas_kmh": {
+   "n": 41959,
+   "p25": 7.350612551556427,
+   "mediana": 19.710492762319053,
+   "p75": 33.42041782542979,
+   "media_aparada_5pct": 21.284142747082853
+  }
+ },
+ "outubro": {
+  "dias": 25,
+  "pedidos": 23523,
+  "status_pct": {
+   "NaoAtendida": 37.04,
+   "CorridaEncerrada": 34.78,
+   "CorridaCanceladaSolicitante": 12.76,
+   "CorridaCanceladaSolicitantePosAceite": 3.94,
+   "PagamentoRejeitado": 3.92,
+   "LimiteEsperaAtingido": 3.14,
+   "CorridaCanceladaMotoristaPosAceite": 2.27,
+   "CorridaCanceladaOperador": 1.25,
+   "Retracamento": 0.84,
+   "CorridaCanceladaAgendamento": 0.06
+  },
+  "corrida_encerrada_pct": 34.78,
+  "aceitas_pct (encerrada + canceladas pos-aceite)": 40.98,
+  "pickup_observado_km": {
+   "n": 8103,
+   "p25": 2.002,
+   "mediana": 4.103,
+   "p75": 7.3955,
+   "media_aparada_5pct": 5.266598189797038
+  },
+  "pickup_observado_nulo_ou_zero": 78,
+  "espera_observada_registro_ate_inicio_s": {
+   "n": 6799,
+   "p25": 648.3915,
+   "mediana": 1051.53,
+   "p75": 2230.5299999999997,
+   "media_aparada_5pct": 1419.4913178623958
+  },
+  "duracao_viagem_observada_s": {
+   "n": 8123,
+   "p25": 715.6615,
+   "mediana": 1215.68,
+   "p75": 2199.415,
+   "media_aparada_5pct": 1516.2631193049663
+  },
+  "fator_rua_reta_registro_ofertas": {
+   "n": 58305,
+   "p25": 1.2105055037909709,
+   "mediana": 1.368901625448092,
+   "p75": 1.614308367286889,
+   "media_aparada_5pct": 1.4311143893670546
+  },
+  "velocidade_aproximacao_registro_ofertas_kmh": {
+   "n": 56625,
+   "p25": 7.885375494071147,
+   "mediana": 20.362568513435722,
+   "p75": 34.31397033115228,
+   "media_aparada_5pct": 21.96641873524913
+  }
+ }
+}

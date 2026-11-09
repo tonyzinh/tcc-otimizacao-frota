@@ -1,0 +1,88 @@
+{
+ "gerado_em": "2026-11-09 19:22:38 -0300",
+ "finalidade": "permitir que a trava da calibração congelada (rodada 5) aceite os arquivos depois da reestruturação do repositório",
+ "natureza_das_mudancas": "caminhos de dados e relatórios, nomes de módulos e scripts, ordem de imports, docstrings e o adaptador da própria trava; nenhuma mudança de cálculo, parâmetro, empate ou unidade (conferir nos diffs)",
+ "fonte_dos_hashes_congelados": "calibracao_congelada.json; conteúdo conferido na cópia pré-migração",
+ "arquivos": {
+  "scripts/pos_hoc_rodada5.py": {
+   "sha256_congelado": "028e3cfc4d9370fcbe4535aa380f3af53f3372414f646ec7624dbb8edeedf002",
+   "caminho_atual": "scripts/analyze_recalibration_out_of_sample.py",
+   "sha256_atual": "2041107fb57a4772edef5a3a96a418c861f50dcead6964c59ad92cef9233773e",
+   "conteudo_identico": false,
+   "linhas_alteradas": 56,
+   "diff": "frozen_code_diffs/pos_hoc_rodada5.py.diff"
+  },
+  "scripts/pos_hoc_parecer.py": {
+   "sha256_congelado": "bc9637aec76588f710bff07226b46cb9d15f9352b4e169ead7cd3089f1978585",
+   "caminho_atual": "scripts/analyze_robustness_review.py",
+   "sha256_atual": "7946f81c0473f01faa68164cc83b433bec0e530d5c1992b64e6511cfb94b4218",
+   "conteudo_identico": false,
+   "linhas_alteradas": 14,
+   "diff": "frozen_code_diffs/pos_hoc_parecer.py.diff"
+  },
+  "src/tcc_frota/simulation/engine.py": {
+   "sha256_congelado": "29c51e6e0aad8543ca5a51235139ebcadcf73bec6227abe241948fa28d464e5d",
+   "caminho_atual": "src/tcc_frota/simulation/engine.py",
+   "sha256_atual": "29c51e6e0aad8543ca5a51235139ebcadcf73bec6227abe241948fa28d464e5d",
+   "conteudo_identico": true,
+   "linhas_alteradas": 0,
+   "diff": null
+  },
+  "src/tcc_frota/simulation/historical.py": {
+   "sha256_congelado": "2175c541a6da428b92e3fed1db9d0b48484ec2f8a70fda9c2d8c4fff928d22ee",
+   "caminho_atual": "src/tcc_frota/simulation/historical.py",
+   "sha256_atual": "1e2ffba8f1a37e2b267ed3c5d764fe49ecec375fc3e146162d75e44064f513d4",
+   "conteudo_identico": false,
+   "linhas_alteradas": 4,
+   "diff": "frozen_code_diffs/historical.py.diff"
+  },
+  "src/tcc_frota/assignment/dispatch.py": {
+   "sha256_congelado": "ea7b235371b3138b5a39fe14e4f42686385ba11a8f7b9ffce80da8ab71080211",
+   "caminho_atual": "src/tcc_frota/assignment/dispatch.py",
+   "sha256_atual": "ea7b235371b3138b5a39fe14e4f42686385ba11a8f7b9ffce80da8ab71080211",
+   "conteudo_identico": true,
+   "linhas_alteradas": 0,
+   "diff": null
+  },
+  "src/tcc_frota/data/world.py": {
+   "sha256_congelado": "34dba1377b5f0af8eef4b4b9fe38fe7232f08691383371c6474cb833da45f1a6",
+   "caminho_atual": "src/tcc_frota/data/world.py",
+   "sha256_atual": "a8b6c7f8215904d93466b1af87ef23398b4e50c188b6f4fab172e537bb817264",
+   "conteudo_identico": false,
+   "linhas_alteradas": 2,
+   "diff": "frozen_code_diffs/world.py.diff"
+  },
+  "src/tcc_frota/data/availability.py": {
+   "sha256_congelado": "49fa5af09f054428c7b1c855a1297fc65b492f2afd400ec00c156c5fcc653283",
+   "caminho_atual": "src/tcc_frota/data/availability.py",
+   "sha256_atual": "49fa5af09f054428c7b1c855a1297fc65b492f2afd400ec00c156c5fcc653283",
+   "conteudo_identico": true,
+   "linhas_alteradas": 0,
+   "diff": null
+  },
+  "src/tcc_frota/data/initial_position.py": {
+   "sha256_congelado": "c6bd8ae108bd4c2e7de9fca3be8f40c8c80d86c976ff8a2017e45dc8e212689d",
+   "caminho_atual": "src/tcc_frota/data/initial_position.py",
+   "sha256_atual": "c6bd8ae108bd4c2e7de9fca3be8f40c8c80d86c976ff8a2017e45dc8e212689d",
+   "conteudo_identico": true,
+   "linhas_alteradas": 0,
+   "diff": null
+  },
+  "src/tcc_frota/domain/entities.py": {
+   "sha256_congelado": "88a1ac1f9da28cd457b777c4ee0143a1bd45c95273daa1de29c0f3f8ab380fcb",
+   "caminho_atual": "src/tcc_frota/domain/entities.py",
+   "sha256_atual": "88a1ac1f9da28cd457b777c4ee0143a1bd45c95273daa1de29c0f3f8ab380fcb",
+   "conteudo_identico": true,
+   "linhas_alteradas": 0,
+   "diff": null
+  },
+  "reports/pos_hoc_parecer/rodada5/PLANO.md": {
+   "sha256_congelado": "61bba8baa778a5ee988398cc0c6a58f4b364363b078d738f4c07c77fa22e06bc",
+   "caminho_atual": "reports/diagnostics/calibration/recalibration_out_of_sample/PLANO.md",
+   "sha256_atual": "61bba8baa778a5ee988398cc0c6a58f4b364363b078d738f4c07c77fa22e06bc",
+   "conteudo_identico": true,
+   "linhas_alteradas": 0,
+   "diff": null
+  }
+ }
+}

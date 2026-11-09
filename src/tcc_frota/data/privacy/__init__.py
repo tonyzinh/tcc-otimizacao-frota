@@ -1,6 +1,6 @@
 """Privacidade: pseudonimização estável e guarda do segredo."""
 
-from tcc_frota.data.privacy.pseudonimizacao import (
+from tcc_frota.data.privacy.pseudonymization import (
     ESQUEMA,
     PseudonimizacaoError,
     Segredo,

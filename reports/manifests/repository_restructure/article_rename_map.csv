@@ -1,0 +1,29 @@
+caminho_antigo,caminho_novo,motivo
+article/sections/00-resumo.tex,article/sections/00_abstract.tex,seção do artigo
+article/sections/01-introducao.tex,article/sections/01_introduction.tex,seção do artigo
+article/sections/02-fundamentacao.tex,article/sections/02_background.tex,seção do artigo
+article/sections/03-metodologia.tex,article/sections/03_methodology.tex,seção do artigo
+article/sections/04-resultados-discussao.tex,article/sections/04_results_discussion.tex,seção do artigo
+article/sections/05-conclusao.tex,article/sections/05_conclusion.tex,seção do artigo
+article/appendices/apendices.tex,article/appendices/appendices.tex,apêndices do artigo
+article/references/referencias.bib,article/references/references.bib,referências do artigo
+article/RELATORIO_CONFORMIDADE.md,article/compliance_report.md,relatório editorial
+article/REFERENCIAS_VERIFICACAO.md,article/reference_audit.md,relatório editorial
+article/AUDITORIA_PARECER.md,article/review_response.md,relatório editorial
+reports/figures/km_atendimento.pdf,reports/figures/empty_km_service_differences.pdf,figura renomeada por conteúdo
+reports/figures/km_atendimento.png,reports/figures/empty_km_service_differences.png,figura renomeada por conteúdo
+reports/figures/ic_diferenca_diaria.pdf,reports/figures/daily_difference_intervals.pdf,figura renomeada por conteúdo
+reports/figures/ic_diferenca_diaria.png,reports/figures/daily_difference_intervals.png,figura renomeada por conteúdo
+reports/figures/sintetico.pdf,reports/figures/synthetic_contrasts.pdf,figura renomeada por conteúdo
+reports/figures/sintetico.png,reports/figures/synthetic_contrasts.png,figura renomeada por conteúdo
+reports/figures/mapa_recorte_h3.html,reports/figures/study_area_h3_map.html,figura renomeada por conteúdo
+reports/figures/mapa_recorte_h3.pdf,reports/figures/study_area_h3_map.pdf,figura renomeada por conteúdo
+reports/figures/mapa_recorte_h3.png,reports/figures/study_area_h3_map.png,figura renomeada por conteúdo
+article/figures/mapa_recorte_h3.pdf,reports/figures/study_area_h3_map_no_footer.pdf,mapa sem rodapé usado no artigo (bytes do arquivo compilado)
+article/figures/mapa_recorte_h3.png,reports/figures/study_area_h3_map_no_footer.png,mapa sem rodapé usado no artigo (bytes do arquivo compilado)
+article/figures/rodada5_diario.pdf,reports/figures/recalibration_daily_differences.pdf,figura da recalibração (bytes do arquivo compilado)
+article/figures/km_atendimento.pdf,@preservacao/artigo_figuras_substituidas_2026-11-09/km_atendimento.pdf,cópia antiga; substituída pela cópia gerada de reports/figures
+article/figures/mapa_recorte_h3.pdf,@preservacao/artigo_figuras_substituidas_2026-11-09/mapa_recorte_h3.pdf,cópia antiga; substituída pela cópia gerada de reports/figures
+article/figures/mapa_recorte_h3.png,@preservacao/artigo_figuras_substituidas_2026-11-09/mapa_recorte_h3.png,cópia antiga; substituída pela cópia gerada de reports/figures
+article/figures/rodada5_diario.pdf,@preservacao/artigo_figuras_substituidas_2026-11-09/rodada5_diario.pdf,cópia antiga; substituída pela cópia gerada de reports/figures
+article/figures/sintetico.pdf,@preservacao/artigo_figuras_substituidas_2026-11-09/sintetico.pdf,cópia antiga; substituída pela cópia gerada de reports/figures

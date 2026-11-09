@@ -1,8 +1,0 @@
-medida,unidade,fonte,n,p10,p25,p50,p75,p90
-fator_rua_reta_viagem,razao,"nU_DISTPERCORRIDA / Haversine(origem, destino solicitado), encerradas, reta >= 0,5 km",94802,1.2071,1.31,1.4849,1.7861,2.3052
-fator_rua_reta_busca,razao,"distMotorista / Haversine(foto livre anterior ao aceite, origem), reta >= 0,5 km",1123,0.6669,1.1478,1.3667,1.6369,2.0331
-velocidade_busca,km/h (distância por rua),"distMotorista / (chegada - aceite), tempo >= 60 s",2094,7.6239,11.338,16.4153,22.7961,30.5102
-tempo_busca_registro_ate_chegada,s,imediatas encerradas na caixa,51839,245.037,377.34,572.026,826.353,1128.88
-tempo_registro_ate_nao_atendida,s,logStatus do status final,33191,98.85,105.407,112.673,120.483,128.2256
-tempo_registro_ate_nao_atendida_limite_espera,s,logStatus do status final,3046,28.7616,39.8878,97.865,107.8012,116.1767
-tempo_registro_ate_cancelada_solicitante_pre_aceite,s,logStatus do status final,18271,2.087,6.814,14.15,59.857,93.083

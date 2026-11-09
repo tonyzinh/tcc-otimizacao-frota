@@ -1,9 +1,0 @@
-referencia_de_dispersao,periodo,mundo_de_amostragem,fp_delta_n_ic_mais_largo,fp_delta_n_ic_iid,fp_km_ic_mais_largo,fp_km_ic_iid,cobertura_n,cobertura_km,dentro_da_faixa_2_a_9pct
-guloso_marginal_a0.1,mar2026,iid,0.07,0.081,0.056,0.064,0.93,0.944,True
-guloso_marginal_a0.1,mar2026,circular_b3,0.086,0.093,0.113,0.152,0.914,0.887,False
-proporcional,mar2026,iid,0.063,0.075,0.063,0.077,0.937,0.937,True
-proporcional,mar2026,circular_b3,0.01,0.01,0.126,0.154,0.99,0.874,False
-guloso_marginal_a0.1,set2026,iid,0.064,0.074,0.078,0.083,0.936,0.922,True
-guloso_marginal_a0.1,set2026,circular_b3,0.129,0.15,0.11,0.124,0.871,0.89,False
-proporcional,set2026,iid,0.084,0.101,0.06,0.074,0.92,0.94,True
-proporcional,set2026,circular_b3,0.087,0.098,0.067,0.071,0.92,0.933,True

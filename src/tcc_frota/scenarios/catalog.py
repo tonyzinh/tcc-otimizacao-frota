@@ -136,7 +136,7 @@ def export_catalog() -> list[dict]:
                 "tipo_de_dado": "sintetico (rede viaria OSM + demanda gerada)",
                 "finalidade": "confirmatorio_principal" if c.id in PRINCIPAIS else "exploratorio_complementar",
                 "configuracao": "configs/scenarios/catalog.json",
-                "resultados_congelados": "reports/sintetico_v2/metodos_avaliacao_D/",
+                "resultados_congelados": "reports/synthetic/dispatch_evaluation/",
                 "nome_antigo": c.id,  # o id gravado nos resultados congelados é o mesmo; a política A aparece como 'R0' nos Parquet
             }
         )

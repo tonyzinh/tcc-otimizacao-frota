@@ -1,0 +1,5 @@
+dia,variante,politica,pedidos,atendidos,expirados,km_vazio,km_com_passageiro,esperas,motoristas,preteridos_e_expirados,preteridos_e_atendidos,lotes_preterido_total,lotes_preterido_max,nao_elegivel,pedidos_tempo_real,instantes_posicao
+2026-11-01,calibracao_nova,,,,,,,,,,,,,True,185.0,717.0
+2026-11-08,calibracao_nova,,,,,,,,,,,,,True,149.0,716.0
+2026-11-01,parametros_marco,,,,,,,,,,,,,True,185.0,717.0
+2026-11-08,parametros_marco,,,,,,,,,,,,,True,149.0,716.0

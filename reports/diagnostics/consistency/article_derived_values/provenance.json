@@ -1,0 +1,8 @@
+﻿{
+ "analise_posterior": true,
+ "data": "2026-11-09",
+ "script": "scripts/compute_article_derived_values.py",
+ "finalidade": "recalcular, a partir dos dados por dia versionados, os números derivados do artigo que a rodada 6 calculou com scripts locais da sessão (share.py, dn_dia.py), e conferir o texto",
+ "entradas": ["reports/diagnostics/statistics/robustness_review/base_por_dia.csv", "reports/diagnostics/statistics/robustness_review/janelas_treino_por_dia.csv", "reports/diagnostics/calibration/recalibration_out_of_sample/teste_por_dia.csv"],
+ "relacao": "não simula; 21 de 21 valores iguais ao texto e aos resumos gravados"
+}

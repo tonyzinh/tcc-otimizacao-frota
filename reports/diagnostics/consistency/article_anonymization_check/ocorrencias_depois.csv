@@ -1,0 +1,14 @@
+origem,local,termo,trecho
+appendices\apendices.tex,linha 32,Viagens,\item \textit{Duração das viagens}: a duração de cada corrida com passageiro é a observada (n
+sections\02-fundamentacao.tex,linha 68,Viagens,ia de desempenho competitivo. A atribuição entre veículos e viagens também foi formulada como otimização em tempo real com dado
+sections\04-resultados-discussao.tex,linha 83,Viagens,ma diferença isolada prova erro do simulador; a duração das viagens é entrada observada. Mas a direção é sistemática. Nenhum aj
+figures/mapa_recorte_h3.png,-,imagem raster,texto não extraível; conferir visualmente
+PDF compilado,página 5,V1,"chegada, cada um pelo veículo mais próximo ainda livre: P1 →V1 (2 km), P2 →V3 (7 km, pois V1 já foi usado) e P3 →V2 (4 km)"
+PDF compilado,página 5,V1,"mais próximo ainda livre: P1 →V1 (2 km), P2 →V3 (7 km, pois V1 já foi usado) e P3 →V2 (4 km), com 13 km. A atribuição conj"
+PDF compilado,página 5,V1,"onjunta olha os três pedidos de uma vez: P1 →V2 (3 km), P2 →V1 (1 km) e P3 →V3 (5 km), com 9 km, 30,8% menos neste exemplo"
+PDF compilado,página 5,V1," 9 km, 30,8% menos neste exemplo. O ganho vem de não gastar V1, de que P2 mais precisa, com P1, que perderia só 1 km usand"
+PDF compilado,página 5,V1,"uição conjunta também atende dois, mas escolhe P1 →V2 e P2 →V1 (3 + 1 = 4 km) e deixa P3 para o lote seguinte. O despacho "
+PDF compilado,página 6,V1,da veículo até cada pedido em um exemplo ilustrativo Pedido V1 V2 V3 P1 2 3 9 P2 1 8 7 P3 6 4 5 Fonte: valores hipotéticos
+PDF compilado,página 7,Viagens,ia de desempenho competitivo. A atribuição entre veículos e viagens também foi formulada como otimização em tempo real com dado
+PDF compilado,página 15,Viagens,ma diferença isolada prova erro do simulador; a duração das viagens é entrada observada. Mas a direção é sistemática. Nenhum aj
+PDF compilado,página 25,Viagens,e busca ob- servados (janela das 4 às 11 h). e) Duração das viagens: a duração de cada corrida com passageiro é a observada (na

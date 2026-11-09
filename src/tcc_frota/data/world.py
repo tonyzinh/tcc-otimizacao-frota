@@ -19,7 +19,7 @@ import pandas as pd
 
 from tcc_frota.data import availability as disp
 from tcc_frota.data.initial_position import Observacao, construir_sessoes
-from tcc_frota.data.timeutil import LOCAL
+from tcc_frota.data.time_utils import LOCAL
 from tcc_frota.domain.entities import SimDriver, SimRequest
 
 CADENCIA_ES_S = 120.0  # cadência aproximada dos snapshots (evidência indireta); fim de sessão = último snapshot + cadência

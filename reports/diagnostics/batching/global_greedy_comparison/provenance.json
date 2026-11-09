@@ -1,0 +1,17 @@
+{
+ "analise_posterior": true,
+ "observacao": "análise posterior aos resultados congelados; não é avaliação independente",
+ "rodada": 7,
+ "caminho_antigo": "reports/pos_hoc_parecer/rodada7/",
+ "data": "2026-11-09",
+ "plano": "decisions.md R-29 (17:57:10) e adendo (17:58:57)",
+ "relatorio": "RELATORIO.md (nesta pasta)",
+ "script": "scripts/analyze_global_greedy_comparison.py (antes scripts/pos_hoc_rodada7.py)",
+ "finalidade": "lote simples, atribuição conjunta e guloso global lado a lado; conferência da coleta do teste; intervalos C×B por variante",
+ "entradas": [
+  "data/raw/v1_viagens/ (local)",
+  "reports/diagnostics/calibration/recalibration_out_of_sample/",
+  "reports/diagnostics/statistics/robustness_review/"
+ ],
+ "relacao": "o guloso global (D) foi definido depois dos resultados congelados"
+}

@@ -1,11 +1,11 @@
 {
- "executado_em": "2026-11-09T12:30:00",
+ "executado_em": "2026-11-09T19:51:09",
  "resultados": [
   {
    "notebook": "01_data_overview.ipynb",
    "status": "ok",
    "detalhe": "",
-   "segundos": 2.2
+   "segundos": 2.4
   },
   {
    "notebook": "02_hungarian_example.ipynb",
@@ -17,19 +17,19 @@
    "notebook": "03_greater_vitoria_h3.ipynb",
    "status": "ok",
    "detalhe": "",
-   "segundos": 12.1
+   "segundos": 3.5
   },
   {
    "notebook": "04_historical_results.ipynb",
    "status": "ok",
    "detalhe": "",
-   "segundos": 2.9
+   "segundos": 3.1
   },
   {
    "notebook": "05_synthetic_results.ipynb",
    "status": "ok",
    "detalhe": "",
-   "segundos": 2.6
+   "segundos": 2.8
   }
  ]
 }

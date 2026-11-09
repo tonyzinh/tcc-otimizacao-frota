@@ -1,0 +1,12 @@
+{
+ "analise_posterior": true,
+ "observacao": "análise posterior aos resultados congelados; não é avaliação independente",
+ "rodada": 6,
+ "caminho_antigo": "reports/pos_hoc_parecer/rodada6/",
+ "data": "2026-11-09",
+ "plano": "decisions.md R-28",
+ "relatorio": "RELATORIO.md (nesta pasta)",
+ "script": "scripts locais da sessão (não preservados). Substitutos versionados: scripts/verify_frozen_results.py (hashes) e scripts/compute_article_derived_values.py (números derivados do artigo; 21/21 conferem)",
+ "finalidade": "simplificação do texto do artigo: conferência dos hashes congelados e dos números",
+ "relacao": "não simula"
+}

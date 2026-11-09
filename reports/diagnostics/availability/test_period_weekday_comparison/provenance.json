@@ -1,0 +1,16 @@
+{
+ "analise_posterior": true,
+ "observacao": "análise posterior aos resultados congelados; não é avaliação independente",
+ "rodada": 8,
+ "caminho_antigo": "reports/pos_hoc_parecer/rodada8/",
+ "data": "2026-11-09",
+ "plano": "decisions.md R-31 (18:22:00)",
+ "relatorio": "RELATORIO.md (nesta pasta)",
+ "script": "scripts/analyze_test_period_weekdays.py (antes scripts/pos_hoc_rodada8.py)",
+ "finalidade": "dias do teste contra os mesmos dias da semana de outubro",
+ "entradas": [
+  "reports/diagnostics/calibration/recalibration_out_of_sample/",
+  "reports/diagnostics/batching/global_greedy_comparison/"
+ ],
+ "relacao": "só lê agregados; não simula"
+}

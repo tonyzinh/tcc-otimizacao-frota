@@ -7,7 +7,7 @@ Comandos:
   analyze-historical  totais e contrastes pareados por dia (C×A principal), critérios E1–E3 e tabelas Markdown;
   figures             gera as figuras do artigo a partir de resultados já calculados.
 
-Resultados congelados (``reports/atribuicao_final``, ``reports/sintetico_v2``) NUNCA são sobrescritos: use outra pasta de saída.
+Resultados congelados (``reports/historical/``, ``reports/synthetic/``, ``reports/diagnostics/``) NUNCA são sobrescritos: use outra pasta de saída.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ import json
 import sys
 from pathlib import Path
 
-FROZEN_DIRS = (Path("reports/atribuicao_final"), Path("reports/sintetico_v2"), Path("reports/tcc_final"))
+FROZEN_DIRS = (Path("reports/historical"), Path("reports/synthetic"), Path("reports/diagnostics"))
 
 
 def _refuse_frozen(out: Path) -> None:
@@ -150,13 +150,13 @@ def build_parser() -> argparse.ArgumentParser:
     s.set_defaults(func=cmd_analyze_synthetic)
 
     s = sub.add_parser("analyze-historical", help="totais e contrastes pareados dos dias reais")
-    s.add_argument("--input", default="reports/atribuicao_final/execucao")
+    s.add_argument("--input", default="reports/historical/frozen_evaluation/execucao")
     s.add_argument("--out", required=True)
     s.set_defaults(func=cmd_analyze_historical)
 
     s = sub.add_parser("figures", help="figuras do artigo")
-    s.add_argument("--historical", default="reports/atribuicao_final/analise")
-    s.add_argument("--synthetic", default="reports/sintetico_v2/metodos_avaliacao_D/analise")
+    s.add_argument("--historical", default="reports/historical/frozen_evaluation/analise")
+    s.add_argument("--synthetic", default="reports/synthetic/dispatch_evaluation/analise")
     s.add_argument("--out", required=True)
     s.set_defaults(func=cmd_figures)
     return p

@@ -1,0 +1,79 @@
+caminho_antigo,caminho_novo,motivo
+data/extraido/v1_viagens,data/raw/v1_viagens,extração vigente (evidência); nome de origem v1_viagens preservado
+data/extraido/v1_viagens_esquema1_20261108,data/raw/v1_viagens_schema1_20261108,"extração substituída (esquema 1), preservada"
+data/extraido/v1_viagens_legado_sal_20261106,data/raw/v1_viagens_previous_salt_20261106,"extração substituída (sal anterior), preservada"
+data/geografia,data/geographic,"geografia pública (IBGE, OSM) e rede viária"
+reports/runs/cache_comparacao,data/processed/world_cache,cache regenerável de mundos (registros individuais; ignorado)
+reports/runs/ab_desenvolvimento,data/processed/run_outputs/ab_development,saídas individuais do A×B de desenvolvimento
+reports/runs/rodada5,data/processed/run_outputs/recalibration_out_of_sample,logs e listas da recalibração (rodada 5)
+reports/runs/rodada7_bcd.log,data/processed/run_outputs/global_greedy_comparison/rodada7_bcd.log,log da rodada 7
+reports/runs/rodada7_dados.log,data/processed/run_outputs/global_greedy_comparison/rodada7_dados.log,log da rodada 7
+reports/runs/rodada7_servicos.log,data/processed/run_outputs/global_greedy_comparison/rodada7_servicos.log,log da rodada 7
+reports/runs/conciliacao_amostra_2026-03-07.csv,data/processed/data_quality_samples/conciliacao_amostra_2026-03-07.csv,amostra individual de conciliação ou disponibilidade
+reports/runs/conciliacao_amostra_2026-03-10.csv,data/processed/data_quality_samples/conciliacao_amostra_2026-03-10.csv,amostra individual de conciliação ou disponibilidade
+reports/runs/conciliacao_amostra_2026-03-13.csv,data/processed/data_quality_samples/conciliacao_amostra_2026-03-13.csv,amostra individual de conciliação ou disponibilidade
+reports/runs/conciliacao_amostra_2026-03-17.csv,data/processed/data_quality_samples/conciliacao_amostra_2026-03-17.csv,amostra individual de conciliação ou disponibilidade
+reports/runs/evidencias_disponibilidade_2026-03-10.csv,data/processed/data_quality_samples/evidencias_disponibilidade_2026-03-10.csv,amostra individual de conciliação ou disponibilidade
+reports/runs/inspecao_vinculos_cobli.csv,data/processed/data_quality_samples/inspecao_vinculos_cobli.csv,amostra individual de conciliação ou disponibilidade
+reports/atribuicao_final,reports/historical/frozen_evaluation,avaliação congelada (setembro e outubro)
+reports/comparacao/grupo_B,reports/historical/development/dispatch_selection,"grupo B = despacho (Húngaro, FIFO; treino e validação)"
+reports/comparacao/grupo_A,reports/historical/development/repositioning_selection,grupo A = reposicionamento (R1–R6); resultado desfavorável mantido
+reports/comparacao/analise_treino,reports/historical/development/analysis_training,análise do treino
+reports/comparacao/analise_validacao,reports/historical/development/analysis_validation,análise da validação
+reports/comparacao/RELATORIO_HUNGARO.md,reports/historical/development/RELATORIO_HUNGARO.md,relatório da seleção do Húngaro
+reports/comparacao_teste,reports/historical/development/smoke_test,execução de teste (1 dia)
+reports/ab_desenvolvimento,reports/historical/development/ab_pilot_day,"A×B, 1 dia (R-20)"
+reports/ab_desenvolvimento_v2,reports/historical/development/ab_development_days,"A×B, 59 dias (R-22)"
+reports/referencia_fatia_diag_E,reports/historical/development/reference_slices/diag_e,fatias da referência
+reports/referencia_fatia_p0_E,reports/historical/development/reference_slices/p0_e,fatias da referência
+reports/referencia_fatia_p0_J,reports/historical/development/reference_slices/p0_j,fatias da referência
+reports/referencia_fatia_teste,reports/historical/development/reference_slices/test,fatias da referência
+reports/sintetico_v2/metodos_avaliacao_D,reports/synthetic/dispatch_evaluation,avaliação sintética congelada do despacho (artigo)
+reports/sintetico_v2/metodos_avaliacao_R,reports/synthetic/repositioning_evaluation,avaliação sintética do reposicionamento (desfavorável)
+reports/sintetico_v2/metodos_avaliacao_busca,reports/synthetic/local_search_evaluation,"busca local (parcial, 14 arquivos)"
+reports/sintetico_v2/metodos_fatia_dev,reports/synthetic/development_slice,fatia de desenvolvimento
+reports/sintetico_v2/selecao_margem_m0.5,reports/synthetic/margin_selection/margin_0_5,seleção de margem
+reports/sintetico_v2/selecao_margem_m1.5,reports/synthetic/margin_selection/margin_1_5,seleção de margem
+reports/sintetico_v2/selecao_margem_m3.0,reports/synthetic/margin_selection/margin_3_0,seleção de margem
+reports/sintetico_v2/ablacao,reports/synthetic/ablation,ablação
+reports/sintetico_v2/auditoria_objetivo,reports/synthetic/objective_audit,auditoria do objetivo
+reports/sintetico_v2/enumeracao,reports/synthetic/enumeration,enumeração exata de instâncias pequenas
+reports/sintetico/desenvolvimento,reports/synthetic/repositioning_greedy_study/development,estudo sintético R-23/R-24 (desfavorável)
+reports/sintetico/avaliacao,reports/synthetic/repositioning_greedy_study/evaluation,estudo sintético R-23/R-24
+reports/sintetico/RELATORIO_SINTETICO.md,reports/synthetic/repositioning_greedy_study/RELATORIO_SINTETICO.md,relatório R-23/R-24
+reports/extracao_v1_viagens,reports/data_quality/v1_viagens_extraction,"qualidade, conciliação e disponibilidade da extração"
+reports/revisao/verificacao_bases_reais.json,reports/data_quality/real_data_check/verificacao_bases_reais.json,verificação das bases reais
+reports/revisao/formatacao_seis_arquivos.patch,reports/manifests/code_formatting_review/formatacao_seis_arquivos.patch,patch de formatação
+reports/pos_hoc_parecer/base_conferencia_congelado.json,reports/diagnostics/statistics/robustness_review/base_conferencia_congelado.json,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/base_por_dia.csv,reports/diagnostics/statistics/robustness_review/base_por_dia.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/base_pratica_e_justica.csv,reports/diagnostics/statistics/robustness_review/base_pratica_e_justica.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/base_resumo.csv,reports/diagnostics/statistics/robustness_review/base_resumo.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/componentes_observados.json,reports/diagnostics/statistics/robustness_review/componentes_observados.json,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/componentes_simulado_A.csv,reports/diagnostics/statistics/robustness_review/componentes_simulado_A.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/disp_contagens_por_dia.csv,reports/diagnostics/statistics/robustness_review/disp_contagens_por_dia.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/disp_contagens_todos_periodos.csv,reports/diagnostics/statistics/robustness_review/disp_contagens_todos_periodos.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/disp_por_dia.csv,reports/diagnostics/statistics/robustness_review/disp_por_dia.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/disp_resumo.csv,reports/diagnostics/statistics/robustness_review/disp_resumo.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/estatistica_diaria_pareada.csv,reports/diagnostics/statistics/robustness_review/estatistica_diaria_pareada.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/estatistica_sensibilidade_ic.csv,reports/diagnostics/statistics/robustness_review/estatistica_sensibilidade_ic.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/janelas_treino_por_dia.csv,reports/diagnostics/statistics/robustness_review/janelas_treino_por_dia.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/janelas_treino_resumo.csv,reports/diagnostics/statistics/robustness_review/janelas_treino_resumo.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/PLANO.md,reports/diagnostics/statistics/robustness_review/PLANO.md,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/RELATORIO.md,reports/diagnostics/statistics/robustness_review/RELATORIO.md,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/sens_por_dia.csv,reports/diagnostics/statistics/robustness_review/sens_por_dia.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/sens_resumo.csv,reports/diagnostics/statistics/robustness_review/sens_resumo.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/sintetico_familias.csv,reports/diagnostics/statistics/robustness_review/sintetico_familias.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/viario_por_dia.csv,reports/diagnostics/statistics/robustness_review/viario_por_dia.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/viario_resumo.csv,reports/diagnostics/statistics/robustness_review/viario_resumo.csv,"rodada 4 (uma execução, um plano)"
+reports/pos_hoc_parecer/rodada5,reports/diagnostics/calibration/recalibration_out_of_sample,rodada 5
+reports/pos_hoc_parecer/rodada6,reports/diagnostics/consistency/text_simplification_check,rodada 6
+reports/pos_hoc_parecer/rodada7,reports/diagnostics/batching/global_greedy_comparison,rodada 7
+reports/pos_hoc_parecer/rodada8,reports/diagnostics/availability/test_period_weekday_comparison,rodada 8
+reports/pos_hoc_parecer/rodada9,reports/diagnostics/consistency/article_anonymization_check,rodada 9
+reports/tcc_final,@preservacao/estudo_anterior_retirado_da_arvore/reports/tcc_final,"estudo anterior (D+1), retirado da árvore ativa"
+reports/tcc_v2,@preservacao/estudo_anterior_retirado_da_arvore/reports/tcc_v2,estudo anterior (extensão v2)
+resultados,@preservacao/estudo_anterior_retirado_da_arvore/resultados,estudo anterior (bateria de 13 e seletivo)
+reports/thesis_audit,@preservacao/estudo_anterior_retirado_da_arvore/reports/thesis_audit,auditoria do estudo anterior (25/10)
+reports/final_release,@preservacao/estudo_anterior_retirado_da_arvore/reports/final_release,organização de 28/10 (estudo anterior)
+reports/repository_migration,@preservacao/estudo_anterior_retirado_da_arvore/reports/repository_migration,organização de 28/10 (estudo anterior)
+reports/validation_current,@preservacao/estudo_anterior_retirado_da_arvore/reports/validation_current,validação de 28/10 (estudo anterior)

@@ -1,0 +1,66 @@
+--- scripts/pos_hoc_rodada5.py
++++ scripts/analyze_recalibration_out_of_sample.py
+@@ -1 +1 @@
+-"""Rodada 5 (pós-hoc): inventário, recalibração temporal e teste fora da amostra. Plano: reports/pos_hoc_parecer/rodada5/PLANO.md.
++"""Rodada 5 (pós-hoc): inventário, recalibração temporal e teste fora da amostra. Plano: reports/diagnostics/calibration/recalibration_out_of_sample/PLANO.md.
+@@ -4 +4 @@
+-    python scripts/pos_hoc_rodada5.py inventario | calibrar | teste | setout | mensal | componentes | intervalos
++    python scripts/analyze_recalibration_out_of_sample.py inventario | calibrar | teste | setout | mensal | componentes | intervalos
+@@ -24 +24 @@
+-import pos_hoc_parecer as r4
++import analyze_robustness_review as r4
+@@ -27,3 +27,3 @@
+-from tcc_frota.data.extraction.entidades import SEM_PRIME
+-from tcc_frota.data.extraction.filtro import FiltroV1
+-from tcc_frota.data.timeutil import LOCAL
++from tcc_frota.data.extraction.entities import SEM_PRIME
++from tcc_frota.data.extraction.filters import FiltroV1
++from tcc_frota.data.time_utils import LOCAL
+@@ -35,3 +35,3 @@
+-OUT = Path("reports/pos_hoc_parecer/rodada5")
+-R4 = Path("reports/pos_hoc_parecer")
+-RAIZ = Path("data/extraido/v1_viagens")
++OUT = Path("reports/diagnostics/calibration/recalibration_out_of_sample")
++R4 = Path("reports/diagnostics/statistics/robustness_review")
++RAIZ = Path("data/raw/v1_viagens")
+@@ -44,12 +44,15 @@
+-HASHED = (
+-    "scripts/pos_hoc_rodada5.py",
+-    "scripts/pos_hoc_parecer.py",
+-    "src/tcc_frota/simulation/engine.py",
+-    "src/tcc_frota/simulation/historical.py",
+-    "src/tcc_frota/assignment/dispatch.py",
+-    "src/tcc_frota/data/world.py",
+-    "src/tcc_frota/data/availability.py",
+-    "src/tcc_frota/data/initial_position.py",
+-    "src/tcc_frota/domain/entities.py",
+-    "reports/pos_hoc_parecer/rodada5/PLANO.md",
+-)
++# Chave: caminho gravado em `calibracao_congelada.json` (09/11/2026). Valor: caminho atual depois da reestruturação do repositório.
++HASHED = {
++    "scripts/pos_hoc_rodada5.py": "scripts/analyze_recalibration_out_of_sample.py",
++    "scripts/pos_hoc_parecer.py": "scripts/analyze_robustness_review.py",
++    "src/tcc_frota/simulation/engine.py": "src/tcc_frota/simulation/engine.py",
++    "src/tcc_frota/simulation/historical.py": "src/tcc_frota/simulation/historical.py",
++    "src/tcc_frota/assignment/dispatch.py": "src/tcc_frota/assignment/dispatch.py",
++    "src/tcc_frota/data/world.py": "src/tcc_frota/data/world.py",
++    "src/tcc_frota/data/availability.py": "src/tcc_frota/data/availability.py",
++    "src/tcc_frota/data/initial_position.py": "src/tcc_frota/data/initial_position.py",
++    "src/tcc_frota/domain/entities.py": "src/tcc_frota/domain/entities.py",
++    "reports/pos_hoc_parecer/rodada5/PLANO.md": "reports/diagnostics/calibration/recalibration_out_of_sample/PLANO.md",
++}
++# Registro das mudanças de caminho e de import feitas depois do congelamento (sem mudança de cálculo), com os diffs conferidos.
++EQUIVALENCE = Path("reports/manifests/repository_restructure/frozen_code_equivalence.json")
+@@ -324 +327 @@
+-    return {p: hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in HASHED}
++    return {chave: hashlib.sha256(Path(p).read_bytes()).hexdigest() for chave, p in HASHED.items()}
+@@ -407 +410,8 @@
+-    mudou = [p for p, h in _hashes().items() if fz["hashes_sha256"].get(p) != h]
++    equivalencias = json.loads(EQUIVALENCE.read_text(encoding="utf-8"))["arquivos"] if EQUIVALENCE.exists() else {}
++
++    def aceito(chave: str, atual: str) -> bool:
++        congelado = fz["hashes_sha256"].get(chave)
++        eq = equivalencias.get(chave, {})
++        return atual == congelado or (eq.get("sha256_congelado") == congelado and eq.get("sha256_atual") == atual)
++
++    mudou = [chave for chave, h in _hashes().items() if not aceito(chave, h)]

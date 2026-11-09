@@ -1,0 +1,87 @@
+\section{Metodologia}\label{sec:metodo}
+
+\subsection{Desenho e políticas comparadas}
+
+O estudo compara políticas de despacho em uma simulação de eventos discretos \cite{banks2010}. Todas as políticas usam os mesmos pedidos, frota, jornadas, compromissos, método de distância e parâmetros. O que se mede é a diferença entre políticas \emph{dentro do simulador}. O despacho imediato simulado não é a operação real: o despacho praticado pela empresa não foi observado nem reproduzido. Há três níveis de validade. A \emph{verificação da implementação} confere que o código faz o que a formulação diz; foi feita com testes automáticos. A \emph{validação de componentes} compara distâncias, velocidades, durações e disponibilidade com o observado; foi feita em parte e depois dos resultados (Seção~\ref{sec:validade}). A \emph{validação do comportamento operacional} exigiria que o simulador reproduzisse a operação; não foi alcançada. A Tabela~\ref{tab:politicas} resume as políticas.
+
+\begin{table}[!htb]
+\caption{Políticas comparadas}\label{tab:politicas}
+\centering\fontetabela
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{9mm}>{\raggedright\arraybackslash}p{30mm}>{\raggedright\arraybackslash}p{54mm}>{\raggedright\arraybackslash}p{50mm}@{}}
+\toprule
+Letra & Política & Quando decide & Como escolhe \\
+\midrule
+A & despacho imediato & na chegada do pedido (fila por ordem de chegada se não houver veículo elegível) & veículo elegível mais próximo \\
+B & lote simples & a cada 60 s; pedidos em ordem de chegada e, em empate, por identificador & cada pedido recebe o veículo elegível mais próximo ainda livre \\
+C & atribuição conjunta & a cada 60 s & solução da equação~\ref{eq:obj} pelo Húngaro \\
+\bottomrule
+\end{tabular}
+\fonte{elaborada pelos autores. As letras são usadas só em tabelas e figuras.}
+\end{table}
+
+A comparação principal, fixada antes das execuções, é atribuição conjunta contra despacho imediato: a troca completa de política. A comparação com o lote simples isola a decisão conjunta, porque as duas esperam o mesmo lote. A comparação entre lote simples e despacho imediato mostra o efeito de esperar o lote sem decidir em conjunto. A ordem do lote simples é a mesma do despacho imediato e foi definida antes de qualquer resultado.
+
+\subsection{Despacho em lotes}
+
+Os lotes ocorrem a cada 60 s, contados da meia-noite. Um pedido espera o próximo lote, e sua espera é contada desde a chegada. Um veículo liberado entre dois lotes só volta a ser candidato no lote seguinte. No despacho imediato, ao contrário, o veículo liberado recebe na hora o pedido em espera mais antigo para o qual é elegível. A cada lote, o simulador monta a lista de veículos elegíveis de cada pedido, chama a política e confere o resultado; ele para com erro se um par for inelegível ou repetido. O Algoritmo~\ref{alg:lote} resume o procedimento, e o Apêndice~\ref{ap:metodo} traz um fluxograma.
+
+\begin{algoritmo}[!htb]
+\caption{Despacho em lotes de 60 s (lote simples e atribuição conjunta)}\label{alg:lote}
+\fontetabela
+\begin{tabular}{@{}l@{}}
+\textbf{para cada} instante de lote $t$ \textbf{faça} \\
+\quad $P \leftarrow$ pedidos pendentes com chegada $\le t$, ordenados por (chegada, identificador) \\
+\quad \textbf{para cada} $r\in P$: $L_r \leftarrow$ veículos elegíveis em $t$, por distância crescente \\
+\quad \textbf{se} lote simples: \textbf{para} $r\in P$ \textbf{em ordem}: atribuir o primeiro $v\in L_r$ ainda livre \\
+\quad \textbf{se} atribuição conjunta: resolver a equação~\ref{eq:obj} pelo Húngaro \\
+\quad conferir pares (únicos e elegíveis); para cada par, ocupar $v$ e atualizar posição e liberação \\
+\quad pedidos sem par permanecem pendentes até $t+60$ s ou até esgotar a paciência \\
+\end{tabular}
+\fonte{elaborado pelos autores a partir do simulador.}
+\end{algoritmo}
+
+\subsection{Dados reais}
+
+Os dados vêm de uma empresa de transporte por aplicativo que opera na Grande Vitória (ES), restritos a um produto, à região da Grande Vitória e a quatro tipos de serviço, sem os serviços de categoria superior (Apêndice~\ref{ap:rastreio}). Foram extraídos em modo somente leitura do banco operacional e do índice de posições dos veículos: pedidos (origem, destino, horário, tipo), jornadas de motoristas, compromissos externos, vínculos entre veículo e motorista, posições dos veículos (a cada cerca de 2 minutos) e cadastro de veículos. Nenhuma quilometragem do estudo vem de odômetro. A Tabela~\ref{tab:periodos} traz os períodos. Treino e validação serviram ao desenvolvimento. Setembro (replicação) e outubro (avaliação final) nunca tinham sido simulados antes da execução congelada.
+
+\begin{table}[!htb]
+\caption{Períodos e volumes dos dados reais (pedidos de tempo real, sem agendados)}\label{tab:periodos}
+\centering\fontetabela
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+Período & Datas (2026) & Dias & Pedidos & Motoristas/dia (média) & Compromissos \\
+\midrule
+Treino & 01/02--15/03 & 43 & 51.909 & 106,8 & 1.458 \\
+Validação & 16/03--31/03 & 16 & 20.178 & 111,3 & 675 \\
+Replicação & 16/09--30/09 & 15 & 16.918 & 86,7 & 674 \\
+Final & 01/10--25/10 & 25 & 23.523 & 74,3 & 842 \\
+\bottomrule
+\end{tabular}
+\fonte{elaborada pelos autores a partir dos dados da operação. Pedidos agendados ficam fora; pedidos cancelados permanecem como demanda.}
+\end{table}
+
+As regras de construção foram fixadas antes da execução congelada; o Apêndice~\ref{ap:metodo} traz a lista completa. Um dia entra se tiver ao menos 300 registros de posição e 200 pedidos; todos os 15 dias de setembro e os 25 de outubro entraram. A disponibilidade de cada motorista é reconstruída depois do dia: a jornada registrada, cruzada com a presença no registro de posições. Essa informação é conhecida pelo avaliador, não pela política, e é igual nas três políticas. Depois da primeira posição observada, a posição e a ocupação de cada veículo vêm das corridas que o próprio simulador atribui. A duração de cada corrida com passageiro é a observada. Novas tentativas do mesmo passageiro não foram deduplicadas, e cancelamentos depois da atribuição não são modelados. O número de motoristas por dia caiu de 106,8 no treino para 74,3 em outubro, junto com a demanda, o que indica mudança da operação.
+
+A distância de aproximação é a distância em linha reta multiplicada por um fator rua/reta de 1,3012, percorrida a 16,079 km/h. O raio de despacho é de 4,5 km em linha reta e a paciência, de 180 s. Esses quatro valores vêm de uma calibração com dados de março e não foram recalibrados para setembro e outubro. Uma recalibração posterior, com janeiro a agosto, está na Seção~\ref{sec:validade}. Identificadores de motoristas, veículos e passageiros são pseudonimizados por HMAC-SHA256 com segredo fora do repositório, e só agregados são reportados, em conformidade com a \citeonline{brasil2018}.
+
+\subsection{Cenários sintéticos}
+
+Os cenários sintéticos usam a geografia real de Vitória, Vila Velha, Serra e Cariacica: malhas do IBGE \cite{ibgemalhas} e rede viária do OpenStreetMap \cite{osm}, obtidas em 08/11/2026. As distâncias são caminhos mínimos pela rede (Dijkstra) entre 368 pontos de parada, escolhidos com células H3 \cite{uberh3}. A demanda, a frota, as jornadas e a velocidade são hipóteses do gerador, não calibradas. A frota tem 100 veículos, com jornadas de 9 horas, velocidade de 25 km/h, raio de 8 km por via e paciência de 600 s. Como esses parâmetros diferem dos dados reais, os percentuais das duas avaliações não são comparáveis em nível.
+
+Há cinco cenários principais: demanda uniforme, demanda concentrada, frota inicialmente desequilibrada, mudança inesperada da demanda e demanda que migra de região. Outros 17 cenários são variantes deles. Cada cenário foi simulado com 40 sementes reservadas antes, e a semente é a unidade de análise. Os resultados dessas sementes foram vistos antes de os autores decidirem adotar o método. Por isso, e porque os 22 cenários compartilham rede, frota e gerador, os cenários sintéticos são evidência exploratória e complementar. O Apêndice~\ref{ap:metodo} detalha a geografia, o mapa e as variantes.
+
+\subsection{Congelamento e origem da janela de 60 s}
+
+A janela de 60 s foi escolhida no treino (01/02--15/03), entre 30 s e 60 s, por uma regra escrita antes da primeira execução: entre as janelas com atendimento preservado e intervalo abaixo de zero, a de menor km, com desempate por simplicidade e tempo. A validação (16--31/03) e os cenários sintéticos foram vistos antes da decisão de adotar o método, embora não tenham escolhido a janela nem o algoritmo. Em 09/11/2026, antes de simular setembro e outubro, foram congelados o código, os parâmetros, as políticas, as comparações e os critérios; o programa se recusa a rodar se o código mudar. Setembro foi executado antes de outubro, uma vez, sem ajuste entre eles, com 0 falhas técnicas e 0 reexecuções. Setembro e outubro são, portanto, evidência fora do período de seleção, mas não totalmente independente: mesma empresa, região, simulador e parâmetros de março.
+
+\subsection{Métricas e estatística}
+
+O km vazio de uma política em um período é a soma das distâncias de aproximação dos pedidos despachados. Esta avaliação não tem reposicionamento nem retorno. A diferença relativa é
+\begin{equation}
+\Delta\% = 100\,\frac{K_C-K_{ref}}{K_{ref}}, \label{eq:delta}
+\end{equation}
+em que $K_C$ é o km vazio da atribuição conjunta e $K_{ref}$, o da referência. \textbf{Valor negativo significa redução.} O atendimento é a fração dos pedidos elegíveis que foram atendidos. $\Delta N$ é a diferença no número de atendidos, e a diferença em pontos percentuais usa como denominador todos os pedidos elegíveis. A espera de um pedido é o tempo entre a chegada e o encontro com o veículo, inclusive o tempo até o fechamento do lote. \textbf{A espera é calculada só entre os pedidos atendidos de cada política.} Como os atendidos diferem entre políticas, a comparação de espera é descritiva.
+
+O critério de atendimento (Seção 1) foi fixado antes, sem acordo de nível de serviço com a empresa. Uma redução só é classificada como \enquote{com atendimento preservado} se o intervalo de 95\% da diferença ficar abaixo de zero e o critério de atendimento for cumprido.
+
+A unidade de análise é o dia. Para cada dia, calcula-se a diferença de km entre as duas políticas. O intervalo de confiança de 95\% (IC95\%) indica a faixa de valores da diferença média diária compatível com a variação entre dias; ele é obtido por \textit{bootstrap}, isto é, sorteando blocos de 7 dias consecutivos muitas vezes e recalculando a média. Com 15 e 25 dias há poucos blocos, e o intervalo é descritivo; o Apêndice~\ref{ap:repro} mostra intervalos alternativos. Um intervalo que inclui zero não mostra que as políticas são equivalentes: isso exigiria uma margem fixada antes, e nenhuma foi fixada. Nos cenários sintéticos, a unidade é a semente. O Apêndice~\ref{ap:metodo} detalha os procedimentos.

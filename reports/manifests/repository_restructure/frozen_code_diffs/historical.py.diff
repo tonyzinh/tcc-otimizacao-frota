@@ -1,0 +1,7 @@
+--- src/tcc_frota/simulation/historical.py
++++ src/tcc_frota/simulation/historical.py
+@@ -29,2 +29,2 @@
+-RAIZ = Path("data/extraido/v1_viagens")
+-CACHE = Path("reports/runs/cache_comparacao")
++RAIZ = Path("data/raw/v1_viagens")
++CACHE = Path("data/processed/world_cache")
