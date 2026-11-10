@@ -73,3 +73,5 @@ htmlcov/
 .audit-deps/
 .ui-deps/
 .ref/
+/.pack/
+/article/supplement/pdf_recebido_40_paginas.pdf

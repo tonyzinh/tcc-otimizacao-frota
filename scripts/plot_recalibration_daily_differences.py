@@ -48,17 +48,28 @@ def _diarios() -> pd.DataFrame:
 def main() -> None:
     d = _diarios()
     plt.rcParams.update({"font.family": ["Arial", "DejaVu Sans"], "font.size": 8, "axes.spines.top": False, "axes.spines.right": False})
-    fig, ax = plt.subplots(2, 1, figsize=(6.3, 4.6), sharex=True)
-    cores = {"CxA_km_pct": "#1f4e79", "CxB_km_pct": "#c55a11"}
-    for col, nome in (("CxA_km_pct", "C×A"), ("CxB_km_pct", "C×B")):
-        ax[0].plot(d.dia, d[col], ".", ms=3, color=cores[col], label=nome)
+    fig, ax = plt.subplots(2, 1, figsize=(6.3, 4.8), sharex=True)
+    # Marcadores de forma diferente (cheio e vazado) e barras cheias/vazadas: legível impresso em tons de cinza.
+    estilos = {
+        "CxA_km_pct": {"marker": "o", "mfc": "0.15", "mec": "0.15", "label": "atribuição conjunta − despacho imediato"},
+        "CxB_km_pct": {"marker": "^", "mfc": "white", "mec": "0.35", "label": "atribuição conjunta − lote sequencial"},
+    }
+    for col, st in estilos.items():
+        ax[0].plot(d.dia, d[col], linestyle="none", ms=3, mew=0.6, **st)
     ax[0].axhline(0, color="0.4", lw=0.6)
-    ax[0].set_ylabel("Δ% km vazio no dia\n(negativo = redução)")
+    ax[0].set_title("(a) Variação do km vazio no dia", fontsize=8, loc="left")
+    ax[0].set_ylabel("variação do km vazio (%)\nnegativo = menos km")
+    ax[0].set_ylim(bottom=-21)  # espaço para a legenda sem cobrir pontos
     ax[0].legend(frameon=False, loc="lower left", ncol=2)
-    cor_n = ["#2e7d32" if v >= 0 else "#b71c1c" for v in d.CxA_dN]
-    ax[1].bar(d.dia, d.CxA_dN, width=0.9, color=cor_n)
+    pos = d.CxA_dN >= 0
+    ax[1].bar(d.dia[pos], d.CxA_dN[pos], width=0.9, color="0.3", edgecolor="0.3", lw=0.3, label="conjunta atende mais ou igual")
+    ax[1].bar(d.dia[~pos], d.CxA_dN[~pos], width=0.9, color="white", edgecolor="0.1", lw=0.5, label="conjunta atende menos")
     ax[1].axhline(0, color="0.4", lw=0.6)
-    ax[1].set_ylabel("ΔN no dia (C − A)\n(vermelho = C atende menos)")
+    ax[1].set_title("(b) Diferença de atendidos no dia: atribuição conjunta − despacho imediato", fontsize=8, loc="left")
+    ax[1].set_ylabel("diferença de atendidos\n(pedidos por dia)")
+    ax[1].set_xlabel("mês/ano (2026)")
+    ax[1].set_ylim(bottom=-62)
+    ax[1].legend(frameon=False, loc="lower left", ncol=2)
     for a in ax:
         a.axvspan(pd.Timestamp("2026-10-26"), pd.Timestamp("2026-11-08"), color="0.9", zorder=0)
         a.axvspan(pd.Timestamp("2026-09-01"), pd.Timestamp("2026-09-15"), color="white", zorder=0)

@@ -1,67 +1,78 @@
-\section{Fundamentação teórica e trabalhos relacionados}
+\section{Revisão da literatura}
 
 \subsection{Alocação de frota, atribuição e roteamento}
 
-Vários problemas clássicos tocam a decisão estudada. Distingui-los evita atribuir ao método mais do que ele resolve. Em sentido amplo, a \textit{alocação de frota} reúne as decisões que destinam os veículos disponíveis a lugares e tarefas ao longo do tempo. Ela inclui o \textit{reposicionamento}, que move veículos ociosos antes dos pedidos \cite{pavone2012, pouls2025}, e a \textit{atribuição}, que associa pedidos já conhecidos a veículos. A atribuição é a forma de alocação estudada aqui. O \textit{caminho mínimo} dá o custo de cada deslocamento \cite{dijkstra1959}. O \textit{sequenciamento} ordena os atendimentos de cada veículo. O \textit{problema de roteamento de veículos} (VRP) constrói rotas completas \cite{toth2002}. Suas variantes de coleta e entrega e de transporte sob demanda (\textit{dial-a-ride}) acrescentam janelas de tempo e, em geral, vários pedidos por rota \cite{cordeau2007, berbeglia2010}. Em versões dinâmicas, os pedidos chegam durante a operação e as decisões são refeitas \cite{pillac2013}.
+O estudo trata de uma decisão específica de alocação de frota: associar pedidos conhecidos a veículos disponíveis. Essa \textit{atribuição} difere do \textit{reposicionamento}, que desloca veículos ociosos antes da chegada de pedidos \cite{pavone2012, pouls2025}. Também difere do sequenciamento e do problema de roteamento de veículos (VRP), que planejam a ordem e as rotas de atendimento \cite{toth2002}. Variantes de coleta e entrega e de transporte sob demanda incluem restrições adicionais, como janelas de tempo e vários pedidos por rota \cite{cordeau2007, berbeglia2010}. Aqui, cada veículo atende uma corrida por vez, enquanto os pedidos chegam ao longo do dia.
 
-O km vazio de um pedido é o custo do caminho entre a posição do veículo e a origem do passageiro. Ele depende, portanto, de \emph{onde o veículo está} e de \emph{qual veículo é escolhido}. A escolha altera o futuro: o veículo termina a corrida no destino, e não onde estava, o que muda os custos dos pedidos seguintes. Um custo menor agora pode piorar o restante do dia, e o contrário também. Como cada veículo atende um pedido por vez, sem compartilhar corridas, a rota de um veículo é a sequência de atendimentos que os lotes produzem, e não um plano feito de uma vez.
+A distância de aproximação depende da posição do veículo e do caminho até a origem do passageiro. A escolha do par também altera o estado futuro: após a corrida, o veículo fica no destino e só volta a ser candidato quando estiver livre. Assim, uma atribuição que reduz a distância no lote corrente pode modificar os custos e a disponibilidade nos lotes seguintes. A sequência diária de atendimentos resulta dessas decisões sucessivas; não é planejada de uma vez.
 
-Neste trabalho, cada lote é um problema de atribuição entre os pedidos pendentes e os veículos elegíveis naquele instante. O Húngaro resolve esse problema de forma ótima \emph{para o lote}. O método não resolve um VRP completo, não planeja pedidos futuros e não prevê demanda. Há deslocamento entre posições, mas o modelo de distância é simplificado e declarado: nos dados reais, a distância em linha reta multiplicada por um fator rua/reta; nos cenários sintéticos, o caminho mínimo na rede viária (Seção~\ref{sec:metodo}). A Tabela~\ref{tab:problemas} resume essas relações.
+Cada lote é formulado como atribuição entre pedidos pendentes e veículos elegíveis. O algoritmo Húngaro resolve o objetivo formulado para o lote, sem otimizar a sequência do dia ou antecipar pedidos futuros. O deslocamento continua presente: nos dados históricos, seu custo é estimado pela distância em linha reta multiplicada por um fator rua/reta; nos cenários sintéticos, por caminho mínimo na rede viária \cite{dijkstra1959}. O Quadro~\ref{qua:problemas} situa a decisão estudada entre esses problemas.
 
-\begin{table}[!htb]
-\caption{Relação entre problemas clássicos e a decisão estudada}\label{tab:problemas}
+\begin{quadro}[!htb]
+\caption{Relação entre problemas clássicos e a decisão estudada}\label{qua:problemas}
 \centering\fontetabela
-\begin{tabular}{@{}p{30mm}p{58mm}p{60mm}@{}}
-\toprule
-Problema & Decisão que resolve & Relação com este estudo \\
-\midrule
+\begin{tabular}{|>{\raggedright\arraybackslash}p{30mm}|>{\raggedright\arraybackslash}p{58mm}|>{\raggedright\arraybackslash}p{60mm}|}
+\hline
+\textbf{Problema} & \textbf{Decisão que resolve} & \textbf{Relação com este estudo} \\
+\hline
 Reposicionamento (alocação antes dos pedidos) & onde os veículos ficam antes dos pedidos & não é decidido \\
+\hline
 Atribuição (alocação a pedidos conhecidos) & qual veículo atende qual pedido conhecido & \textbf{problema resolvido a cada lote} (Húngaro) \\
+\hline
 Caminho mínimo & custo do deslocamento entre dois pontos & fornece o custo: reta $\times$ 1,3012 (dados reais) ou Dijkstra (cenários sintéticos) \\
+\hline
 Sequenciamento & ordem dos atendimentos de um veículo & resulta da sucessão dos lotes; não é planejado \\
+\hline
 VRP, coleta e entrega, \textit{dial-a-ride} & rotas completas, com janelas e vários pedidos por rota & fora do escopo; sem compartilhamento de corridas \\
-\bottomrule
+\hline
 \end{tabular}
 \fonte{elaborado pelos autores a partir de \citeonline{toth2002}, \citeonline{cordeau2007}, \citeonline{berbeglia2010} e \citeonline{pillac2013}.}
-\end{table}
+\end{quadro}
 
 \subsection{Um exemplo: km vazio, lote e atribuição conjunta}
 
-A Tabela~\ref{tab:exemplo} mostra três pedidos que chegaram em ordem ($P_1$, $P_2$, $P_3$) dentro do mesmo lote de 60 segundos e três veículos livres. Os valores são hipotéticos. Cada célula é o km vazio que o veículo percorreria até o passageiro. O lote simples atende os pedidos em ordem de chegada, cada um pelo veículo mais próximo ainda livre: $P_1\to V_1$ (2 km), $P_2\to V_3$ (7 km, pois $V_1$ já foi usado) e $P_3\to V_2$ (4 km), com 13 km. A atribuição conjunta olha os três pedidos de uma vez: $P_1\to V_2$ (3 km), $P_2\to V_1$ (1 km) e $P_3\to V_3$ (5 km), com 9 km, 30,8\% menos neste exemplo. O ganho vem de não gastar $V_1$, de que $P_2$ mais precisa, com $P_1$, que perderia só 1 km usando $V_2$.
+A Tabela~\ref{tab:exemplo} apresenta três pedidos recebidos no mesmo lote e três veículos livres. Os valores hipotéticos representam a distância de aproximação de cada par. O lote sequencial segue a ordem de chegada: $P_1\to V_1$ (2 km), $P_2\to V_3$ (7 km) e $P_3\to V_2$ (4 km), totalizando 13 km.
 
-Se $V_3$ não existisse, só dois pedidos poderiam ser atendidos. O lote simples atenderia $P_1$ e $P_2$ (2 + 8 = 10 km). A atribuição conjunta também atende dois, mas escolhe $P_1\to V_2$ e $P_2\to V_1$ (3 + 1 = 4 km) e deixa $P_3$ para o lote seguinte. O despacho imediato decide cada pedido no momento em que chega, sem esperar o lote; com estes valores, e se nenhum veículo se liberar entre as chegadas, ele repetiria as escolhas do lote simples.
+A atribuição conjunta considera os pares simultaneamente: $P_1\to V_2$ (3 km), $P_2\to V_1$ (1 km) e $P_3\to V_3$ (5 km), totalizando 9 km. Nesse exemplo, reservar $V_1$ para $P_2$ evita que a escolha inicial pelo veículo mais próximo imponha a $P_2$ uma aproximação muito maior. A diferença de 30,8\% ilustra o mecanismo, sem representar um resultado do experimento.
+
+Se $V_3$ não estivesse disponível, as duas políticas em lote formariam no máximo dois pares. O lote sequencial atenderia $P_1$ e $P_2$ com 10 km; a atribuição conjunta formaria $P_1\to V_2$ e $P_2\to V_1$ com 4 km, deixando $P_3$ pendente. O despacho imediato, nas condições deste exemplo e sem liberação de veículos entre chegadas, repetiria as escolhas sequenciais.
 
 \begin{table}[!htb]
 \caption{Km vazio (km) de cada veículo até cada pedido em um exemplo ilustrativo}\label{tab:exemplo}
 \centering\fontetabela
-\begin{tabular}{lccc}
-\toprule
-Pedido & $V_1$ & $V_2$ & $V_3$ \\
-\midrule
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Pedido} & \textbf{$V_1$} & \textbf{$V_2$} & \textbf{$V_3$} \\
+\hline
 $P_1$ & 2 & 3 & 9 \\
+\hline
 $P_2$ & 1 & 8 & 7 \\
+\hline
 $P_3$ & 6 & 4 & 5 \\
-\bottomrule
+\hline
 \end{tabular}
 \fonte{valores hipotéticos criados pelos autores; não vêm dos dados do estudo.}
 \end{table}
 
-\subsection{Formulação da atribuição por lote}
+\subsection{Formulação da atribuição por lote}\label{sec:formulacao}
 
-Seja $t$ um instante de decisão (múltiplo de 60 s). Seja $R_t$ o conjunto de pedidos pendentes, isto é, já chegados, não atendidos e não expirados, e $V_t$ o conjunto de veículos \emph{online}. Um par $(r,v)$ é \emph{elegível}, $(r,v)\in E_t$, se o veículo está livre em $t$, não há conflito com seus compromissos externos e a distância de aproximação está dentro do raio de despacho (4,5 km em linha reta nos dados reais; 8 km por via nos cenários sintéticos). O custo $c_{rv}$ é a distância de aproximação estimada, em km, e $x_{rv}\in\{0,1\}$ indica que o veículo $v$ atende o pedido $r$. O problema do lote tem duas etapas: primeiro, maximizar o número de pedidos atendidos; depois, entre as soluções com esse máximo, minimizar o custo total:
+Seja $t$ um instante de decisão (múltiplo de 60 s). Seja $R_t$ o conjunto de pedidos pendentes, isto é, já chegados, não atendidos e não expirados, e $V_t$ o conjunto de veículos \emph{online}. Um par $(r,v)$ é \emph{elegível}, $(r,v)\in E_t$, se o veículo está livre em $t$, não há conflito com seus compromissos externos e a distância de aproximação está dentro do raio de despacho (4,5 km em linha reta nos dados reais; 8 km por via nos cenários sintéticos). O custo $c_{rv}$ é essa distância estimada, em km. A variável $x_{rv}$ vale 1 quando o pedido $r$ recebe o veículo $v$ e 0 nos demais casos; um par inelegível sempre recebe 0.
+
+Chamamos de $N$ o número de pedidos que recebem um veículo e de $K$ a soma das distâncias de aproximação desses veículos. A escolha do lote segue esta ordem:
 \begin{equation}
-\max \sum_{(r,v)\in E_t} x_{rv} \quad\text{e, em seguida,}\quad \min \sum_{(r,v)\in E_t} c_{rv}\,x_{rv}, \label{eq:obj}
+\begin{aligned}
+\text{primeiro:}\quad & \max N \quad\text{(atender o máximo de pedidos)},\\
+\text{em caso de empate:}\quad & \min K \quad\text{(percorrer a menor distância)}.
+\end{aligned}
+\label{eq:obj}
 \end{equation}
-\begin{equation}
-\sum_{v:(r,v)\in E_t} x_{rv}\le 1\ \ \forall r\in R_t, \qquad \sum_{r:(r,v)\in E_t} x_{rv}\le 1\ \ \forall v\in V_t, \qquad x_{rv}\in\{0,1\}. \label{eq:rest}
-\end{equation}
-A equação~\ref{eq:obj} dá prioridade ao atendimento. A equação~\ref{eq:rest} impede que um pedido receba dois veículos e que um veículo atenda dois pedidos. Um pedido sem par segue para o lote seguinte, até esgotar a paciência (180 s nos dados reais; 600 s nos cenários sintéticos). Na implementação, as duas etapas viram um único problema de atribuição, com colunas fictícias de \enquote{não atribuído} e um bônus grande para cada par formado (Apêndice~\ref{ap:metodo}).
+Uma opção que atende mais pedidos tem prioridade mesmo quando soma maior distância. A distância só desempata opções que atendem o mesmo número de pedidos. Cada pedido pode receber no máximo um veículo; cada veículo, no máximo um pedido; e pares inelegíveis não podem ser escolhidos. Um pedido sem par segue para o lote seguinte, até esgotar a paciência (180 s nos dados reais; 600 s nos cenários sintéticos). Na implementação, as duas etapas da equação~\ref{eq:obj} viram um único problema de atribuição, com colunas fictícias de \enquote{não atribuído} e um bônus grande para cada par formado. As restrições em notação matemática e a construção da matriz estão no Apêndice~\ref{ap:metodo}.
 
 \subsection{O algoritmo Húngaro}
 
-Cada pedido e cada coluna recebem um \enquote{potencial} que abate o custo sem torná-lo negativo. Só pares de custo reduzido nulo podem compor a solução. O algoritmo insere um pedido por vez, procura o rearranjo de menor custo (caminho aumentante) e atualiza os potenciais. Ao terminar, os potenciais certificam que nenhum conjunto de pares tem custo menor \cite{kuhn1955, munkres1957}. A implementação é própria, segue a forma de caminhos mínimos com potenciais \cite{tomizawa1971, edmondskarp1972} e foi conferida contra enumeração exaustiva, contra a biblioteca SciPy \cite{jonker1987, crouse2016} e em 2.628 lotes reais de desenvolvimento (Apêndice~\ref{ap:metodo}). Essas conferências mostram concordância de custo \emph{nas instâncias verificadas}; não são prova geral de correção.
+Na implementação, o Húngaro usa potenciais para manter custos reduzidos não negativos e constrói a atribuição por caminhos aumentantes \cite{kuhn1955, munkres1957, tomizawa1971, edmondskarp1972}. Os custos transformados da matriz podem ser negativos por causa do bônus de cardinalidade; isso não contradiz a condição sobre os custos \emph{reduzidos}. A implementação própria foi confrontada com enumeração exaustiva, com uma rotina da biblioteca SciPy usada apenas como oráculo \cite{jonker1987, crouse2016} e com 2.628 lotes de desenvolvimento (Apêndice~\ref{ap:metodo}). A concordância nas instâncias verificadas sustenta a implementação examinada, sem constituir prova geral de correção.
 
-O ótimo do lote é ótimo \emph{para aquele lote, dado o estado do instante}. Ele não garante o ótimo do dia, porque a atribuição muda as posições futuras dos veículos e quais deles estarão livres, e porque os pedidos futuros não são conhecidos. Em ambiente dinâmico, o método é uma heurística de horizonte rolante \cite{pillac2013}, e sua qualidade é uma questão empírica, tratada na Seção~\ref{sec:resultados}.
+O ótimo do lote é ótimo \emph{para aquele lote, dado o estado do instante}. Ele não garante o ótimo do dia, porque a atribuição muda as posições futuras dos veículos e quais deles estarão livres, e porque os pedidos futuros não são conhecidos. Em ambiente dinâmico, o método é uma heurística de horizonte rolante \cite{pillac2013}, e sua qualidade é uma questão empírica, tratada em \nameref{sec:resultados}.
 
 \subsection{Trabalhos relacionados}
 

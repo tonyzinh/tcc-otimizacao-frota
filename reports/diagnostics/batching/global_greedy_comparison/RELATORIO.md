@@ -93,6 +93,8 @@ A Tabela 6, congelada, não foi alterada.
 
 A vantagem do Húngaro sobre um guloso global simples **não se confirmou**. D foi definido depois dos resultados congelados, e isso está rotulado na tabela e no texto.
 
+> **Nota de 09/11/2026 (rodada 10, só redação; números inalterados).** A frase acima foi reescrita no artigo como troca sem vencedor claro: D teve menos km que C em todos os períodos; C atendeu mais com os parâmetros de março (179 e 83), por pouco com a calibração nova (41 e 25, até 0,4%) e menos no teste (−29), onde o intervalo da diferença média diária de km D−C (t pareado) vai de −23,2 a +12,2 km/dia. O estudo não mostra que o Húngaro seja melhor que o guloso global, nem o contrário. Ver `reports/diagnostics/consistency/greedy_framing_and_table_readability/RELATORIO.md` e `docs/decisions.md` (R-37).
+
 ## 4. Item 3: intervalos C×B por variante
 
 A nova Tabela 14 (`tab:sensic`, Apêndice B) traz, para cada variante, o intervalo do t pareado e o do bootstrap de blocos de 7 dias.

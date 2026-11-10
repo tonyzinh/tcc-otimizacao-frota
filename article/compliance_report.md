@@ -1,8 +1,81 @@
 # Relatório de conformidade do artigo e do repositório
 
+## Atualização vigente: formulação explicada em linguagem direta (09/11/2026)
+
+O corpo do artigo define $N$ como número de pedidos atendidos e $K$ como soma das distâncias até os passageiros; a equação (1) mostra apenas a ordem de decisão: maximizar $N$ e, entre soluções empatadas, minimizar $K$. O texto explica em palavras o limite de um veículo por pedido, de um pedido por veículo e a exclusão dos pares inelegíveis. Os somatórios e as restrições binárias, necessários para a reprodução técnica, estão no Apêndice A (equação 3). A página 6 e o início do Apêndice A foram renderizados e conferidos. O PDF principal tem **30 páginas**, com referências até a **24** e apêndices nas páginas 25–30; não há caixas transbordadas nem remissões indefinidas.
+
+## Ajuste visual anterior da formulação matemática (09/11/2026)
+
+As equações (1) e (2) foram organizadas em linhas alinhadas: a primeira distingue a prioridade de maximizar pares da etapa de minimizar distância entre as soluções máximas; a segunda separa restrições por pedido, por veículo e domínio binário. A formulação, os símbolos, a numeração e as remissões foram preservados. A página 6 foi renderizada e inspecionada; não há sobreposição ou caixa transbordada. O PDF principal continua com 29 páginas, referências até a 24.
+
+Essa versão intermediária foi substituída pela atualização vigente acima após o proprietário informar que o excesso de símbolos ainda dificultava a leitura.
+
+## Atualização vigente: conteúdo das tabelas e notas de fonte (09/11/2026)
+
+Por esclarecimento do proprietário, o negrito foi retirado dos títulos externos de tabelas, quadros e figuras. O destaque foi aplicado aos cabeçalhos internos de todos os elementos tabulares, como “Política”, “Quando decide” e “Como escolhe” no Quadro 2; negritos que identificam resultados específicos foram preservados. O conteúdo das células passou de 10 para 9,5 pt, com maior altura de linha e 1 pt de folga vertical adicional na grade. Os textos descritivos permanecem alinhados à esquerda e os valores numéricos à direita ou ao centro, conforme a coluna.
+
+As notas “Fonte” foram abreviadas para indicar origem e, quando necessário, a natureza posterior da análise; explicações essenciais foram mantidas na prosa. Os títulos continuam centralizados, em Arial 11 regular, com 6 pt até o elemento e 6 pt antes da fonte. O artigo principal foi recompilado com **29 páginas, referências até a página 24 e apêndices nas páginas 25–29**; o suplemento tem **19 páginas**. As páginas 14 do artigo e 11 do suplemento foram inspecionadas visualmente, inclusive uma tabela densa. Os logs não apontam caixas transbordadas nem remissões indefinidas. Os resultados numéricos não foram alterados.
+
+## Atualização vigente: subtítulos, legendas e paginação (09/11/2026)
+
+Esta atualização substitui os números de páginas e as descrições de subtítulos, apêndices, legendas e numeração apresentados nas rodadas históricas abaixo. Os subtítulos de Resultados e discussão que antes iniciavam o mesmo parágrafo do texto agora ocupam linha própria, em caixa alta e sem negrito. Os oito subtítulos introdutórios do Apêndice A e seus equivalentes no suplemento também ocupam linha própria; nesses dois documentos, os títulos dos apêndices e seus subtítulos estão em negrito, conforme a preferência mais recente do proprietário.
+
+Os títulos de tabelas, quadros e figuras permanecem acima dos elementos, centralizados, em Arial 11 e agora integralmente em negrito. O intervalo entre título e elemento é de 6 pt; o intervalo entre elemento e nota “Fonte” também é de 6 pt. A nota de fonte permanece centralizada, regular, em Arial 11. A grade uniforme adotada em R-47 permanece. A primeira página não mostra número; o Abstract inicia na página 2, numerada no canto superior direito. O corpo mantém 12 pt antes dos parágrafos; os apêndices usam 8 pt para que os subtítulos separados e as notas de fonte caibam no limite do PDF sem suprimir texto.
+
+**Verificação:** artigo principal recompilado com 30 páginas, referências até a página 25 e apêndices nas páginas 26–30. O suplemento recompilado tem 19 páginas e numeração própria. As páginas 2, 14 e 28 foram inspecionadas visualmente; a primeira página e as páginas 25–26 foram conferidas por extração de texto. Os logs não apontam caixas transbordadas nem remissões indefinidas. Nenhum dado, resultado ou conclusão científica foi alterado nesta rodada.
+
+## Revisão de formatação pelo esquema transcrito (09/11/2026)
+
+Esta seção descreve o estado atual e prevalece sobre os registros históricos abaixo. O esquema de formatação transcrito pelo proprietário foi aplicado como regra explícita e conferido no PDF da página da biblioteca FAESA disponibilizado em `Downloads/`. O *Guia para Elaboração de Trabalho de Conclusão de Curso — Artigo Científico — FAESA 2024* foi lido integralmente (11 páginas). O modelo do AVA não foi encontrado. O TCC de Marcelo Miranda e Thiago Poggian foi examinado apenas como exemplo secundário de organização.
+
+| Requisito | Fonte da regra | Implementação | Verificação | Pendência |
+|---|---|---|---|---|
+| A4, Arial, margens 3/2 cm | esquema e guia, p. 9 | `config/packages.tex`, `config/formatting.tex` | PDF A4; `pdffonts` confirma Arial incorporada; corpo inicia a cerca de 30 mm da borda esquerda na primeira página | Modelo do AVA não localizado |
+| Títulos bilíngues, 14 pt, 1,5, centralizados | esquema | `config/commands.tex` | extração XML do PDF: fonte Arial 14 pt, títulos centralizados; inglês em negrito e itálico | — |
+| Autores à direita, estudantes em ordem alfabética; qualificação 11 pt | esquema e convenção do pedido | `config/metadata.tex`, `config/commands.tex` | Entony antes de Raphael, orientador abaixo; XML mostra nomes em Arial 12 pt e qualificações em cerca de 11 pt | Titulação do orientador não foi inventada; confirmar se o guia requer campo adicional |
+| Resumo e abstract | esquema e guia, pp. 6–7, 9; pedido atual sobre espaço | parágrafo único, Arial 12 pt, espaçamento simples; abstract integral em itálico; 8 pt após cada cabeçalho | resumo: **225 palavras**; texto começa separado do título em ambos os idiomas; palavras-chave permanecem na primeira página | O guia não especifica método de contagem |
+| Palavras-chave e Keywords | esquema | rótulo em negrito; termos separados por ponto; Keywords em itálico | PDF, páginas 1–2 | — |
+| Corpo 12 pt, entrelinha 1,5, 12 pt antes, sem recuo | esquema | `\espacamentocorpo` e `\parskip` definidos uma vez em `config/formatting.tex` | fonte e espaçamentos conferidos no PDF renderizado; nenhum ajuste negativo de compactação | — |
+| Resumo, abstract, seções, subseções e referências à esquerda | pedido atual; TCC de exemplo como referência visual | `\tituloresumo` e `\titleformat` em `config/commands.tex` e `config/formatting.tex`; subseções em maiúsculas e sem negrito, seções principais em negrito; sem numeração | PDF: cabeçalhos começam na margem esquerda; “REVISÃO DA LITERATURA” e “ALOCAÇÃO DE FROTA...” próximos e legíveis | — |
+| Introdução, Revisão da literatura, Metodologia, Resultados e discussão, Considerações finais, Referências | esquema | nomes das seções nos fontes | todos aparecem no PDF na ordem solicitada | — |
+| Citações diretas e notas de rodapé | esquema | estilos de citação longa e nota centralizados em `config/commands.tex` e `config/formatting.tex` | não há citação longa nem nota de rodapé para conferir visualmente nesta versão | Condicional ao uso futuro desses elementos |
+| Figuras, quadros e tabelas: título e fonte 11 pt, centralizados; grade uniforme | pedido mais recente do proprietário; esquema e TCC de exemplo | `caption` e `\fonte` centralizados; os 2 quadros e as 7 tabelas numéricas do artigo, além das 13 tabelas do suplemento, usam borda externa e divisórias internas | 22 elementos tabulares com o mesmo padrão; tabelas densas inspecionadas no PDF; sem caixa transbordada | A grade com linhas verticais diverge da orientação explícita do esquema para tabelas numéricas; adotada por pedido posterior de uniformidade |
+| Referências 12 pt, simples, alinhadas à esquerda e citadas | esquema | BibTeX ABNT; estilo em `config/commands.tex` | referências nas páginas **23–24**; compilação sem citação indefinida | Verificação bibliográfica integral permanece no `reference_audit.md` |
+| Apêndices após referências, sem negrito no título; cada item identificado no corpo | esquema, guia p. 5 e esclarecimento do proprietário | `\apendice` centralizado e sem negrito; metodologia indica conteúdo e localização dos Apêndices A–B e dos quatro suplementares | Apêndices A–B nas páginas **25–29**; PDF suplementar compilado separadamente com **18 páginas**; não há anexos de terceiros | — |
+| Numeração superior direita, Arial 10 | guia, p. 10 | `fancyhdr`, inclusive na primeira página e nos apêndices | extração XML: número da página 2 a cerca de 20 mm do topo e 22 mm da borda direita, Arial 10 | Modelo do AVA não localizado |
+| Equações numeradas à direita | esquema | `amsmath`; símbolos não substituídos por Arial quando não suportados | equações 1–3 e remissões visíveis; fontes matemáticas incorporadas | — |
+| Limites de páginas | pedido atual | síntese editorial e suplemento em PDF, sem reduzir fonte/margens | **24 páginas até o fim das referências; 5 de apêndices; 29 no PDF principal; 18 no suplemento** | — |
+| Compilação e inspeção | pedido atual | XeLaTeX → BibTeX → XeLaTeX ×2; suplemento com remissões externas prefixadas | PDF principal recompilado com 29 páginas, sem caixa transbordada ou remissão indefinida; páginas de cabeçalhos e referências inspecionadas; suplemento recompilado com 18 páginas e cópia final conferida por SHA-256 | O `latexmk` local depende de Perl ausente; a cadeia manual funcionou |
+
+**Decisões entre instruções divergentes.** O esquema prevalece nas regras explícitas e o guia complementa as omissões. O resumo segue 100–250 *palavras* (guia, p. 6), em vez de caracteres. O guia pede entrelinha simples e espaço simples entre parágrafos (p. 9), autores à esquerda e qualificação em nota (p. 6), seções numeradas e iniciadas em nova página (p. 10), palavras-chave separadas por ponto e vírgula (p. 7) e fontes de figuras/tabelas em 10 pt (p. 9). Por convenção expressa do proprietário, foram adotados corpo 1,5 com 12 pt antes, autores e qualificações à direita, seções sem numeração e com paginação natural, palavras-chave separadas por ponto e fontes em 11 pt. Abstract integral em itálico e títulos dos elementos em 11 pt coincidem com o guia. O modelo do AVA não foi fornecido; não se afirma concordância geral entre as fontes.
+
+**Ajustes editoriais e científicos preservados.** O Quadro 1 organiza conceitos e o Quadro 2 descreve as políticas; as tabelas numéricas mantêm contador próprio. “Lote sequencial” é o nome curto de “despacho sequencial em lote”. O critério de 300 refere-se a instantes de posição (`docs/methodology.md` e `CONGELAMENTO.json`). A limitação sobre durações observadas/medianas retrospectivas e elegibilidade foi explicitada sem alegar ausência de efeito diferencial. Os valores principais (−5,96%, −5,04%, −2,74%, −1,40%, perda de 85 atendimentos em outubro e teste posterior inconclusivo) foram preservados. Os detalhes extensos de validação e recalibração foram movidos para `supplement/material_suplementar.pdf`; o corpo mantém o descompasso operacional e os resultados desfavoráveis.
+
+**Completude acadêmica.** A introdução explicita pergunta, hipótese original, objetivo geral, objetivos específicos, justificativa e síntese do método em parágrafos corridos. A metodologia justifica o desenho quantitativo, comparativo e retrospectivo e delimita a reprodução com dados confidenciais. As considerações finais respondem à pergunta e classificam a expectativa de reduzir km com atendimento preservado como parcialmente sustentada. O mapa de cada elemento, sua localização e as inconsistências corrigidas constam em `article/editorial_review_2026-11-09.md`, na seção “Conferência de completude acadêmica”.
+
+**Ajuste visual posterior.** O pedido foi esclarecido: tratava-se do espaço entre títulos de seção e subseção, como “REVISÃO DA LITERATURA” e “ALOCAÇÃO DE FROTA...”. A alteração anterior entre os títulos em português e inglês foi desfeita. Resumo, abstract, seções, subseções e referências estão alinhados à esquerda, como no TCC de exemplo; subseções aparecem em maiúsculas e os espaços antes/depois dos cabeçalhos foram reduzidos. A revisão foi conferida no PDF: 24 páginas até as referências e 29 no principal.
+
+**Ajuste de subtítulos e quadros.** Por pedido posterior, as subseções e os marcadores de parágrafo com função de subtítulo ficaram em maiúsculas, sem negrito, inclusive nos apêndices autorais e no suplemento. O resumo e o abstract ganharam 8 pt entre título e texto; a primeira página manteve as palavras-chave junto ao resumo. Na primeira aplicação da referência visual, só os Quadros 1–2 receberam grade. O proprietário corrigiu essa interpretação e pediu uniformidade para todos os elementos tabulares. Agora as 7 tabelas do artigo e as 13 do suplemento também têm grade, com título acima e fonte abaixo. Isso contraria a orientação anterior de evitar linhas verticais nas tabelas; a divergência é deliberada por instrução posterior do proprietário. Os PDFs principal e suplementar têm 29 e 18 páginas.
+
+**Verificações de resultados.** `scripts/verify_frozen_results.py` conferiu 19/19, 138/138 e 40/40 arquivos congelados; `scripts/sync_article_figures.py --check` conferiu 3/3 figuras. `compute_article_derived_values.py --check` não se aplica integralmente à redação condensada: procura 21 cadeias de valores derivados que foram retiradas do corpo na revisão anterior e encerra com falha de codificação no console Windows. Não houve reexecução de simulações nem alteração de dados ou resultados. A suíte geral de testes não foi reexecutada para esta revisão de formatação.
+
 Data: 09/11/2026 (rodada 3). Revisão feita por modelo de IA (Claude) sobre os arquivos do projeto. **Não é leitura humana independente de orientador ou banca.**
 
-Entregas: `article/ARTIGO_ATRIBUICAO_HUNGARO.pdf` (fonte: `article/`, compilação em `article/README.md`), `article/reference_audit.md` (tabela obra × afirmação × evidência), este relatório.
+Entregas: `article/TCC 2026-2 - Entony Jovino - Raphael Simões - Orientador Rober Marcone Rosi.pdf` (nome fixo desde 09/11/2026; antes `ARTIGO_ATRIBUICAO_HUNGARO.pdf`; gerado por `scripts/build_article.py`) (fonte: `article/`, compilação em `article/README.md`), `article/reference_audit.md` (tabela obra × afirmação × evidência), este relatório.
+
+## 00. Atualização da rodada 10 (09/11/2026: guloso global × atribuição conjunta e legibilidade)
+
+Esta seção prevalece sobre as seguintes no que trata. Relatório completo: `reports/diagnostics/consistency/greedy_framing_and_table_readability/RELATORIO.md`.
+
+| Item | Resultado |
+|---|---|
+| Enquadramento D × C | Resumo, abstract, 4.3, 4.5, 4.6 e conclusão descrevem a comparação como troca sem vencedor claro: D com menos km em todos os períodos; C com mais atendidos com março, por pouco com a calibração nova e menos no teste. A frase "a vantagem do Húngaro … não se confirmou" saiu do artigo. O mecanismo aparece em 4.5 como "leitura coerente com os dados, não testada" |
+| Números | Nenhum valor saiu do PDF. Entraram o intervalo D−C do teste (−23,2 a +12,2 km/dia, `teste_resumo.csv`) e as diferenças −179 e −83 com sinal (`bcd_resumo.csv`). Comparação valor a valor em `valores_antes_depois.csv` |
+| Tabelas | Nomes das políticas por extenso; letras só entre parênteses nos títulos; cabeçalhos com unidade; diferença com referência e sinal declarados; negrito no melhor valor; origem (congelada ou posterior, †) e calibração visíveis; nova Tabela 18 (B, C, D absolutos) no Apêndice B; Apêndice D em tabela |
+| Figuras | Figuras 3 e 4 refeitas em tons de cinza, com hachuras e marcadores; legendas com eixos e unidades |
+| Páginas | 40 no total; corpo e referências nas páginas 1–24; apêndices A–D nas páginas 25–40 |
+| Compilação | 0 *overfull*, 0 referência ou citação indefinida; 8 *underfull* (7 anteriores + 1 no parágrafo do Apêndice D) |
+| Verificações | 21/21 valores derivados; congelados 19/19, 138/138, 40/40; 3 figuras sincronizadas; 208 testes aprovados, 0 falhas; Ruff limpo |
 
 ## 0. Atualização da rodada 4 (09/11/2026, auditoria do parecer crítico)
 

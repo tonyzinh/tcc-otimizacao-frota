@@ -1,0 +1,17 @@
+% Material suplementar do artigo; compilar no diretório article/supplement.
+\documentclass[12pt,a4paper]{article}
+\input{../config/packages}
+\input{../config/formatting}
+\input{../config/commands}
+\input{../config/metadata}
+\usepackage{xr-hyper}
+\externaldocument[art-]{../build/main}
+\graphicspath{{../}}
+
+\begin{document}
+\section*{Material suplementar}
+Detalhes de método, séries, intervalos, verificações e rastreabilidade das análises citadas no artigo principal. Este documento acompanha a mesma versão dos resultados agregados; não substitui os achados centrais e as limitações apresentados no artigo.
+
+\input{appendices_full}
+\bibliography{../references/references}
+\end{document}

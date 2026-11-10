@@ -8,7 +8,7 @@ Trabalho de Conclusão de Curso. Bacharelado em Ciência da Computação, FAESA,
 |---|---|
 | **Alunos** | Entony Jovino dos Santos · Raphael Simões Gomes |
 | **Orientador** | Prof. Rober Marcone Rosi |
-| **Artigo** | [`article/ARTIGO_ATRIBUICAO_HUNGARO.pdf`](article/ARTIGO_ATRIBUICAO_HUNGARO.pdf) (fonte LaTeX em [`article/`](article/)) |
+| **Artigo** | [`article/TCC 2026-2 - Entony Jovino - Raphael Simões - Orientador Rober Marcone Rosi.pdf`](<article/TCC 2026-2 - Entony Jovino - Raphael Simões - Orientador Rober Marcone Rosi.pdf>) (fonte LaTeX em [`article/`](article/)) |
 
 ---
 
@@ -101,7 +101,7 @@ O que mais os resultados mostram:
 - **Teste posterior fora da amostra** (12 dias, 26/10 a 08/11, parâmetros recalibrados com janeiro a agosto):
   - contra A, a redução caiu para **−2,79%**, com intervalo que inclui zero;
   - contra B, o km ficou **0,87% maior**, com 29 atendimentos a mais e o mesmo km por atendido.
-- **Guloso global (D):** teve menos km que o Húngaro e atendeu quase o mesmo, então a vantagem do Húngaro sobre ele **não se confirmou**.
+- **Guloso global (D):** teve menos km que o Húngaro em todos os períodos; o Húngaro atendeu mais com os parâmetros de março, por pouco com a calibração nova e menos no teste. **Nenhum dos dois mostrou vantagem clara.**
 - **Cenários sintéticos:** redução mediana de 2,0% a 8,9%.
 
 Em resumo: decidir o lote em conjunto reduziu o km vazio simulado em relação ao despacho imediato, mas parte desse ganho vem de esperar o lote. A vantagem específica da atribuição ótima sobre regras mais simples não ficou demonstrada. O trabalho relata o resultado desfavorável junto com o favorável.

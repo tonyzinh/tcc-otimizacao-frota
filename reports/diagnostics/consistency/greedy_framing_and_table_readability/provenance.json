@@ -1,0 +1,26 @@
+{
+  "rodada": 10,
+  "data": "2026-11-09",
+  "natureza": "pós-hoc; revisão de redação e apresentação do artigo; sem simulação nova; sem acesso a dados reais",
+  "decisao": "docs/decisions.md R-37",
+  "entradas": [
+    "reports/diagnostics/batching/global_greedy_comparison/bcd_resumo.csv",
+    "reports/diagnostics/calibration/recalibration_out_of_sample/teste_resumo.csv",
+    "reports/historical/frozen_evaluation/analise/resumo.json",
+    "reports/diagnostics/calibration/recalibration_out_of_sample/{mensal,setout,teste}_por_dia.csv"
+  ],
+  "codigo_alterado": [
+    "src/tcc_frota/visualization/figures.py (plot_km_and_attendance: tons de cinza e hachuras)",
+    "scripts/plot_recalibration_daily_differences.py (marcadores e barras cheias/vazadas)"
+  ],
+  "saidas": [
+    "RELATORIO.md",
+    "valores_antes_depois.csv (contagem de cada valor numérico no PDF antes e depois)",
+    "reports/figures/empty_km_service_differences.{pdf,png}",
+    "reports/figures/recalibration_daily_differences.pdf"
+  ],
+  "pdf_antes_sha256": "433B952576DEDC86B6DB9D2C3F469E747FB2D486F6F70C83AA48F435497EA5F0",
+  "pdf_depois_sha256": "734DC5F85F74C3E0C6C969AC8552BAE894AD72A081ED3EFCA4C8E9A81EC9AED7",
+  "script_comparacao": "script local da sessão (comparar_valores.py, não versionado): extrai números do texto dos dois PDFs com PyMuPDF e conta cada valor",
+  "commit_base": "b30b8a8"
+}

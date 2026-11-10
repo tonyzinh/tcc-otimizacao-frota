@@ -245,3 +245,149 @@ Esses números passaram a ser recalculados por `scripts/compute_article_derived_
 
 **Limitação:** a conferência no texto procura a cadeia formatada. Valores curtos e comuns ("1,3", "0,9") aparecem em outras frases do artigo, e para eles a conferência só garante presença, não a frase. Por isso o script grava também a chave e a fonte de cada valor.
 
+## R-37 · Rodada 10: guloso global × atribuição conjunta como troca sem vencedor e legibilidade das tabelas (09/11/2026) · EXECUTADA, SÓ REDAÇÃO
+
+**Problema:** o artigo resumia a comparação posterior com o guloso global (D) como "a vantagem do Húngaro sobre um guloso global simples não se confirmou". A frase é verdadeira, mas lê um lado só. Os dados mostram uma troca: D teve menos km em todos os períodos, e C atendeu mais na maior parte deles. As tabelas usavam letras e abreviações que não se leem sozinhas.
+**Evidência:** `reports/diagnostics/batching/global_greedy_comparison/bcd_resumo.csv` (D−C: km −2,66%, −1,88%, −1,23%, −2,04%, −0,62%; atendidos −179, −83, −41, −25, +29) e `reports/diagnostics/calibration/recalibration_out_of_sample/teste_resumo.csv` (teste, intervalo t pareado da diferença média diária de km D−C: −23,2 a +12,2 km/dia).
+**Alternativas:** manter a frase (lê só o lado favorável a D); declarar D melhor (o atendimento contradiz); medir os pares que só C forma (exige simulação nova com saída por pedido, que os resultados agregados da rodada 7 não guardam).
+**Decisão (pedido dos autores):**
+- resumo, abstract, 4.3, 4.5, 4.6 e conclusão passam a dizer que nenhuma das duas regras mostrou vantagem clara, e em quê cada uma se saiu melhor;
+- 4.6 ganha o item "que o Húngaro seja melhor que um guloso global simples, nem o contrário";
+- 4.5 traz o mecanismo provável, rotulado como "leitura coerente com os dados, não testada": ótimo por lote não é ótimo do dia; o objetivo lexicográfico aceita aproximações mais longas para atender mais; o guloso deixa pedidos sem par, mas mantém veículos perto da demanda;
+- D continua rotulado como definido depois dos resultados congelados, posterior e não confirmatório.
+
+A leitura de R-30 (vantagem de C sobre D não confirmada) **continua no texto**, em outras palavras: "não mostra que o Húngaro seja melhor que um guloso global simples". Esta entrada não substitui R-30; amplia a leitura para os dois lados.
+**Legibilidade:**
+- nomes das políticas por extenso (despacho imediato, lote simples, atribuição conjunta, guloso global), com as letras só entre parênteses nos títulos;
+- unidades nos cabeçalhos, referência e sinal das diferenças declarados, negrito no melhor valor, origem e calibração visíveis;
+- `tab:bcd` vira D×C no corpo, e os absolutos com espera vão para a nova `tab:bcdabs` (Apêndice B);
+- `tab:diario` agrupada por semana;
+- Apêndice D em tabela (`tab:rastreio`), com caminhos em fonte monoespaçada (Consolas, só nos caminhos);
+- aberturas de 2–3 linhas nos apêndices;
+- Figuras `empty_km_service_differences` e `recalibration_daily_differences` refeitas em tons de cinza, com hachuras e marcadores. O código está em `src/tcc_frota/visualization/figures.py` e `scripts/plot_recalibration_daily_differences.py`, com os mesmos dados.
+**Impacto:** nenhum valor saiu do PDF. Entraram só o intervalo −23,2 a +12,2 e os sinais de −179 e −83 (`valores_antes_depois.csv`). Não houve simulação nova nem acesso a dados reais.
+**Validação:**
+- 21/21 valores derivados;
+- `verify_frozen_results.py` 19/19, 138/138, 40/40;
+- figuras sincronizadas 3/3;
+- 208 testes aprovados; Ruff limpo;
+- compilação: 0 *overfull*, 0 referência indefinida;
+- 40 páginas: corpo e referências em 1–24, apêndices em 25–40.
+
+Relatório: `reports/diagnostics/consistency/greedy_framing_and_table_readability/RELATORIO.md`.
+**Pendência:** `.claude/rules/fleet_assignment.md` ainda resume R-30 como "a vantagem de C sobre … D também não [se confirmou]". O sentido continua válido, mas a regra pode ser alinhada pelos autores à leitura de troca.
+
+## R-38 · Revisão editorial do artigo com limite integral de 30 páginas (09/11/2026) · EXECUTADA
+
+**Decisão:** condensar o PDF principal por síntese editorial, mantendo os resultados centrais e desfavoráveis no corpo. Mover séries diárias, grades extensas e rastreabilidade de caminhos para o material suplementar em article/supplement/appendices_full.tex, preservado integralmente antes dos cortes. Trazer o fluxograma à metodologia e o gráfico central aos resultados. Manter fonte, margens, entrelinha, dados e critérios; não recalcular resultados nem alterar o simulador.
+
+**Evidência e limites:** mapa de mudanças e inconsistências em article/editorial_review_2026-11-09.md. O guia institucional e o PDF de referência não foram localizados no repositório examinado; a aparência atual não é certificação de conformidade. O congelamento é local, sem pré-registro externo verificável. A validação operacional continua não alcançada. A decisão preserva o resultado desfavorável de atendimento em outubro e o teste posterior inconclusivo.
+
+**Ajuste editorial subsequente (pedido do proprietário):** introdução concentrada na pergunta e nas comparações; discussão dedicada à interpretação de C×A e C×B, ao ótimo por lote e às limitações, sem repetir a tabela; conclusão sintética em prosa, preservando C×B e seu resultado desfavorável no teste posterior. PDF recompilado em 29 páginas, sem mudança de resultados.
+
+## R-39 · Precisão terminológica e continuidade do manuscrito (09/11/2026) · EXECUTADA, SÓ REDAÇÃO
+
+**Evidência:** em src/tcc_frota/simulation/engine.py, o contador de atendidos aumenta no evento de despacho; a construção de pares elegíveis usa a duração histórica ou sua mediana diária ao conferir compromissos. A linha sintética usa distância por via, enquanto a histórica usa reta multiplicada pelo fator. A antiga redação do apêndice juntava essas duas distâncias em uma única fórmula. O plano e os relatórios mantêm separados aceite observado e atendimento simulado.
+
+**Decisão:** explicitar no artigo os denominadores e o momento de contagem; distinguir informação retrospectiva do avaliador da informação apresentada à política, inclusive o efeito indireto da duração na elegibilidade; corrigir a fórmula de distância sintética; separar os parágrafos de cronologia, validação e resultados. A comparação C×B e os resultados desfavoráveis permanecem no corpo. Nenhum resultado, parâmetro, critério ou código de simulação foi alterado. PDF recompilado em 28 páginas.
+
+## R-40 · Conferência da referência visual disponibilizada (09/11/2026) · EXECUTADA, SÓ EDITORIAL
+
+**Evidência:** o PDF de referência e o pacote de análise estão em `.pack/`. O pacote registra 24 páginas, Arial 12 pt na prosa, margens estimadas de 30/20/30/20 mm e sete quadros descritivos, sem fórmula ou tabela quantitativa. A referência não substitui o guia institucional, que segue indisponível.
+
+**Decisão:** manter a formatação já aplicada ao artigo, as seções numeradas e a apresentação própria das tabelas quantitativas. Atualizar o relatório editorial para distinguir medidas da referência de requisitos institucionais. Corrigir o compilador automatizado para impedir que uma falha copie um PDF antigo como entrega. A compilação efetiva produziu 28 páginas, sem erros ou avisos de referência indefinida; todas foram renderizadas e inspecionadas. Nenhum resultado científico foi alterado.
+
+## R-41 · Aplicação do esquema de formatação transcrito (09/11/2026) · EXECUTADA, SÓ FORMATAÇÃO E REDAÇÃO
+
+**Origem e precedência:** o proprietário forneceu novo esquema explícito e convenções para conflitos com o guia FAESA 2024. Esta entrada substitui, quanto à apresentação, a decisão de R-40 de manter seções numeradas; mantém o registro histórico de R-40. O guia foi anunciado, mas seu PDF e o modelo do AVA não estavam disponíveis no repositório nem no anexo recebido nesta etapa. As regras atribuídas ao guia pelo proprietário foram aplicadas como instruções dele, sem certificação de conformidade institucional integral.
+
+**Decisão:** usar seções sem numeração e remissões pelo nome; corpo Arial 12 com entrelinha 1,5 e 12 pt antes dos parágrafos; títulos e autores conforme o esquema; abstract integral em itálico; palavras-chave separadas por ponto; títulos e fontes de elementos em Arial 11. Os quadros conceituais passam a ter contador próprio. Não se força página nova a cada seção. O limite fica em 25 páginas até as referências e 30 no PDF principal completo. Duas tabelas detalhadas de validação/recalibração passaram ao suplemento compilado, pois seus resultados decisivos já estão no corpo.
+
+**Fidelidade:** a regra de elegibilidade foi uniformizada para 300 *instantes* de posição, como em `docs/methodology.md` e `reports/historical/frozen_evaluation/CONGELAMENTO.json`; a limitação sobre durações retrospectivas e elegibilidade foi explicitada. Nenhum resultado ou critério foi recalculado; não houve simulação nova. `article/compliance_report.md` registra a matriz requisito × fonte × implementação × verificação × pendência.
+
+**Verificação:** resumo com 225 palavras; referências terminam na página 25, apêndices ocupam 26–30, total de 30 páginas; suplemento compilado com 18 páginas. Fontes incorporadas, margens e paginação foram conferidas no PDF; 30 + 18 páginas foram renderizadas e inspecionadas. Logs sem erros, caixas transbordadas e referências/citações indefinidas. Congelados 19/19, 138/138 e 40/40 iguais; figuras 3/3 sincronizadas. A suíte geral de testes não foi reexecutada nesta revisão editorial.
+
+## R-42 · Conferência direta do guia FAESA 2024 e remissões aos apêndices (09/11/2026) · EXECUTADA
+
+**Evidência:** o proprietário disponibilizou o guia institucional de 11 páginas em `Downloads/`. O texto foi lido integralmente. Ele determina resumo de 100–250 palavras (p. 6), Arial e margens já aplicadas (p. 9) e paginação superior direita em Arial 10 (p. 10). Há divergências com o esquema transcrito: entrelinha e espaço entre parágrafos, alinhamento dos autores e notas de qualificação, numeração e abertura das seções, separador de palavras-chave e tamanho das fontes das ilustrações (pp. 6–10). O modelo do AVA permanece indisponível.
+
+**Decisão:** manter a precedência expressa pelo proprietário em R-41: esquema para regras explícitas, guia para omissões e resumo em palavras. Numerar também a primeira página. Distinguir os Apêndices A–B autorais do PDF principal dos Apêndices A–D do suplemento; mencionar individualmente conteúdo e localização de todos na metodologia. Não há anexos de terceiros. A referência de R-41 à falta do guia é registro do estado daquela etapa e fica substituída por esta conferência.
+
+**Verificação:** após a revisão, as referências continuam até a página 25; os apêndices começam na 26 e terminam na 30. O total do PDF principal é 30 páginas, com 5 de apêndices. O suplemento tem paginação própria. Nenhum resultado, parâmetro ou conclusão científica foi alterado.
+
+## R-43 · Coerência entre pergunta, objetivos, método e conclusão (09/11/2026) · EXECUTADA, SÓ REDAÇÃO
+
+**Evidência:** o esquema oficial da biblioteca FAESA foi conferido diretamente; o guia de 2024 e o TCC de referência foram consultados segundo a precedência do proprietário. A introdução anterior continha pergunta e hipótese, mas condensava objetivos em uma frase; a metodologia descrevia os procedimentos sem nomear o desenho justificado; a conclusão respondia aos resultados sem explicitar a condição em que o objetivo foi alcançado nem classificar a expectativa original.
+
+**Decisão:** organizar a introdução em parágrafos de contexto, pergunta interrogativa, hipótese de redução de km e critério de atendimento, objetivo geral, objetivos específicos, justificativa e síntese metodológica, sem novos subtítulos. Classificar o desenho como avaliação quantitativa e comparativa por simulação, contrafactual e retrospectiva nos dados históricos, com cenários sintéticos exploratórios. Responder à pergunta e à hipótese nas considerações finais, distinguindo C×A, C×B e o teste posterior. Registrar em `article/editorial_review_2026-11-09.md` a localização de cada elemento e as correções.
+
+**Limites e verificação:** a hipótese de redução de km foi sustentada nas duas comparações dos períodos congelados; a condição de atendimento falhou em C×A em outubro, de modo que a expectativa conjunta foi apenas parcialmente sustentada. A avaliação histórica permanece restrita ao simulador e às entradas confidenciais. O PDF recompilado tem 25 páginas até as referências e 30 ao todo, sem caixas transbordadas. Não houve nova simulação nem alteração de valores ou parâmetros.
+
+## R-44 · Espaço entre os títulos bilíngues (09/11/2026) · SUBSTITUÍDA POR R-45
+
+**Decisão:** por instrução específica do proprietário, reduzir de 14 pt para 6 pt o espaço entre o título em português e o título em inglês, usando o TCC de exemplo como referência visual neste ponto. O guia não foi usado para definir esse intervalo. O tamanho, a fonte e o conteúdo dos títulos não mudaram.
+
+**Verificação:** primeira página renderizada e inspecionada; PDF recompilado sem caixas transbordadas. Referências ainda terminam na página 25; apêndices ocupam 26–30, total de 30 páginas.
+
+**Estado posterior:** o proprietário esclareceu que se referia aos títulos de seção e subseção. A alteração de 6 pt entre os títulos bilíngues foi desfeita em R-45; este registro descreve apenas a etapa intermediária.
+
+## R-45 · Alinhamento e proximidade de títulos e subtítulos do artigo (09/11/2026) · EXECUTADA, SÓ FORMATAÇÃO
+
+**Origem:** o proprietário esclareceu que o exemplo desejado é o cabeçalho “ARQUITETURA DA SOLUÇÃO COM GLPI” no TCC de referência: os títulos desde RESUMO até REFERÊNCIAS devem começar na margem esquerda, e o subtítulo “Alocação de frota, atribuição e roteamento” não deve ficar distante de “REVISÃO DA LITERATURA”. A interpretação anterior de R-44, sobre o intervalo entre os títulos bilíngues, foi revogada.
+
+**Decisão:** restaurar os 14 pt entre os títulos português/inglês. Alinhar RESUMO, ABSTRACT e os cabeçalhos sem numeração à esquerda; manter seções e referências à esquerda; apresentar subseções em maiúsculas, como os cabeçalhos do exemplo; retirar o espaço adicional definido entre seção e subseção e antes/depois das subseções. O texto, as tabelas, as legendas e os apêndices não foram reescritos. Esta escolha visual específica do proprietário prevalece sobre orientação distinta do guia para títulos sem numeração.
+
+**Verificação:** primeira página e página da revisão da literatura conferidas no PDF; títulos extraídos nas coordenadas da margem esquerda; compilação sem caixas transbordadas nem remissões indefinidas. Referências terminam na página 24, apêndices ocupam 25–29, total 29 páginas. O suplemento foi recompilado com 18 páginas e numeração própria.
+
+## R-46 · Subtítulos regulares, separação dos resumos e grade dos quadros (09/11/2026) · PARCIALMENTE SUBSTITUÍDA POR R-47
+
+**Origem:** o proprietário pediu que todo subtítulo após a introdução fique em maiúsculas e sem negrito, que haja espaço entre RESUMO/ABSTRACT e seus textos e, se possível, que as tabelas se aproximem do TCC de exemplo.
+
+**Decisão:** retirar negrito e itálico das subseções, mantendo caixa alta e margem esquerda; converter marcadores de parágrafo com função de subtítulo em caixa alta regular no corpo e nos apêndices. Inserir 8 pt após os cabeçalhos de resumo e abstract. O exemplo contém quadros conceituais com grade e nenhuma tabela estatística; os dois quadros do artigo receberam grade e cabeçalho destacado. As tabelas numéricas conservaram títulos/fontes centralizados e ausência de linhas verticais, conforme a regra explícita do esquema, pois copiar a grade dos quadros contrariaria essa regra e reduziria a legibilidade dos resultados.
+
+**Verificação:** PDF principal recompilado, 29 páginas; referências até a página 24 e apêndices nas páginas 25–29. Suplemento recompilado, 18 páginas. Inspeção das páginas 1, 5 e 8 confirma separação dos resumos, subtítulos sem negrito e quadros legíveis. Logs sem caixas transbordadas, citações ou referências indefinidas. Nenhum resultado ou dado foi alterado.
+
+**Estado posterior:** R-47 substitui somente a decisão de manter tabelas numéricas sem grade. As escolhas sobre subtítulos e espaçamento dos resumos permanecem vigentes.
+
+## R-47 · Grade uniforme para todos os quadros e tabelas (09/11/2026) · EXECUTADA, SÓ FORMATAÇÃO
+
+**Origem e divergência:** o proprietário apontou que a aplicação anterior deixou os quadros com grade e as tabelas numéricas com outro estilo. O esquema FAESA transcrito pede evitar linhas verticais nas tabelas. A instrução posterior e específica do proprietário de uniformizar todos os elementos tabulares prevalece para esta entrega; o afastamento do esquema fica registrado no relatório de conformidade.
+
+**Decisão:** aplicar borda externa e divisórias verticais e horizontais aos dois quadros e às sete tabelas do artigo principal e às 13 tabelas do suplemento, preservando títulos acima, fontes abaixo, numeração própria e todos os valores. Usar Arial 10 no conteúdo, com espaçamento interno reduzido apenas nas tabelas mais largas para respeitar as margens; não reduzir fontes, margens ou espaçamento do corpo. Retirar `booktabs`, que deixou de ser usado.
+
+**Verificação:** os PDFs principal e suplementar foram recompilados com 29 e 18 páginas, respectivamente. As referências do artigo terminam na página 24; os apêndices ocupam 25–29. Tabelas centrais e tabelas densas do suplemento foram renderizadas e inspecionadas; os logs não apontam caixas transbordadas, citações ou referências indefinidas. Não houve alteração de dados, métricas, resultados ou conclusões.
+
+## R-48 · Subtítulos separados, legendas e primeira página sem número (09/11/2026) · EXECUTADA, SÓ FORMATAÇÃO
+
+**Origem:** o proprietário apontou que rótulos como “FATOR RUA/RETA E ESCOLHA” estavam no mesmo parágrafo do texto. Pediu subtítulo em linha própria, permitiu negrito nos apêndices, pediu títulos de tabelas e gráficos centralizados e em negrito, intervalo visível até o elemento e a nota de fonte, além de ocultar o número da primeira página e iniciar a numeração visível com 2 no Abstract.
+
+**Decisão:** converter os cinco rótulos de Resultados e discussão em subtítulos independentes, em caixa alta sem negrito; separar os oito rótulos do Apêndice A e seus equivalentes no suplemento, com títulos de apêndices e subtítulos em negrito. Usar Arial 11 em negrito e centralizada nas legendas de figuras, quadros e tabelas, com 6 pt até o elemento e 6 pt antes da nota “Fonte”, que permanece regular e centralizada. A primeira página usa estilo vazio, preservando o contador para que o Abstract mostre 2. Nos apêndices, o espaço entre parágrafos passa a 8 pt para caberem até a página 30, sem redução da fonte ou corte de conteúdo. Esta instrução posterior sobre negrito nos apêndices substitui apenas esse ponto da orientação anterior registrada em R-46.
+
+**Verificação:** PDF principal com 30 páginas; referências até a 25, apêndices nas páginas 26–30. Suplemento com 19 páginas. Páginas 2, 14 e 28 inspecionadas visualmente, página 1 sem numeral na extração de texto, Abstract com numeral 2. Logs de compilação sem caixas transbordadas ou remissões indefinidas. Resultados e parâmetros científicos preservados.
+
+## R-49 · Negrito apenas nos cabeçalhos internos e mais espaço nas células (09/11/2026) · EXECUTADA, SÓ FORMATAÇÃO
+
+**Origem:** o proprietário esclareceu que o exemplo de negrito é o cabeçalho dentro do Quadro 2, não o título acima da tabela ou figura. Pediu notas “Fonte” mais curtas e conteúdo tabular menos colado à grade, com pequeno ajuste de fonte e alinhamento.
+
+**Decisão:** restaurar peso regular nas legendas externas de tabelas, quadros e figuras; destacar os cabeçalhos internos de todas as tabelas, mantendo o negrito dos resultados que já tinham função interpretativa. Usar 9,5 pt nas células, maior altura de linha e 1 pt de folga vertical adicional. Abreviar as notas “Fonte”, mantendo na prosa as distinções metodológicas necessárias. A regra anterior de R-48 para negrito no título externo fica substituída por esta decisão; os espaços e a centralização externos permanecem.
+
+**Verificação:** PDF principal com 29 páginas, referências até a 24 e apêndices nas páginas 25–29; suplemento com 19 páginas. Inspeção visual das páginas 14 do artigo e 11 do suplemento confirmou cabeçalhos em negrito, títulos regulares e células legíveis. Logs sem caixas transbordadas nem remissões indefinidas. Resultados numéricos preservados.
+
+## R-50 · Formulação matemática em linhas alinhadas (09/11/2026) · SUBSTITUÍDA POR R-51
+
+**Origem:** o proprietário apontou que as equações (1) e (2) estavam visualmente espremidas, com duas etapas do objetivo e três restrições em linhas únicas.
+
+**Decisão:** apresentar as duas prioridades em linhas alinhadas da equação (1), indicando que a minimização ocorre entre os máximos da primeira etapa; separar por linha as restrições de pedido, veículo e domínio binário na equação (2). Preservar símbolos, rótulos e numeração. Nenhum algoritmo ou resultado científico foi alterado.
+
+**Verificação:** PDF principal recompilado com 29 páginas e sem caixas transbordadas ou remissões indefinidas. Página 6 renderizada e inspecionada; referências permanecem até a página 24.
+
+**Estado posterior:** o proprietário informou que essa versão continuava difícil de entender; R-51 substitui a apresentação das equações no corpo.
+
+## R-51 · Formulação principal em linguagem direta e álgebra no apêndice (09/11/2026) · EXECUTADA, SÓ REDAÇÃO E APRESENTAÇÃO
+
+**Origem:** apesar do alinhamento de R-50, o proprietário continuou sem compreender os somatórios e índices da formulação mostrada no corpo do artigo.
+
+**Decisão:** definir no corpo $N$ (número de pedidos atendidos) e $K$ (soma das distâncias de aproximação) em palavras e exibir apenas a prioridade lexicográfica: maior $N$, depois menor $K$ entre soluções empatadas. Explicar as restrições em frases curtas e transferir a notação completa, inclusive o domínio binário e a exclusão de pares inelegíveis, para o Apêndice A. Preservar as variáveis, o significado do objetivo, a implementação e os resultados; o rótulo `eq:rest` acompanha a equação formal no apêndice.
+
+**Verificação:** artigo principal com 30 páginas, referências até a 24 e apêndices nas páginas 25–30. Página 6 e início do Apêndice A renderizados e inspecionados; logs sem caixas transbordadas ou remissões indefinidas.
+

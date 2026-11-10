@@ -9,6 +9,7 @@ Fonte LaTeX (XeLaTeX + BibTeX). Estrutura:
 - `figures/` (cópias geradas; ver abaixo);
 - `config/`: formatação central, incluindo o espaçamento do corpo `\espacamentocorpo`;
 - `build/`: saída, ignorada pelo Git.
+- `supplement/main.tex` e `supplement/material_suplementar.pdf`: apêndices detalhados compilados separadamente após o artigo principal.
 
 ## Compilar
 
@@ -28,7 +29,13 @@ xelatex -output-directory=build main.tex
 xelatex -output-directory=build main.tex
 ```
 
-O PDF final é copiado para `ARTIGO_ATRIBUICAO_HUNGARO.pdf`.
+O PDF final de entrega tem sempre o nome `TCC 2026-2 - Entony Jovino - Raphael Simões - Orientador Rober Marcone Rosi.pdf`, em `article/`. O modo recomendado compila e copia de uma vez, e só copia se não houver erro nem referência ou citação indefinida:
+
+```bash
+python scripts/build_article.py
+```
+
+Depois do latexmk ou da sequência manual, copie `build/main.pdf` para esse nome.
 
 ## Figuras
 

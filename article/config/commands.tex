@@ -51,7 +51,7 @@
 \newcommand{\imprimirano}{\tcc@ano}
 
 % ---------------------------------------------------------------------------
-% Primeira página: títulos (centralizados, 14 pt) e autores (à esquerda).
+% Primeira página: títulos (centralizados, 14 pt) e autores à direita.
 % Layout dos artigos FAESA aprovados (.ref/): autores à direita, nome em
 % maiúsculas, formação/vínculo e e-mail sublinhado abaixo, sem nota de rodapé.
 % ---------------------------------------------------------------------------
@@ -59,11 +59,11 @@
   \begingroup
     \raggedleft
     \setlength{\parskip}{0pt}%
-    \setstretch{1}%
-    \MakeUppercase{#2}\par
-    #3\par
+    \setstretch{\espacamentocorpo}%
+    \fontsize{12}{20.7}\selectfont\MakeUppercase{#2}\par
+    {\fonteonze #3\par}%
     \ifstrempty{#1}{}{Orcid: #1\par}%
-    \ifstrempty{#4}{}{\mbox{\underline{\href{mailto:#4}{#4}}}\par}%
+    \ifstrempty{#4}{}{{\fonteonze\mbox{\underline{\href{mailto:#4}{#4}}}\par}}%
   \endgroup
   \vspace{6pt}%
 }
@@ -72,7 +72,7 @@
   \begingroup
     \setlength{\parskip}{0pt}%
     \setstretch{1}%
-    \centering\fontsize{14}{16.1}\selectfont\bfseries
+    \centering\fontsize{14}{21}\selectfont\bfseries
     \MakeUppercase{\tcc@titulo}\par
     \vspace{14pt}%
     \ifdefempty{\tcc@tituloingles}{}{\itshape\MakeUppercase{\tcc@tituloingles}\par}%
@@ -84,21 +84,22 @@
 
 % ---------------------------------------------------------------------------
 % Resumo e Abstract (palavras-chave vêm de config/metadata.tex)
-% Títulos sem numeração: centralizados (Guia p. 10)
+% Títulos sem numeração alinhados à esquerda (pedido específico do proprietário).
 % ---------------------------------------------------------------------------
-\titleformat{name=\section,numberless}[block]{\normalfont\bfseries\centering}{}{0pt}{\MakeUppercase}
+\titleformat{name=\section,numberless}[block]{\normalfont\raggedright\fontsize{12}{20.7}\selectfont\bfseries}{}{0pt}{\MakeUppercase}
+\newcommand{\tituloresumo}[1]{\par\begingroup\raggedright\fontsize{12}{20.7}\selectfont\bfseries\MakeUppercase{#1}\par\endgroup\nobreak\vspace{8pt}\nobreak}
 
 \newcommand{\tcc@palavras}[2]{%
-  \ifdefempty{#2}{}{\par\textbf{#1:} #2\par}%
+  \ifdefempty{#2}{}{\par\nobreak\begingroup\setstretch{\espacamentocorpo}\fontsize{12}{20.7}\selectfont\noindent\textbf{#1:} #2\par\endgroup}%
 }
 
 \newenvironment{resumo}
-  {\section*{Resumo}}
-  {\tcc@palavras{Palavras-chave}{\tcc@palavraschave}}
+  {\tituloresumo{Resumo}\begingroup\fontedozesimples\setlength{\parskip}{0pt}\noindent}
+  {\par\endgroup\tcc@palavras{Palavras-chave}{\tcc@palavraschave}}
 
 \renewenvironment{abstract}
-  {\section*{Abstract}\itshape}
-  {\par\textbf{Keywords:} \tcc@keywords\par}
+  {\tituloresumo{Abstract}\begingroup\fontedozesimples\setlength{\parskip}{0pt}\itshape\noindent}
+  {\par\endgroup\par\nobreak\begingroup\setstretch{\espacamentocorpo}\fontsize{12}{20.7}\selectfont\noindent\textbf{Keywords:} \textit{\tcc@keywords}\par\endgroup}
 
 % ---------------------------------------------------------------------------
 % Figuras
@@ -106,7 +107,7 @@
 % ---------------------------------------------------------------------------
 \newcommand{\fonte}[1]{%
   \par\vspace{\espacofonte}%
-  {\raggedright\fontedez Fonte: #1\par}%
+  {\centering\fonteonze Fonte: #1\par}%
 }
 
 \newcommand{\figura}[5][\largurapadraofigura]{%
@@ -146,6 +147,7 @@
 
 % Algoritmos em pseudocódigo: flutuante próprio, numerado à parte dos quadros
 \DeclareCaptionType[fileext=loa,placement=htbp]{algoritmo}[Algoritmo][Lista de algoritmos]
+\DeclareCaptionType[fileext=loq,placement=htbp]{quadro}[Quadro][Lista de quadros]
 
 % ---------------------------------------------------------------------------
 % Referências bibliográficas
@@ -165,10 +167,15 @@
   \bibliography{references/references}%
 }
 
+% Caminhos e identificadores de código: Arial também nos trechos técnicos,
+% com quebras após /, _ e . para caber em colunas estreitas.
+\DeclareUrlCommand\caminho{\def\UrlFont{\ttfamily}\def\UrlLeft{}\def\UrlRight{}\def\UrlBreaks{\do\/\do\_\do\.}}
+
 % Apêndices (após as referências): título centralizado, sem numeração progressiva
 \newcounter{apendice}
 \renewcommand{\theapendice}{\Alph{apendice}}
-\newcommand{\apendice}[2]{\FloatBarrier\refstepcounter{apendice}\section*{Apêndice \theapendice\ - #1}\label{#2}}
+\newcommand{\apendice}[2]{\FloatBarrier\setlength{\parskip}{8pt}\refstepcounter{apendice}{\normalfont\centering\fontsize{12}{20.7}\selectfont\bfseries APÊNDICE \theapendice\ - \MakeUppercase{#1}\par}\label{#2}}
+\newcommand{\apendicesubtitulo}[1]{\par\noindent{\bfseries\MakeUppercase{#1}\par}\nobreak}
 
 % ---------------------------------------------------------------------------
 % Metadados do PDF

@@ -1,10 +1,7 @@
 % =============================================================================
-% Formatação visual do artigo. ORIGEM DE CADA REGRA (ver article/compliance_report.md):
-%  - espaçamento do corpo 1,5: INSTRUÇÃO EXPRESSA DOS AUTORES (09/11/2026);
-%  - margens 30/20/30/20 mm, Arial 12, título 14, autores à direita, numeração no canto superior direito:
-%    INFERÊNCIA a partir de PDF-modelo de artigo FAESA (medições), não de um guia institucional (nenhum guia da FAESA foi localizado);
-%  - alíneas, legendas e demais detalhes: herdados da configuração anterior do projeto.
-% Pendência: confirmar as regras com o orientador (pergunta preparada no relatório de conformidade).
+% Formatação central do artigo. Fonte das regras: esquema transcrito pelos autores
+% em 09/11/2026; as divergências com o guia citado e as verificações possíveis
+% estão em article/compliance_report.md. O modelo do AVA não foi localizado.
 % =============================================================================
 
 % ---------------------------------------------------------------------------
@@ -26,13 +23,13 @@
 % 1,5 linha do Word com Arial 12 = 1,5 x 13,8 pt = 20,7 pt = 1,428 x 14,5 pt (linha-base do LaTeX a 12 pt).
 % Única definição do espaçamento do corpo: \espacamentocorpo. Não use \setstretch/\linespread locais.
 % Exceções (espaçamento simples, definidas só aqui): tabelas, notas de fonte, pseudocódigo,
-% legendas, referências, cabeçalho e autores. Parágrafos sem recuo, separados por 6 pt.
+% legendas, referências e qualificações. Parágrafos sem recuo, com 12 pt antes.
 % ---------------------------------------------------------------------------
 \renewcommand{\familydefault}{\sfdefault}
 \newcommand{\espacamentocorpo}{1.428}
 \setstretch{\espacamentocorpo}
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt plus 1pt minus 1pt}
+\setlength{\parskip}{12pt}
 
 \raggedbottom
 \setlength{\emergencystretch}{1.5em}  % evita linhas que excedem a margem perto de citações longas
@@ -44,17 +41,17 @@
 \newcommand{\fontedez}{\setstretch{1}\fontsize{10}{11.5}\selectfont}
 \newcommand{\fonteonze}{\setstretch{1}\fontsize{11}{12.65}\selectfont}
 \newcommand{\fontedozesimples}{\setstretch{1}\fontsize{12}{13.8}\selectfont}
-% Corpo de tabelas largas: 10 pt (o Guia não fixa o tamanho; ver CONFORMIDADE_FAESA.md)
-\newcommand{\fontetabela}{\setstretch{1}\fontsize{10}{11.5}\selectfont}
+% Conteúdo tabular compacto, com folga vertical junto às linhas da grade.
+\newcommand{\fontetabela}{\setstretch{1}\fontsize{9.5}{11.5}\selectfont\setlength{\tabcolsep}{3pt}\setlength{\extrarowheight}{1pt}\renewcommand{\arraystretch}{1.18}}
 
 % ---------------------------------------------------------------------------
-% Títulos de seção numerados, alinhados à esquerda
+% Títulos de seção sem numeração, alinhados à esquerda
 % ---------------------------------------------------------------------------
-\setcounter{secnumdepth}{3}
-\titleformat{\section}{\normalfont\bfseries}{\thesection}{0.5em}{\MakeUppercase}
-\titleformat{\subsection}{\normalfont}{\thesubsection}{0.5em}{\MakeUppercase}
-\titleformat{\subsubsection}{\normalfont\bfseries}{\thesubsubsection}{0.5em}{}
-\titlespacing*{\section}{0pt}{0pt}{0pt}
+\setcounter{secnumdepth}{0}
+\titleformat{\section}{\normalfont\raggedright\fontsize{12}{20.7}\selectfont\bfseries}{\thesection}{0.5em}{\MakeUppercase}
+\titleformat{\subsection}{\normalfont\raggedright\fontsize{12}{20.7}\selectfont}{\thesubsection}{0.5em}{\MakeUppercase}
+\titleformat{\subsubsection}{\normalfont\raggedright\fontsize{12}{20.7}\selectfont}{\thesubsubsection}{0.5em}{\MakeUppercase}
+\titlespacing*{\section}{0pt}{12pt}{0pt}
 \titlespacing*{\subsection}{0pt}{0pt}{0pt}
 \titlespacing*{\subsubsection}{0pt}{0pt}{0pt}
 
@@ -87,19 +84,19 @@
 \setlist[enumerate,1]{label=\arabic*.}
 
 % ---------------------------------------------------------------------------
-% Figuras, tabelas e quadros: título acima, "Tabela 1 - Título", Arial 11
-% (Guia p. 9 e 11); fonte abaixo, Arial 10
+% Figuras, tabelas e quadros: título acima, Arial 11; fonte abaixo, Arial 11.
 % ---------------------------------------------------------------------------
 \DeclareCaptionLabelSeparator{hifen}{ - }
 \DeclareCaptionFont{onze}{\fontsize{11}{12.65}\selectfont\setstretch{1}}  % legendas em espaçamento simples
 \captionsetup{
   font=onze,
   labelfont=normalfont,
+  textfont=normalfont,
   labelsep=hifen,
-  justification=raggedright,
-  singlelinecheck=false,
+  justification=centering,
+  singlelinecheck=true,
   position=top,
-  skip=4pt,
+  skip=6pt,
 }
 
 \floatplacement{figure}{htbp}
@@ -107,7 +104,11 @@
 
 \newcommand{\largurapadraofigura}{0.6\linewidth}
 \newcommand{\alturamaximafigura}{0.4\textheight}
-\newcommand{\espacofonte}{2pt}
+\newcommand{\espacofonte}{6pt}
+
+% Notas de rodapé: Arial 10, entrelinha simples, alinhadas à esquerda.
+\let\footnotesize\fontedez
+\renewcommand{\footnoterule}{\kern-3pt\hrule width 40mm\kern 2.6pt}
 
 \setlength{\intextsep}{14pt plus 2pt minus 2pt}
 \setlength{\textfloatsep}{10pt plus 2pt minus 2pt}

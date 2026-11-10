@@ -19,6 +19,12 @@ PALETTE = {"A": "#7f7f7f", "B": "#c97a2b", "C": "#1f4e79", "CxB": "#7aa6c9"}
 CONTRAST_COLORS = {"C × A": "#1f4e79", "C × B": "#7aa6c9", "B × A": "#c97a2b"}
 PERIOD_LABELS = {"replicacao": "Setembro (15 dias)", "final": "Outubro (25 dias)"}
 CHANGE_KEY = "variacao_km_vazio_pct (negativo = reducao)"
+# Preenchimento legível em impressão em tons de cinza: tom e hachura distintos por contraste (a cor não é o único código).
+CONTRAST_STYLE = {
+    "C × A": {"color": "0.25", "hatch": "", "label": "atribuição conjunta − despacho imediato"},
+    "C × B": {"color": "0.65", "hatch": "///", "label": "atribuição conjunta − lote sequencial"},
+    "B × A": {"color": "1.0", "hatch": "...", "label": "lote sequencial − despacho imediato"},
+}
 
 
 def _style() -> None:
@@ -41,9 +47,12 @@ def _comma(v: float, fmt: str) -> str:
 
 
 def plot_km_and_attendance(summary: dict, out: Path, name: str = "empty_km_service_differences") -> list[Path]:
-    """Duas faixas: variação do km vazio (%) e do atendimento (p.p.) por contraste e período. Negativo no km = redução."""
+    """Duas faixas: variação do km vazio (%) e do atendimento (p.p.) por contraste e período. Negativo no km = redução.
+
+    Cada contraste tem tom de cinza e hachura próprios, para que a figura continue legível impressa sem cor.
+    """
     _style()
-    fig, ax = plt.subplots(1, 2, figsize=(6.3, 2.7))
+    fig, ax = plt.subplots(1, 2, figsize=(6.3, 3.1))
     width, x = 0.25, np.arange(len(PERIOD_LABELS))
     for i, contrast in enumerate(CONTRAST_COLORS):
         km, att = [], []
@@ -51,8 +60,10 @@ def plot_km_and_attendance(summary: dict, out: Path, name: str = "empty_km_servi
             row = next(c for c in summary[period]["contrastes"] if c["contraste"] == contrast)
             km.append(row[CHANGE_KEY])
             att.append(row["diferenca_atendimento_pontos_percentuais"])
-        b1 = ax[0].bar(x + (i - 1) * width, km, width, color=CONTRAST_COLORS[contrast], label=contrast)
-        b2 = ax[1].bar(x + (i - 1) * width, att, width, color=CONTRAST_COLORS[contrast], label=contrast)
+        st = CONTRAST_STYLE[contrast]
+        kw = {"color": st["color"], "hatch": st["hatch"], "edgecolor": "k", "linewidth": 0.6, "label": st["label"]}
+        b1 = ax[0].bar(x + (i - 1) * width, km, width, **kw)
+        b2 = ax[1].bar(x + (i - 1) * width, att, width, **kw)
         for r, v in zip(b1, km, strict=True):
             ax[0].text(r.get_x() + r.get_width() / 2, v - 0.25, _comma(v, ".1f"), ha="center", va="top", fontsize=7.5)
         for r, v in zip(b2, att, strict=True):
@@ -65,8 +76,8 @@ def plot_km_and_attendance(summary: dict, out: Path, name: str = "empty_km_servi
                 fontsize=7.5,
             )
     for a, title, ylabel in (
-        (ax[0], "(a) Variação do km vazio (%)", "negativo = redução"),
-        (ax[1], "(b) Variação do atendimento (p.p.)", "negativo = menos atendimento"),
+        (ax[0], "(a) Variação do km vazio", "variação do km vazio (%)\nnegativo = menos km"),
+        (ax[1], "(b) Variação do atendimento", "variação do atendimento (p.p.)\nnegativo = menos atendidos"),
     ):
         a.axhline(0, color="k", lw=0.8)
         a.set_xticks(x)
@@ -75,8 +86,9 @@ def plot_km_and_attendance(summary: dict, out: Path, name: str = "empty_km_servi
         a.set_ylabel(ylabel, fontsize=8)
     ax[0].set_ylim(-7.3, 0.5)
     ax[1].set_ylim(-1.5, 1.6)
-    ax[0].legend(frameon=False, fontsize=8, loc="lower right")
-    fig.tight_layout()
+    handles, labels = ax[0].get_legend_handles_labels()
+    fig.legend(handles, labels, frameon=False, fontsize=8, loc="lower center", ncol=2, bbox_to_anchor=(0.5, 0.0))
+    fig.tight_layout(rect=(0, 0.13, 1, 1))
     return _save(fig, out, name)
 
 

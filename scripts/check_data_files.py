@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 
 MAX_BYTES = 5_000_000
-ALLOWED_LARGE = {"article/ARTIGO_ATRIBUICAO_HUNGARO.pdf"}
+ALLOWED_LARGE = {"article/TCC 2026-2 - Entony Jovino - Raphael Simões - Orientador Rober Marcone Rosi.pdf"}
 DATA_EXT = {".parquet", ".parq", ".pq", ".pkl", ".pickle", ".feather", ".arrow", ".db", ".sqlite", ".sqlite3", ".xlsx", ".xls"}
 SECRET = re.compile(r"(^|/)(\.env(\..+)?|.*\.(pem|p12|pfx|key|salt)|\.pseudo_salt|.*pseudo_secret.*|credentials.*\.json)$", re.I)
 
@@ -43,9 +43,11 @@ def problems(paths: list[str]) -> list[str]:
 
 def main(argv: list[str]) -> int:
     if argv[:1] == ["--staged"]:
-        argv = subprocess.run(
-            ["git", "diff", "--cached", "--name-only", "--diff-filter=ACMR"], capture_output=True, text=True, check=True
-        ).stdout.split()
+        # -z: nomes separados por NUL, sem aspas nem escapes (o PDF final tem espaços e acento no nome)
+        out = subprocess.run(
+            ["git", "diff", "--cached", "--name-only", "--diff-filter=ACMR", "-z"], capture_output=True, check=True
+        ).stdout.decode("utf-8")
+        argv = [p for p in out.split("\0") if p]
     found = problems(argv)
     for f in found:
         print("BLOQUEADO:", f)
